@@ -13,6 +13,9 @@
     <ClCompile Include="src\lve_game_object.cpp" />
     <ClCompile Include="src\lve_renderer.cpp" />
     <ClCompile Include="src\simple_render_system.cpp" />
+    <ClCompile Include="src\lve_buffer.cpp" />
+    <ClCompile Include="src\lve_descriptors.cpp" />
+    <ClCompile Include="src\lve_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\first_app.h" />
@@ -26,5 +29,9 @@
     <ClInclude Include="src\lve_game_object.h" />
     <ClInclude Include="src\lve_renderer.h" />
     <ClInclude Include="src\simple_render_system.h" />
+    <ClInclude Include="src\lve_buffer.h" />
+    <ClInclude Include="src\lve_descriptors.h" />
+    <ClInclude Include="src\lve_frame_info.h" />
+    <ClInclude Include="src\lve_utils.h" />
   </ItemGroup>
 </Project>

@@ -42,7 +42,7 @@ namespace lve
     void first_app::run()
     {
         std::vector<std::unique_ptr<lve_buffer>> ubo_buffers(lve_swap_chain::MAX_FRAMES_IN_FLIGHT);
-        for (int i = 0; i < ubo_buffers.size(); i++)
+        for (int i = 0; i < ubo_buffers.size(); ++i)
         {
             ubo_buffers[i] = std::make_unique<lve_buffer>(
                 device_,
@@ -110,7 +110,8 @@ namespace lve
                     frame_index,
                     frame_time,
                     command_buffer,
-                    camera
+                    camera,
+                    global_descriptor_sets[frame_index]
                 };
                 render_system.render_game_objects(frame_info, game_objects_);
                 renderer_.end_swap_chain_render_pass(command_buffer);

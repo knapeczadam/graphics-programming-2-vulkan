@@ -14,7 +14,7 @@ namespace lve
 {
     struct simple_push_constant_data
     {
-        glm::mat4 transform{1.0f};
+        glm::mat4 model_matrix{1.0f};
         glm::mat4 normal_matrix{1.0f};
     };
     
@@ -30,17 +30,25 @@ namespace lve
         vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
     }
 
-    void simple_render_system::render_game_objects(frame_info &frame_info, std::vector<lve_game_object>& game_objects)
+void simple_render_system::render_game_objects(frame_info &frame_info, std::vector<lve_game_object>& game_objects)
     {
         pipeline_->bind(frame_info.command_buffer);
 
-        auto projection_view = frame_info.camera.get_projection() * frame_info.camera.get_view();
+        vkCmdBindDescriptorSets(
+            frame_info.command_buffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            pipeline_layout_,
+            0,
+            1,
+            &frame_info.global_descriptor_set,
+            0,
+            nullptr
+        );
 
         for (auto &obj : game_objects)
         {
             simple_push_constant_data push{};
-            auto model_matrix = obj.transform.mat4();
-            push.transform = projection_view * model_matrix;
+            push.model_matrix = obj.transform.mat4();
             push.normal_matrix = obj.transform.normal_matrix();
 
             vkCmdPushConstants(
@@ -67,8 +75,8 @@ namespace lve
         
         VkPipelineLayoutCreateInfo pipeline_layout_info{};
         pipeline_layout_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipeline_layout_info.setLayoutCount         = 0;
-        pipeline_layout_info.pSetLayouts            = nullptr;
+        pipeline_layout_info.setLayoutCount         = static_cast<uint32_t>(descriptor_set_layouts.size());
+        pipeline_layout_info.pSetLayouts            = descriptor_set_layouts.data();
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
