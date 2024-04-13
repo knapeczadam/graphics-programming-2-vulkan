@@ -1,0 +1,31 @@
+﻿#pragma once
+
+#include "lve_game_object.h"
+#include "lve_window.h"
+
+namespace lve
+{
+    enum key_mappings
+    {
+        move_left     = GLFW_KEY_A,
+        move_right    = GLFW_KEY_D,
+        move_forward  = GLFW_KEY_W,
+        move_backward = GLFW_KEY_S,
+        move_up       = GLFW_KEY_E,
+        move_down     = GLFW_KEY_Q,
+        look_left     = GLFW_KEY_LEFT,
+        look_right    = GLFW_KEY_RIGHT,
+        look_up       = GLFW_KEY_UP,
+        look_down     = GLFW_KEY_DOWN
+        
+    };
+    class keyboard_movement_controller
+    {
+    public:
+        void move_in_plane_xy(GLFWwindow *window_ptr, float dt, lve_game_object &game_object);
+        
+    public:
+        float move_speed = 3.0f;
+        float look_speed = 1.5;
+    };
+}
