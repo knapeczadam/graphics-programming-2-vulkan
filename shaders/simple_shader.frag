@@ -5,7 +5,7 @@ layout (location = 0) out vec4 out_color;
 
 layout (push_constant) uniform Push 
 {
-    mat4 model_matrix;
+    mat4 transform;
     mat4 normal_matrix;
 } push;
 

@@ -67,7 +67,7 @@ namespace lve
                 .build(global_descriptor_sets[i]);
         }
         
-        simple_render_system render_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->getDescriptorSetLayout()};
+        simple_render_system render_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         lve_camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{0.5f, 0.0f, 1.0f});
         camera.set_view_target(glm::vec3{-1.0f, -2.0f, -20.0f}, glm::vec3{2.0f, -2.0f, 2.5f});
@@ -110,8 +110,7 @@ namespace lve
                     frame_index,
                     frame_time,
                     command_buffer,
-                    camera,
-                    global_descriptor_sets[frame_index]
+                    camera
                 };
                 render_system.render_game_objects(frame_info, game_objects_);
                 renderer_.end_swap_chain_render_pass(command_buffer);

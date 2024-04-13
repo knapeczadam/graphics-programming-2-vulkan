@@ -37,7 +37,7 @@ namespace lve
         lve_descriptor_set_layout(const lve_descriptor_set_layout &)            = delete;
         lve_descriptor_set_layout &operator=(const lve_descriptor_set_layout &) = delete;
 
-        VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptor_set_layout_; }
+        [[nodiscard]] auto get_descriptor_set_layout() const -> VkDescriptorSetLayout { return descriptor_set_layout_; }
 
     private:
         lve_device                   &device_;

@@ -192,7 +192,7 @@ namespace lve
 
     auto lve_descriptor_writer::build(VkDescriptorSet &set) -> bool
     {
-        bool success = pool_.allocate_descriptor(set_layout_.getDescriptorSetLayout(), set);
+        bool success = pool_.allocate_descriptor(set_layout_.get_descriptor_set_layout(), set);
         if (!success)
         {
             return false;
