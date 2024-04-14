@@ -53,7 +53,9 @@
     <ClInclude Include="src\simple_render_system.h" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CMakeLists.txt" />
     <Content Include="compile.bat" />
+    <Content Include=".env.cmake" />
     <Content Include="shaders\simple_shader.frag" />
     <Content Include="shaders\simple_shader.vert" />
   </ItemGroup>

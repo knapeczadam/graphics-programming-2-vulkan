@@ -52,9 +52,9 @@ namespace lve
         std::unique_ptr<lve_swap_chain> swap_chain_;
         std::vector<VkCommandBuffer>    command_buffers_;
 
-        uint32_t current_image_index_;
-        int      current_frame_index_;
-        bool     is_frame_started_;
+        uint32_t current_image_index_ = {};
+        int      current_frame_index_ = {};
+        bool     is_frame_started_    = {};
         
         
     };

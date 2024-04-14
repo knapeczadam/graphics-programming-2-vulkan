@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)3rdparty\glfw\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)3rdparty\glfw\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)3rdparty\glfw\lib\lib-vc2022\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Link>
       <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>

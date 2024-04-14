@@ -10,6 +10,17 @@
 // Project includes
 #include "lve_device.h"
 
+#if defined(CMAKE_BUILD)
+#ifndef ENGINE_DIR
+#define ENGINE_DIR "../"
+#endif
+#else
+#ifndef ENGINE_DIR
+#define ENGINE_DIR ""
+#endif
+#endif
+
+
 namespace lve
 {
     lve_pipeline::lve_pipeline(
@@ -105,10 +116,11 @@ namespace lve
 
     auto lve_pipeline::read_file(std::string const &file_path) -> std::vector<char>
     {
-        std::ifstream file{file_path, std::ios::ate | std::ios::binary};
+        std::string const engine_path = ENGINE_DIR + file_path;
+        std::ifstream file{engine_path, std::ios::ate | std::ios::binary};
         if (not file.is_open())
         {
-            throw std::runtime_error{"failed to open file: " + file_path};
+            throw std::runtime_error{"failed to open file: " + engine_path};
         }
 
         size_t file_size = static_cast<size_t>(file.tellg());

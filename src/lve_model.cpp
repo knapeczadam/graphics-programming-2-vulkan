@@ -17,6 +17,16 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
+#if defined(CMAKE_BUILD)
+#ifndef ENGINE_DIR
+#define ENGINE_DIR "../"
+#endif
+#else
+#ifndef ENGINE_DIR
+#define ENGINE_DIR ""
+#endif
+#endif
+
 namespace std
 {
     template<>
@@ -94,7 +104,8 @@ namespace lve
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
 
-        if (not tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_path.c_str()))
+        std::string const engine_path = ENGINE_DIR + file_path;
+        if (not tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, engine_path.c_str()))
         {
             throw std::runtime_error{warn + err};
         }
