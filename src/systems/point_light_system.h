@@ -21,7 +21,8 @@ namespace lve
 
         point_light_system(point_light_system const &)            = delete;
         point_light_system &operator=(point_light_system const &) = delete;
-        
+
+        void update(frame_info &frame_info, global_ubo &ubo);
         void render(frame_info &frame_info);
 
     private:

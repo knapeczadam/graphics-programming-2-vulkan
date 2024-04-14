@@ -48,6 +48,8 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
 
         for (auto &obj : frame_info.game_objects | std::views::values)
         {
+            if (obj.model == nullptr) continue;
+            
             simple_push_constant_data push{};
             push.model_matrix = obj.transform.mat4();
             push.normal_matrix = obj.transform.normal_matrix();

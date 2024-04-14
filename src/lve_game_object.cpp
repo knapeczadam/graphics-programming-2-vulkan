@@ -60,4 +60,14 @@ namespace lve
                 }
         };
     }
+
+    auto lve_game_object::make_point_light(float intensity, float radius, glm::vec3 color) -> lve_game_object
+    {
+        lve_game_object go = create_game_object();
+        go.color = color;
+        go.transform.scale.x = radius;
+        go.point_light = std::make_unique<point_light_component>();
+        go.point_light->light_intensity = intensity;
+        return go;
+    }
 }

@@ -20,15 +20,6 @@
 
 namespace lve
 {
-    struct global_ubo
-    {
-        glm::mat4 projection{1.0f};
-        glm::mat4 view{1.0f};
-        glm::vec4 ambient_light_color{1.0f, 1.0f, 1.0f, 0.02f};
-        glm::vec3 light_position{-1.0f};
-        alignas(16) glm::vec4 light_color{1.0f}; // w is light intensity
-    };
-    
     first_app::first_app()
     {
         global_pool_ = lve_descriptor_pool::builder(device_)
@@ -104,15 +95,6 @@ namespace lve
             {
                 int frame_index = renderer_.get_frame_index();
                 
-                // update
-                global_ubo ubo{};
-                ubo.projection = camera.get_projection();
-                ubo.view = camera.get_view();
-                ubo_buffers[frame_index]->write_to_buffer(&ubo);
-                ubo_buffers[frame_index]->flush();
-                
-                // render
-                renderer_.begin_swap_chain_render_pass(command_buffer);
                 frame_info frame_info{
                     frame_index,
                     frame_time,
@@ -121,6 +103,17 @@ namespace lve
                     global_descriptor_sets[frame_index],
                     game_objects_
                 };
+                
+                // update
+                global_ubo ubo{};
+                ubo.projection = camera.get_projection();
+                ubo.view = camera.get_view();
+                point_light_system.update(frame_info, ubo);
+                ubo_buffers[frame_index]->write_to_buffer(&ubo);
+                ubo_buffers[frame_index]->flush();
+                
+                // render
+                renderer_.begin_swap_chain_render_pass(command_buffer);
                 simple_render_system.render_game_objects(frame_info);
                 point_light_system.render(frame_info);
                 renderer_.end_swap_chain_render_pass(command_buffer);
@@ -152,5 +145,30 @@ namespace lve
         go3.transform.translation = {0.0f, 0.5f, 0.0f};
         go3.transform.scale = glm::vec3{3};
         game_objects_.emplace(go3.get_id(), std::move(go3));
+
+        auto point_light = lve_game_object::make_point_light(0.2f);
+        game_objects_.emplace(point_light.get_id(), std::move(point_light));
+        
+        std::vector<glm::vec3> light_colors{
+            {1.f, .1f, .1f},
+            {.1f, .1f, 1.f},
+            {.1f, 1.f, .1f},
+            {1.f, 1.f, .1f},
+            {.1f, 1.f, 1.f},
+            {1.f, 1.f, 1.f} //
+        };
+
+        for (int i = 0; i < light_colors.size(); ++i)
+        {
+            auto point_light = lve_game_object::make_point_light(0.2f);
+            point_light.color = light_colors[i];
+            auto rotate_light = glm::rotate(
+                glm::mat4{1.0f},
+                (i * glm::two_pi<float>()) / light_colors.size(),
+                {0.0f, -1.0f, 0.0f}
+            );
+            point_light.transform.translation = glm::vec3{rotate_light * glm::vec4{-1.0f, -1.0f, -1.0f, 1.0f}};
+            game_objects_.emplace(point_light.get_id(), std::move(point_light));
+        }
     }
 }

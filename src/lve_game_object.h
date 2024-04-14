@@ -27,6 +27,11 @@ namespace lve
         glm::mat4 mat4();
         glm::mat4 normal_matrix();
     };
+
+    struct point_light_component
+    {
+        float light_intensity = 1.0f;
+    };
     
     class lve_game_object
     {
@@ -48,6 +53,8 @@ namespace lve
             return lve_game_object{current_id++};
         }
 
+        static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> lve_game_object;
+
         [[nodiscard]] auto get_id() const -> id_t { return id_; }
 
     private:
@@ -57,6 +64,8 @@ namespace lve
         std::shared_ptr<lve_model> model     = {};
         glm::vec3                  color     = {};
         transform_component        transform = {};
+
+        std::unique_ptr<point_light_component> point_light = nullptr;
 
     private:
         id_t id_;
