@@ -22,7 +22,9 @@ namespace lve
     struct global_ubo
     {
         glm::mat4 projection_view{1.0f};
-        glm::vec3 light_direction = glm::normalize(glm::vec3{1.0f, -3.0f, -1.0f});
+        glm::vec4 ambient_light_color{1.0f, 1.0f, 1.0f, 0.02f};
+        glm::vec3 light_position{-1.0f};
+        alignas(16) glm::vec4 light_color{1.0f}; // w is light intensity
     };
     
     first_app::first_app()
@@ -73,6 +75,7 @@ namespace lve
         camera.set_view_target(glm::vec3{-1.0f, -2.0f, -20.0f}, glm::vec3{2.0f, -2.0f, 2.5f});
 
         auto viewer_object = lve_game_object::create_game_object();
+        viewer_object.transform.translation.z = -2.5f;
         keyboard_movement_controller camera_controller = {};
 
         auto current_time = std::chrono::high_resolution_clock::now();
@@ -92,7 +95,7 @@ namespace lve
             
             float aspect = renderer_.get_aspect_ratio();
             camera.set_orthographic_projection(-aspect, aspect, -1, 1, -1, 1);
-            camera.set_perspective_projection(glm::radians(50.0f), aspect, 0.1f, 100.0f);
+            camera.set_perspective_projection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
             if (auto command_buffer = renderer_.begin_frame())
             {
@@ -123,18 +126,25 @@ namespace lve
     
     void first_app::load_game_objects()
     {
-        std::shared_ptr<lve_model> model = lve_model::create_model_from_file(device_, "C:\\Users\\K-M\\Documents\\Visual Studio 2022\\Projects\\VulkanTutorial\\models\\smooth_vase.obj");
+        std::shared_ptr<lve_model> model = lve_model::create_model_from_file(device_, "models/smooth_vase.obj");
         auto go1 = lve_game_object::create_game_object();
         go1.model = model;
-        go1.transform.translation = {0.0f, 0.0f, 2.5f};
-        go1.transform.scale = glm::vec3{3.0f, 1.0f, 2.0f};
+        go1.transform.translation = {-0.5f, 0.5f, 0.0f};
+        go1.transform.scale = glm::vec3{3.0f, 1.5f, 2.0f};
         game_objects_.push_back(std::move(go1));
         
-        model = lve_model::create_model_from_file(device_, "C:\\Users\\K-M\\Documents\\Visual Studio 2022\\Projects\\VulkanTutorial\\models\\flat_vase.obj");
+        model = lve_model::create_model_from_file(device_, "models/flat_vase.obj");
         auto go2 = lve_game_object::create_game_object();
         go2.model = model;
-        go2.transform.translation = {0.0f, 0.5f, 5.5f};
+        go2.transform.translation = {0.5f, 0.5f, 0.0f};
         go2.transform.scale = glm::vec3{3};
         game_objects_.push_back(std::move(go2));
+        
+        model = lve_model::create_model_from_file(device_, "models/quad.obj");
+        auto go3 = lve_game_object::create_game_object();
+        go3.model = model;
+        go3.transform.translation = {0.0f, 0.5f, 0.0f};
+        go3.transform.scale = glm::vec3{3};
+        game_objects_.push_back(std::move(go3));
     }
 }
