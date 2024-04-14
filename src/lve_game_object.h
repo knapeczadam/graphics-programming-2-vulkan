@@ -2,6 +2,7 @@
 
 // Standard includes
 #include <memory>
+#include <unordered_map>
 
 // Project includes
 #include "lve_model.h"
@@ -11,8 +12,6 @@
 
 namespace lve
 {
-    // Type aliases
-    using id_t = unsigned int;
 
     struct transform_component
     {
@@ -31,6 +30,11 @@ namespace lve
     
     class lve_game_object
     {
+    public:
+        // Type aliases
+        using id_t = unsigned int;
+        using map = std::unordered_map<id_t, lve_game_object>;
+        
     public:
         lve_game_object(lve_game_object const &)            = delete;
         lve_game_object &operator=(lve_game_object const &) = delete;

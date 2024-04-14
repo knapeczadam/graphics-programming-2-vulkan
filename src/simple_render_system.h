@@ -22,7 +22,7 @@ namespace lve
         simple_render_system(simple_render_system const &)            = delete;
         simple_render_system &operator=(simple_render_system const &) = delete;
         
-        void render_game_objects(frame_info &frame_info, std::vector<lve_game_object> &game_objects);
+        void render_game_objects(frame_info &frame_info);
 
     private:
         void create_pipeline_layout(VkDescriptorSetLayout global_set_layout);

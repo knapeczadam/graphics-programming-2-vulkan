@@ -7,6 +7,7 @@
 // GLM includes
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <ranges>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
@@ -30,7 +31,7 @@ namespace lve
         vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
     }
 
-void simple_render_system::render_game_objects(frame_info &frame_info, std::vector<lve_game_object>& game_objects)
+void simple_render_system::render_game_objects(frame_info &frame_info)
     {
         pipeline_->bind(frame_info.command_buffer);
 
@@ -45,7 +46,7 @@ void simple_render_system::render_game_objects(frame_info &frame_info, std::vect
             nullptr
         );
 
-        for (auto &obj : game_objects)
+        for (auto &obj : frame_info.game_objects | std::views::values)
         {
             simple_push_constant_data push{};
             push.model_matrix = obj.transform.mat4();

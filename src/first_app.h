@@ -37,6 +37,6 @@ namespace lve
         lve_renderer                    renderer_{window_, device_};
 
         std::unique_ptr<lve_descriptor_pool> global_pool_{};
-        std::vector<lve_game_object>    game_objects_;
+        lve_game_object::map                 game_objects_;
     };
 }

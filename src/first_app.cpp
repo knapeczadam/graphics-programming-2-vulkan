@@ -57,7 +57,7 @@ namespace lve
         }
 
         auto global_set_layout = lve_descriptor_set_layout::builder(device_)
-                                 .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                                 .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                  .build();
 
         std::vector<VkDescriptorSet> global_descriptor_sets(lve_swap_chain::MAX_FRAMES_IN_FLIGHT);
@@ -114,9 +114,10 @@ namespace lve
                     frame_time,
                     command_buffer,
                     camera,
-                    global_descriptor_sets[frame_index]
+                    global_descriptor_sets[frame_index],
+                    game_objects_
                 };
-                render_system.render_game_objects(frame_info, game_objects_);
+                render_system.render_game_objects(frame_info);
                 renderer_.end_swap_chain_render_pass(command_buffer);
                 renderer_.end_frame();
             }
@@ -131,20 +132,20 @@ namespace lve
         go1.model = model;
         go1.transform.translation = {-0.5f, 0.5f, 0.0f};
         go1.transform.scale = glm::vec3{3.0f, 1.5f, 2.0f};
-        game_objects_.push_back(std::move(go1));
+        game_objects_.emplace(go1.get_id(), std::move(go1));
         
         model = lve_model::create_model_from_file(device_, "models/flat_vase.obj");
         auto go2 = lve_game_object::create_game_object();
         go2.model = model;
         go2.transform.translation = {0.5f, 0.5f, 0.0f};
         go2.transform.scale = glm::vec3{3};
-        game_objects_.push_back(std::move(go2));
+        game_objects_.emplace(go2.get_id(), std::move(go2));
         
         model = lve_model::create_model_from_file(device_, "models/quad.obj");
         auto go3 = lve_game_object::create_game_object();
         go3.model = model;
         go3.transform.translation = {0.0f, 0.5f, 0.0f};
         go3.transform.scale = glm::vec3{3};
-        game_objects_.push_back(std::move(go3));
+        game_objects_.emplace(go3.get_id(), std::move(go3));
     }
 }
