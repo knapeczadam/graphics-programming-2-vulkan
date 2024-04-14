@@ -2,7 +2,8 @@
 
 // Project includes
 #include "lve_camera.h"
-#include "simple_render_system.h"
+#include "systems/simple_render_system.h"
+#include "systems/point_light_system.h"
 #include "keyboard_movement_controller.h"
 #include "lve_buffer.h"
 
@@ -21,7 +22,8 @@ namespace lve
 {
     struct global_ubo
     {
-        glm::mat4 projection_view{1.0f};
+        glm::mat4 projection{1.0f};
+        glm::mat4 view{1.0f};
         glm::vec4 ambient_light_color{1.0f, 1.0f, 1.0f, 0.02f};
         glm::vec3 light_position{-1.0f};
         alignas(16) glm::vec4 light_color{1.0f}; // w is light intensity
@@ -69,7 +71,8 @@ namespace lve
                 .build(global_descriptor_sets[i]);
         }
         
-        simple_render_system render_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        simple_render_system simple_render_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        point_light_system point_light_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         lve_camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{0.5f, 0.0f, 1.0f});
         camera.set_view_target(glm::vec3{-1.0f, -2.0f, -20.0f}, glm::vec3{2.0f, -2.0f, 2.5f});
@@ -103,7 +106,8 @@ namespace lve
                 
                 // update
                 global_ubo ubo{};
-                ubo.projection_view = camera.get_projection() * camera.get_view();
+                ubo.projection = camera.get_projection();
+                ubo.view = camera.get_view();
                 ubo_buffers[frame_index]->write_to_buffer(&ubo);
                 ubo_buffers[frame_index]->flush();
                 
@@ -117,7 +121,8 @@ namespace lve
                     global_descriptor_sets[frame_index],
                     game_objects_
                 };
-                render_system.render_game_objects(frame_info);
+                simple_render_system.render_game_objects(frame_info);
+                point_light_system.render(frame_info);
                 renderer_.end_swap_chain_render_pass(command_buffer);
                 renderer_.end_frame();
             }

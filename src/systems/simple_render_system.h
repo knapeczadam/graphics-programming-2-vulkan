@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "lve_pipeline.h"
-#include "lve_device.h"
-#include "lve_game_object.h"
-#include "lve_camera.h"
-#include "lve_frame_info.h"
+#include "../lve_pipeline.h"
+#include "../lve_device.h"
+#include "../lve_game_object.h"
+#include "../lve_camera.h"
+#include "../lve_frame_info.h"
 
 // Standard includes
 #include <memory>
