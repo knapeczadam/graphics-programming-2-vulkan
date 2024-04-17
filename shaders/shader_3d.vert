@@ -24,6 +24,7 @@ layout (set = 0, binding = 0) uniform global_ubo
     int num_lights;
 } ubo;
 
+// There must be no more than one push constant block statically used per shader entry point.
 layout (push_constant) uniform Push 
 {
     mat4 model_matrix;

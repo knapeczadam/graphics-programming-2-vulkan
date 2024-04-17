@@ -3,7 +3,7 @@
 // Standard includes
 #include <functional>
 
-namespace lve
+namespace dae
 {
     // from: https://stackoverflow.com/a/57595105
     template <typename T, typename... Rest>

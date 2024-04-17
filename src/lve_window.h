@@ -7,7 +7,7 @@
 // Standard includes
 #include <string>
 
-namespace lve
+namespace dae
 {
     class lve_window
     {
@@ -29,7 +29,7 @@ namespace lve
         void create_window_surface(VkInstance instance, VkSurfaceKHR *surface_ptr);
 
     private:
-        static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
+        static void framebuffer_resize_callback(GLFWwindow *window_ptr, int width, int height);
         void init_window();
 
     private:

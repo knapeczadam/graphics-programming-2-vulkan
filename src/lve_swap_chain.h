@@ -11,12 +11,12 @@
 #include <string>
 #include <vector>
 
-namespace lve
+namespace dae
 {
     class lve_swap_chain
     {
     public:
-        static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+        static constexpr int MAX_FRAMES_IN_FLIGHT = 2; // at most 2 command buffers to the device's graphics queue at once
 
         lve_swap_chain(lve_device &device_ref, VkExtent2D window_extent);
         lve_swap_chain(lve_device &device_ref, VkExtent2D window_extent, std::shared_ptr<lve_swap_chain> const &previous);

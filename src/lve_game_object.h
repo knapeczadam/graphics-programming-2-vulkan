@@ -10,7 +10,7 @@
 // GLM includes
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace lve
+namespace dae
 {
 
     struct transform_component
@@ -32,7 +32,7 @@ namespace lve
     {
         float light_intensity = 1.0f;
     };
-    
+
     class lve_game_object
     {
     public:
@@ -47,18 +47,19 @@ namespace lve
         lve_game_object &operator=(lve_game_object &&)      = default;
 
         
-        static auto create_game_object() -> lve_game_object
+        static auto create_game_object(std::string const &name) -> lve_game_object
         {
             static id_t current_id = 0;
-            return lve_game_object{current_id++};
+            return lve_game_object{current_id++, name};
         }
 
         static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> lve_game_object;
 
         [[nodiscard]] auto get_id() const -> id_t { return id_; }
+        [[nodiscard]] auto get_name() const -> std::string { return name_; }
 
     private:
-        lve_game_object(id_t id) : id_{id} {}
+        lve_game_object(id_t id, std::string const  &name) : id_{id}, name_{name} {}
 
     public:
         std::shared_ptr<lve_model> model     = {};
@@ -68,6 +69,7 @@ namespace lve
         std::unique_ptr<point_light_component> point_light = nullptr;
 
     private:
-        id_t id_;
+        id_t        id_;
+        std::string name_;
     };
 }

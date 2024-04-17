@@ -13,16 +13,15 @@
 
 namespace dae
 {
-    class point_light_system
+    class render_system_2d
     {
     public:
-        point_light_system(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
-        ~point_light_system();
+        render_system_2d(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        ~render_system_2d();
 
-        point_light_system(point_light_system const &)            = delete;
-        point_light_system &operator=(point_light_system const &) = delete;
-
-        void update(frame_info &frame_info, global_ubo &ubo);
+        render_system_2d(render_system_2d const &)            = delete;
+        render_system_2d &operator=(render_system_2d const &) = delete;
+        
         void render(frame_info &frame_info);
 
     private:

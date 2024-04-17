@@ -21,7 +21,7 @@
 #endif
 
 
-namespace lve
+namespace dae
 {
     lve_pipeline::lve_pipeline(
         lve_device &device,
@@ -45,10 +45,10 @@ namespace lve
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline_);
     }
 
-    auto lve_pipeline::default_pipeline_config_info(pipeline_config_info &config_info) -> void
+    void lve_pipeline::default_pipeline_config_info(pipeline_config_info &config_info)
     {
         config_info.input_assembly_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        config_info.input_assembly_info.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        config_info.input_assembly_info.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; // TODO: Strip?
         config_info.input_assembly_info.primitiveRestartEnable = VK_FALSE;
         
         config_info.viewport_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -107,7 +107,7 @@ namespace lve
         config_info.depth_stencil_info.front                 = {}; // Optional
         config_info.depth_stencil_info.back                  = {}; // Optional
 
-        config_info.dynamic_state_enables                = {VK_DYNAMIC_STATE_VIEWPORT,                                      VK_DYNAMIC_STATE_SCISSOR};
+        config_info.dynamic_state_enables                = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
         config_info.dynamic_state_info.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         config_info.dynamic_state_info.pDynamicStates    = config_info.dynamic_state_enables.data();
         config_info.dynamic_state_info.dynamicStateCount = static_cast<uint32_t>(config_info.dynamic_state_enables.size());
@@ -207,9 +207,9 @@ namespace lve
     void lve_pipeline::create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module)
     {
         VkShaderModuleCreateInfo create_info{};
-        create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         create_info.codeSize = code.size();
-        create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+        create_info.pCode    = reinterpret_cast<uint32_t const *>(code.data());
 
         if (vkCreateShaderModule(device_.device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
         {

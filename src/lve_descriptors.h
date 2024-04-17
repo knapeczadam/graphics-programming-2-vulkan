@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace lve
+namespace dae
 {
     class lve_descriptor_set_layout
     {
@@ -106,4 +106,4 @@ namespace lve
         lve_descriptor_pool               &pool_;
         std::vector<VkWriteDescriptorSet> writes_;
     };
-} // namespace lve
+}

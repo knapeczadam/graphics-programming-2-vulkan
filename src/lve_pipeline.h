@@ -6,7 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 
-namespace lve
+namespace dae
 {
     // Forward declarations
     class lve_device;

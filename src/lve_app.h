@@ -11,20 +11,20 @@
 #include <memory>
 #include <vector>
 
-namespace lve
+namespace dae
 {
-    class first_app
+    class lve_app
     {
     public:
         static constexpr int width = 800;
         static constexpr int height = 600;
         static constexpr float max_frame_time = 60.0f;
 
-        first_app();
-        ~first_app();
+        lve_app();
+        ~lve_app();
 
-        first_app(first_app const &)            = delete;
-        first_app &operator=(first_app const &) = delete;
+        lve_app(lve_app const &)            = delete;
+        lve_app &operator=(lve_app const &) = delete;
 
         void run();
 

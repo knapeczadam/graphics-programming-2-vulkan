@@ -2,7 +2,7 @@
 
 #include "lve_device.h"
 
-namespace lve
+namespace dae
 {
     class lve_buffer
     {
@@ -56,4 +56,4 @@ namespace lve
         VkBufferUsageFlags    usage_flags_;
         VkMemoryPropertyFlags memory_property_flags_;
     };
-} // namespace lve
+}

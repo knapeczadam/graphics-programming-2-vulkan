@@ -10,7 +10,7 @@
 #include <vector>
 #include <cassert>
 
-namespace lve
+namespace dae
 {
     class lve_renderer
     {

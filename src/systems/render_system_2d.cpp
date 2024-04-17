@@ -1,4 +1,4 @@
-﻿#include "point_light_system.h"
+﻿#include "render_system_2d.h"
 
 // Standard includes
 #include <stdexcept>
@@ -13,53 +13,24 @@
 
 namespace dae
 {
-    struct point_light_push_constants
+    struct push_constant_data_2d
     {
-        glm::vec4 position{};
-        glm::vec4 color{};
-        float radius;
+        glm::mat4 transform{1.0f}; 
     };
     
-    point_light_system::point_light_system(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+    render_system_2d::render_system_2d(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
         : device_{device}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
     }
 
-    point_light_system::~point_light_system()
+    render_system_2d::~render_system_2d()
     {
         vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
     }
 
-    void point_light_system::update(frame_info &frame_info, global_ubo &ubo)
-    {
-        auto rotate_light = glm::rotate(
-            glm::mat4{1.0f},
-            frame_info.frame_time,
-            {0.0f, -1.0f, 0.0f}
-        );
-        
-        int light_index = 0;
-        for (auto &obj : frame_info.game_objects | std::views::values)
-        {
-            if (obj.point_light == nullptr) continue;
-
-            assert(light_index < MAX_LIGHTS and "Point lights exceed maximum specified");
-
-            // update light position
-            obj.transform.translation = glm::vec3{rotate_light * glm::vec4{obj.transform.translation, 1.0f}};
-
-            // copy light to ubo
-            ubo.point_lights[light_index].position = glm::vec4{obj.transform.translation, 1.0f};
-            ubo.point_lights[light_index].color    = glm::vec4{obj.color, obj.point_light->light_intensity};
-
-            ++light_index;
-        }
-        ubo.num_lights = light_index;
-    }
-
-void point_light_system::render(frame_info &frame_info)
+void render_system_2d::render(frame_info &frame_info)
     {
         pipeline_->bind(frame_info.command_buffer);
 
@@ -76,32 +47,30 @@ void point_light_system::render(frame_info &frame_info)
         
         for (auto &obj : frame_info.game_objects | std::views::values)
         {
-            if (obj.get_name() != "point_light") continue;
-
-            point_light_push_constants push{};
-            push.position = glm::vec4{obj.transform.translation, 1.0f};
-            push.color    = glm::vec4{obj.color, obj.point_light->light_intensity};
-            push.radius   = obj.transform.scale.x;
+            if (obj.get_name() != "2d") continue;
+            
+            push_constant_data_2d push{};
+            push.transform = obj.transform.mat4();
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
                 pipeline_layout_,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                sizeof(point_light_push_constants),
-                &push
-            );
-            vkCmdDraw(frame_info.command_buffer, 6, 1, 0, 0);
+                sizeof(push_constant_data_2d),
+                &push);
+            
+            obj.model->bind(frame_info.command_buffer);
+            obj.model->draw(frame_info.command_buffer);
         }
-        
     }
 
-    void point_light_system::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
+    void render_system_2d::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
     {
         VkPushConstantRange push_constant_range{};
         push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         push_constant_range.offset     = 0;
-        push_constant_range.size       = sizeof(point_light_push_constants);
+        push_constant_range.size       = sizeof(push_constant_data_2d);
 
         std::vector<VkDescriptorSetLayout> descriptor_set_layouts{global_set_layout};
         
@@ -118,20 +87,18 @@ void point_light_system::render(frame_info &frame_info)
         }
     }
 
-    void point_light_system::create_pipeline(VkRenderPass render_pass)
+    void render_system_2d::create_pipeline(VkRenderPass render_pass)
     {
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
         pipeline_config_info pipeline_config{};
         lve_pipeline::default_pipeline_config_info(pipeline_config);
-        pipeline_config.attribute_descriptions.clear();
-        pipeline_config.binding_descriptions.clear();
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<lve_pipeline>(
             device_,
-            "shaders/point_light.vert.spv",
-            "shaders/point_light.frag.spv",
+            "shaders/shader_2d.vert.spv",
+            "shaders/shader_2d.frag.spv",
             pipeline_config);
     }
 }

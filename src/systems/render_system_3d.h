@@ -11,16 +11,16 @@
 #include <memory>
 #include <vector>
 
-namespace lve
+namespace dae
 {
-    class simple_render_system
+    class render_system_3d
     {
     public:
-        simple_render_system(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
-        ~simple_render_system();
+        render_system_3d(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        ~render_system_3d();
 
-        simple_render_system(simple_render_system const &)            = delete;
-        simple_render_system &operator=(simple_render_system const &) = delete;
+        render_system_3d(render_system_3d const &)            = delete;
+        render_system_3d &operator=(render_system_3d const &) = delete;
         
         void render_game_objects(frame_info &frame_info);
 

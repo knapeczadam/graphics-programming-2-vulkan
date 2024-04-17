@@ -13,7 +13,7 @@
 #include <vector>
 #include <memory>
 
-namespace lve
+namespace dae
 {
     class lve_model
     {
@@ -34,7 +34,7 @@ namespace lve
         struct lve_builder
         {
             std::vector<lve_vertex> vertices = {};
-            std::vector<uint32_t>   indicies = {};
+            std::vector<uint32_t>   indices = {};
 
             void load_model(std::string const &file_path);
         };
@@ -46,6 +46,7 @@ namespace lve
         lve_model &operator=(lve_model const &) = delete;
 
         static auto create_model_from_file(lve_device &device, std::string const &file_path) -> std::unique_ptr<lve_model>;
+        static auto create_model_from_vertices(lve_device &device, std::vector<lve_vertex> const &vertices) -> std::unique_ptr<lve_model>;
 
         void bind(VkCommandBuffer command_buffer);
         void draw(VkCommandBuffer command_buffer);

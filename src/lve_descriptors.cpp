@@ -4,7 +4,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace lve
+namespace dae
 {
     // *************** Descriptor Set Layout Builder *********************
 
@@ -193,7 +193,7 @@ namespace lve
     auto lve_descriptor_writer::build(VkDescriptorSet &set) -> bool
     {
         bool success = pool_.allocate_descriptor(set_layout_.get_descriptor_set_layout(), set);
-        if (!success)
+        if (not success)
         {
             return false;
         }
@@ -209,4 +209,4 @@ namespace lve
         }
         vkUpdateDescriptorSets(pool_.device_.device(), writes_.size(), writes_.data(), 0, nullptr);
     }
-} // namespace lve
+}

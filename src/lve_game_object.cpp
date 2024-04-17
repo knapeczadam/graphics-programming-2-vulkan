@@ -1,6 +1,6 @@
 ﻿#include "lve_game_object.h"
 
-namespace lve
+namespace dae
 {
     glm::mat4 transform_component::mat4()
         {
@@ -63,7 +63,7 @@ namespace lve
 
     auto lve_game_object::make_point_light(float intensity, float radius, glm::vec3 color) -> lve_game_object
     {
-        lve_game_object go = create_game_object();
+        lve_game_object go = create_game_object("point_light");
         go.color = color;
         go.transform.scale.x = radius;
         go.point_light = std::make_unique<point_light_component>();

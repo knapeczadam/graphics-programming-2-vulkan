@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.h>
 
 
-namespace lve
+namespace dae
 {
     constexpr int MAX_LIGHTS = 10;
     

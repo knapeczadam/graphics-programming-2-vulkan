@@ -10,7 +10,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace lve
+namespace dae
 {
     /**
      * Returns the minimum instance size required to be compatible with devices minOffsetAlignment
@@ -213,4 +213,4 @@ namespace lve
     {
         return invalidate(alignment_size_, index * alignment_size_);
     }
-} // namespace lve
+}

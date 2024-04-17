@@ -4,7 +4,7 @@
 #include <cassert>
 #include <limits>
 
-namespace lve
+namespace dae
 {
     void lve_camera::set_orthographic_projection(float left, float right, float top, float bottom, float near,
         float far)

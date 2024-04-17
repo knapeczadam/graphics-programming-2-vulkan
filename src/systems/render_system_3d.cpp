@@ -1,4 +1,4 @@
-﻿#include "simple_render_system.h"
+﻿#include "render_system_3d.h"
 
 // Standard includes
 #include <stdexcept>
@@ -11,27 +11,27 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-namespace lve
+namespace dae
 {
-    struct simple_push_constant_data
+    struct push_constant_data_3d
     {
         glm::mat4 model_matrix{1.0f};
         glm::mat4 normal_matrix{1.0f};
     };
     
-    simple_render_system::simple_render_system(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+    render_system_3d::render_system_3d(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
         : device_{device}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
     }
 
-    simple_render_system::~simple_render_system()
+    render_system_3d::~render_system_3d()
     {
         vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
     }
 
-void simple_render_system::render_game_objects(frame_info &frame_info)
+void render_system_3d::render_game_objects(frame_info &frame_info)
     {
         pipeline_->bind(frame_info.command_buffer);
 
@@ -49,8 +49,9 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
         for (auto &obj : frame_info.game_objects | std::views::values)
         {
             if (obj.model == nullptr) continue;
+            if (obj.get_name() != "3d") continue;
             
-            simple_push_constant_data push{};
+            push_constant_data_3d push{};
             push.model_matrix = obj.transform.mat4();
             push.normal_matrix = obj.transform.normal_matrix();
 
@@ -59,7 +60,7 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
                 pipeline_layout_,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                sizeof(simple_push_constant_data),
+                sizeof(push_constant_data_3d),
                 &push);
             
             obj.model->bind(frame_info.command_buffer);
@@ -67,12 +68,12 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
         }
     }
 
-    void simple_render_system::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
+    void render_system_3d::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
     {
         VkPushConstantRange push_constant_range{};
         push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         push_constant_range.offset     = 0;
-        push_constant_range.size       = sizeof(simple_push_constant_data);
+        push_constant_range.size       = sizeof(push_constant_data_3d);
 
         std::vector<VkDescriptorSetLayout> descriptor_set_layouts{global_set_layout};
         
@@ -89,7 +90,7 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
         }
     }
 
-    void simple_render_system::create_pipeline(VkRenderPass render_pass)
+    void render_system_3d::create_pipeline(VkRenderPass render_pass)
     {
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
@@ -99,8 +100,8 @@ void simple_render_system::render_game_objects(frame_info &frame_info)
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<lve_pipeline>(
             device_,
-            "shaders/simple_shader.vert.spv",
-            "shaders/simple_shader.frag.spv",
+            "shaders/shader_3d.vert.spv",
+            "shaders/shader_3d.frag.spv",
             pipeline_config);
     }
 }

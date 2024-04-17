@@ -1,10 +1,24 @@
-﻿#include "keyboard_movement_controller.h"
+﻿#include "movement_controller.h"
 
-namespace lve
+namespace dae
 {
-    void keyboard_movement_controller::move_in_plane_xy(GLFWwindow* window_ptr, float dt, lve_game_object& game_object)
+    void movement_controller::move(GLFWwindow* window_ptr, float dt, lve_game_object& game_object)
     {
-        glm::vec3 rotate {0};
+        double mouse_x, mouse_y;
+        glm::vec3 rotate{0};
+        
+        if (glfwGetWindowAttrib(window_ptr, GLFW_HOVERED))
+        {
+            glfwGetCursorPos(window_ptr, &mouse_x, &mouse_y);
+            double delta_x = mouse_x - last_mouse_x_;
+            double delta_y = mouse_y - last_mouse_y_;
+            last_mouse_x_ = mouse_x;
+            last_mouse_y_ = mouse_y;
+
+            rotate.x += look_speed * delta_y * dt * -1;
+            rotate.y += look_speed * delta_x * dt;
+        }
+        
         if (glfwGetKey(window_ptr, key_mappings::look_right) == GLFW_PRESS)
         {
             rotate.y += 1.0f;
@@ -31,9 +45,16 @@ namespace lve
         game_object.transform.rotation.y = glm::mod(game_object.transform.rotation.y, glm::two_pi<float>());
 
         float yaw = game_object.transform.rotation.y;
-        glm::vec3 const forward_dir = {glm::sin(yaw), 0.0f, glm::cos(yaw)};
-        glm::vec3 const right_dir   = {forward_dir.z, 0.0f, -forward_dir.x};
-        glm::vec3 const up_dir      = {0.0f, -1.0f, 0.0f};
+        float pitch = game_object.transform.rotation.x;
+
+        glm::vec3 forward_dir = {
+            glm::cos(pitch) * glm::sin(yaw),
+            -glm::sin(pitch),
+            glm::cos(pitch) * glm::cos(yaw)
+        };
+
+        glm::vec3 right_dir = glm::cross(forward_dir, glm::vec3(0.0f, -1.0f, 0.0f));
+        glm::vec3 up_dir = glm::cross(right_dir, forward_dir);
 
         glm::vec3 move_dir {0.0f};
         if (glfwGetKey(window_ptr, key_mappings::move_forward) == GLFW_PRESS)

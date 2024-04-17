@@ -30,12 +30,12 @@
 namespace std
 {
     template<>
-    struct hash<lve::lve_model::lve_vertex>
+    struct hash<dae::lve_model::lve_vertex>
     {
-        auto operator()(lve::lve_model::lve_vertex const &vertex) const noexcept -> size_t
+        auto operator()(dae::lve_model::lve_vertex const &vertex) const noexcept -> size_t
         {
             size_t seed = 0;
-            lve::hash_combine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+            dae::hash_combine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
             return seed;
         }
     };
@@ -43,7 +43,7 @@ namespace std
 }
 
 
-namespace lve
+namespace dae
 {
     auto lve_model::lve_vertex::get_binding_description() -> std::vector<VkVertexInputBindingDescription>
     {
@@ -111,7 +111,7 @@ namespace lve
         }
 
         vertices.clear();
-        indicies.clear();
+        indices.clear();
 
         std::unordered_map<lve_vertex, uint32_t> unique_vertices{};
 
@@ -158,7 +158,7 @@ namespace lve
                     unique_vertices[vertex] = static_cast<uint32_t>(vertices.size());
                     vertices.push_back(vertex);
                 }
-                indicies.push_back(unique_vertices[vertex]);
+                indices.push_back(unique_vertices[vertex]);
             }
         }
     }
@@ -167,7 +167,7 @@ namespace lve
         : device_{device}
     {
         create_vertex_buffers(builder.vertices);
-        create_index_buffers(builder.indicies);
+        create_index_buffers(builder.indices);
     }
 
     lve_model::~lve_model()
@@ -178,6 +178,14 @@ namespace lve
     {
         lve_builder builder{};
         builder.load_model(file_path);
+        std::cout << "Vertex count: " << builder.vertices.size() << '\n';
+        return std::make_unique<lve_model>(device, builder);
+    }
+
+    auto lve_model::create_model_from_vertices(lve_device &device, std::vector<lve_vertex> const &vertices) -> std::unique_ptr<lve_model>
+    {
+        lve_builder builder{};
+        builder.vertices = vertices;
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
         return std::make_unique<lve_model>(device, builder);
     }
@@ -222,7 +230,7 @@ namespace lve
         };
 
         staging_buffer.map();
-        staging_buffer.write_to_buffer((void*) vertices.data());
+        staging_buffer.write_to_buffer(const_cast<lve_vertex*>(vertices.data()));
 
         vertex_buffer_ = std::make_unique<lve_buffer>(
             device_,

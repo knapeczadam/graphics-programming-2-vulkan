@@ -3,7 +3,7 @@
 #include "lve_game_object.h"
 #include "lve_window.h"
 
-namespace lve
+namespace dae
 {
     enum key_mappings
     {
@@ -19,13 +19,16 @@ namespace lve
         look_down     = GLFW_KEY_DOWN
         
     };
-    class keyboard_movement_controller
+    class movement_controller
     {
     public:
-        void move_in_plane_xy(GLFWwindow *window_ptr, float dt, lve_game_object &game_object);
+        void move(GLFWwindow *window_ptr, float dt, lve_game_object &game_object);
         
-    public:
+    private:
         float move_speed = 3.0f;
-        float look_speed = 1.5;
+        float look_speed = 5.5;
+
+        double last_mouse_x_ = 0;
+        double last_mouse_y_ = 0;
     };
 }
