@@ -1,4 +1,4 @@
-﻿#include "lve_device.h"
+﻿#include "device.h"
 
 // std headers
 #include <cstring>
@@ -12,7 +12,7 @@ namespace dae
     static auto VKAPI_CALL debug_callback(
         VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
         VkDebugUtilsMessageTypeFlagsEXT message_type,
-        const VkDebugUtilsMessengerCallbackDataEXT *callback_data_ptr,
+        VkDebugUtilsMessengerCallbackDataEXT const *callback_data_ptr,
         void *user_data_ptr) -> VkBool32
     {
         std::cerr << "validation layer: " << callback_data_ptr->pMessage << '\n';
@@ -22,8 +22,8 @@ namespace dae
 
     auto create_debug_utils_messenger_ext(
         VkInstance instance,
-        const VkDebugUtilsMessengerCreateInfoEXT *create_info_ptr,
-        const VkAllocationCallbacks *allocator_ptr,
+        VkDebugUtilsMessengerCreateInfoEXT const *create_info_ptr,
+        VkAllocationCallbacks const *allocator_ptr,
         VkDebugUtilsMessengerEXT *debug_messenger_ptr) -> VkResult
     {
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -50,7 +50,7 @@ namespace dae
     }
 
     // class member functions
-    lve_device::lve_device(lve_window &window) : window_{window}
+    device::device(window &window) : window_{window}
     {
         create_instance();
         setup_debug_messenger();
@@ -60,7 +60,7 @@ namespace dae
         create_command_pool();
     }
 
-    lve_device::~lve_device()
+    device::~device()
     {
         vkDestroyCommandPool(device_, command_pool_, nullptr);
         vkDestroyDevice(device_, nullptr);
@@ -74,7 +74,7 @@ namespace dae
         vkDestroyInstance(instance_, nullptr);
     }
 
-    void lve_device::create_instance()
+    void device::create_instance()
     {
         if (enable_validation_layers and not check_validation_layer_support())
         {
@@ -120,7 +120,7 @@ namespace dae
         has_gflw_required_instance_extensions();
     }
 
-    void lve_device::pick_physical_device()
+    void device::pick_physical_device()
     {
         uint32_t device_count = 0;
         vkEnumeratePhysicalDevices(instance_, &device_count, nullptr);
@@ -150,7 +150,7 @@ namespace dae
         std::cout << "physical device: " << properties.deviceName << '\n';
     }
 
-    void lve_device::create_logical_device()
+    void device::create_logical_device()
     {
         queue_family_indices indices = find_queue_families(physical_device_);
 
@@ -202,7 +202,7 @@ namespace dae
         vkGetDeviceQueue(device_, indices.present_family, 0, &present_queue_);
     }
 
-    void lve_device::create_command_pool()
+    void device::create_command_pool()
     {
         queue_family_indices queue_family_indices = find_physical_queue_families();
 
@@ -217,9 +217,9 @@ namespace dae
         }
     }
 
-    void lve_device::create_surface() { window_.create_window_surface(instance_, &surface_); }
+    void device::create_surface() { window_.create_window_surface(instance_, &surface_); }
 
-    auto lve_device::is_device_suitable(VkPhysicalDevice device) -> bool
+    auto device::is_device_suitable(VkPhysicalDevice device) -> bool
     {
         queue_family_indices indices = find_queue_families(device);
 
@@ -239,7 +239,7 @@ namespace dae
             supported_features.samplerAnisotropy;
     }
 
-    void lve_device::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &create_info)
+    void device::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &create_info)
     {
         create_info = {};
         create_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -249,7 +249,7 @@ namespace dae
         create_info.pUserData       = nullptr; // Optional
     }
 
-    void lve_device::setup_debug_messenger()
+    void device::setup_debug_messenger()
     {
         if (not enable_validation_layers) return;
         VkDebugUtilsMessengerCreateInfoEXT create_info;
@@ -260,7 +260,7 @@ namespace dae
         }
     }
 
-    auto lve_device::check_validation_layer_support() -> bool
+    auto device::check_validation_layer_support() -> bool
     {
         uint32_t layer_count;
         vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
@@ -290,7 +290,7 @@ namespace dae
         return true;
     }
 
-    auto lve_device::get_required_extensions() -> std::vector<const char*>
+    auto device::get_required_extensions() -> std::vector<const char*>
     {
         uint32_t glfw_extension_count = 0;
         const char **glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
@@ -305,7 +305,7 @@ namespace dae
         return extensions;
     }
 
-    void lve_device::has_gflw_required_instance_extensions()
+    void device::has_gflw_required_instance_extensions()
     {
         uint32_t extension_count = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
@@ -332,7 +332,7 @@ namespace dae
         }
     }
 
-    auto lve_device::check_device_extension_support(VkPhysicalDevice device) -> bool
+    auto device::check_device_extension_support(VkPhysicalDevice device) -> bool
     {
         uint32_t extension_count;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
@@ -354,7 +354,7 @@ namespace dae
         return required_extensions.empty();
     }
 
-    auto lve_device::find_queue_families(VkPhysicalDevice device) -> queue_family_indices
+    auto device::find_queue_families(VkPhysicalDevice device) -> queue_family_indices
     {
         queue_family_indices indices;
 
@@ -390,7 +390,7 @@ namespace dae
         return indices;
     }
 
-    auto lve_device::query_swap_chain_support(VkPhysicalDevice device) -> swap_chain_support_details
+    auto device::query_swap_chain_support(VkPhysicalDevice device) -> swap_chain_support_details
     {
         swap_chain_support_details details;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface_, &details.capabilities);
@@ -419,7 +419,7 @@ namespace dae
         return details;
     }
 
-    auto lve_device::find_supported_format(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) -> VkFormat
+    auto device::find_supported_format(std::vector<VkFormat> const &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) -> VkFormat
     {
         for (VkFormat format : candidates)
         {
@@ -438,7 +438,7 @@ namespace dae
         throw std::runtime_error("failed to find supported format!");
     }
 
-    auto lve_device::find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties) -> uint32_t
+    auto device::find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties) -> uint32_t
     {
         VkPhysicalDeviceMemoryProperties mem_properties;
         vkGetPhysicalDeviceMemoryProperties(physical_device_, &mem_properties);
@@ -453,7 +453,7 @@ namespace dae
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void lve_device::create_buffer(
+    void device::create_buffer(
         VkDeviceSize size,
         VkBufferUsageFlags usage,
         VkMemoryPropertyFlags properties,
@@ -487,7 +487,7 @@ namespace dae
         vkBindBufferMemory(device_, buffer, buffer_memory, 0);
     }
 
-    auto lve_device::begin_single_time_commands() -> VkCommandBuffer
+    auto device::begin_single_time_commands() -> VkCommandBuffer
     {
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -506,7 +506,7 @@ namespace dae
         return command_buffer;
     }
 
-    void lve_device::end_single_time_commands(VkCommandBuffer command_buffer)
+    void device::end_single_time_commands(VkCommandBuffer command_buffer)
     {
         vkEndCommandBuffer(command_buffer);
 
@@ -521,7 +521,7 @@ namespace dae
         vkFreeCommandBuffers(device_, command_pool_, 1, &command_buffer);
     }
 
-    void lve_device::copy_buffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size)
+    void device::copy_buffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size)
     {
         VkCommandBuffer command_buffer = begin_single_time_commands();
 
@@ -534,7 +534,7 @@ namespace dae
         end_single_time_commands(command_buffer);
     }
 
-    void lve_device::copy_buffer_to_image(
+    void device::copy_buffer_to_image(
         VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layer_count)
     {
         VkCommandBuffer command_buffer = begin_single_time_commands();
@@ -562,8 +562,8 @@ namespace dae
         end_single_time_commands(command_buffer);
     }
 
-    void lve_device::create_image_with_info(
-        const VkImageCreateInfo &image_info,
+    void device::create_image_with_info(
+        VkImageCreateInfo const &image_info,
         VkMemoryPropertyFlags properties,
         VkImage &image,
         VkDeviceMemory &image_memory)

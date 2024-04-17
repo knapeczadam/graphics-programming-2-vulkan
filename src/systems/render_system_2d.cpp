@@ -18,7 +18,7 @@ namespace dae
         glm::mat4 transform{1.0f}; 
     };
     
-    render_system_2d::render_system_2d(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+    render_system_2d::render_system_2d(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
         : device_{device}
     {
         create_pipeline_layout(global_set_layout);
@@ -27,7 +27,7 @@ namespace dae
 
     render_system_2d::~render_system_2d()
     {
-        vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
+        vkDestroyPipelineLayout(device_.get_logical_device(), pipeline_layout_, nullptr);
     }
 
 void render_system_2d::render(frame_info &frame_info)
@@ -81,7 +81,7 @@ void render_system_2d::render(frame_info &frame_info)
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
-        if (vkCreatePipelineLayout(device_.device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(device_.get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create pipeline layout!"};
         }
@@ -92,10 +92,10 @@ void render_system_2d::render(frame_info &frame_info)
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
         pipeline_config_info pipeline_config{};
-        lve_pipeline::default_pipeline_config_info(pipeline_config);
+        pipeline::default_pipeline_config_info(pipeline_config);
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
-        pipeline_ = std::make_unique<lve_pipeline>(
+        pipeline_ = std::make_unique<pipeline>(
             device_,
             "shaders/shader_2d.vert.spv",
             "shaders/shader_2d.frag.spv",

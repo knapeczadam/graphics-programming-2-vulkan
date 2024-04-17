@@ -1,5 +1,5 @@
-﻿#include "lve_pipeline.h"
-#include "lve_model.h"
+﻿#include "pipeline.h"
+#include "model.h"
 
 // Standard includes
 #include <fstream>
@@ -8,7 +8,7 @@
 #include <cassert>
 
 // Project includes
-#include "lve_device.h"
+#include "device.h"
 
 #if defined(CMAKE_BUILD)
 #ifndef ENGINE_DIR
@@ -23,8 +23,8 @@
 
 namespace dae
 {
-    lve_pipeline::lve_pipeline(
-        lve_device &device,
+    pipeline::pipeline(
+        device &device,
         std::string const &vertex_file_path,
         std::string const &fragment_file_path,
         pipeline_config_info const &config_info)
@@ -33,19 +33,19 @@ namespace dae
         create_graphics_pipeline(vertex_file_path, fragment_file_path, config_info);
     }
 
-    lve_pipeline::~lve_pipeline()
+    pipeline::~pipeline()
     {
-        vkDestroyShaderModule(device_.device(), vertex_shader_module_, nullptr);
-        vkDestroyShaderModule(device_.device(), fragment_shader_module_, nullptr);
-        vkDestroyPipeline(device_.device(), graphics_pipeline_, nullptr);
+        vkDestroyShaderModule(device_.get_logical_device(), vertex_shader_module_, nullptr);
+        vkDestroyShaderModule(device_.get_logical_device(), fragment_shader_module_, nullptr);
+        vkDestroyPipeline(device_.get_logical_device(), graphics_pipeline_, nullptr);
     }
 
-    void lve_pipeline::bind(VkCommandBuffer command_buffer)
+    void pipeline::bind(VkCommandBuffer command_buffer)
     {
         vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphics_pipeline_);
     }
 
-    void lve_pipeline::default_pipeline_config_info(pipeline_config_info &config_info)
+    void pipeline::default_pipeline_config_info(pipeline_config_info &config_info)
     {
         config_info.input_assembly_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         config_info.input_assembly_info.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; // TODO: Strip?
@@ -113,11 +113,11 @@ namespace dae
         config_info.dynamic_state_info.dynamicStateCount = static_cast<uint32_t>(config_info.dynamic_state_enables.size());
         config_info.dynamic_state_info.flags             = 0;
 
-        config_info.binding_descriptions   = lve_model::lve_vertex::get_binding_description();
-        config_info.attribute_descriptions = lve_model::lve_vertex::get_attribute_descriptions();
+        config_info.binding_descriptions   = model::vertex::get_binding_description();
+        config_info.attribute_descriptions = model::vertex::get_attribute_descriptions();
     }
 
-    auto lve_pipeline::read_file(std::string const &file_path) -> std::vector<char>
+    auto pipeline::read_file(std::string const &file_path) -> std::vector<char>
     {
         std::string const engine_path = ENGINE_DIR + file_path;
         std::ifstream file{engine_path, std::ios::ate | std::ios::binary};
@@ -136,7 +136,7 @@ namespace dae
         return buffer;
     }
 
-    void lve_pipeline::create_graphics_pipeline(std::string const &vertex_file_path,
+    void pipeline::create_graphics_pipeline(std::string const &vertex_file_path,
                                                 std::string const &fragment_file_path,
                                                 pipeline_config_info const &config_info)
     {
@@ -198,20 +198,20 @@ namespace dae
         pipeline_info.basePipelineIndex  = -1;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
-        if (vkCreateGraphicsPipelines(device_.device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
+        if (vkCreateGraphicsPipelines(device_.get_logical_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create graphics pipeline!"};
         }
     }
 
-    void lve_pipeline::create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module)
+    void pipeline::create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module)
     {
         VkShaderModuleCreateInfo create_info{};
         create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         create_info.codeSize = code.size();
         create_info.pCode    = reinterpret_cast<uint32_t const *>(code.data());
 
-        if (vkCreateShaderModule(device_.device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+        if (vkCreateShaderModule(device_.get_logical_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create shader module!"};
         }

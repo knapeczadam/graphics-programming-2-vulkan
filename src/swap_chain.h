@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // Project headers
-#include "lve_device.h"
+#include "device.h"
 
 // Vulkan headers
 #include <vulkan/vulkan.h>
@@ -13,17 +13,17 @@
 
 namespace dae
 {
-    class lve_swap_chain
+    class swap_chain
     {
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2; // at most 2 command buffers to the device's graphics queue at once
 
-        lve_swap_chain(lve_device &device_ref, VkExtent2D window_extent);
-        lve_swap_chain(lve_device &device_ref, VkExtent2D window_extent, std::shared_ptr<lve_swap_chain> const &previous);
-        ~lve_swap_chain();
+        swap_chain(device &device_ref, VkExtent2D window_extent);
+        swap_chain(device &device_ref, VkExtent2D window_extent, std::shared_ptr<swap_chain> const &previous);
+        ~swap_chain();
 
-        lve_swap_chain(lve_swap_chain const &)            = delete;
-        lve_swap_chain &operator=(lve_swap_chain const &) = delete;
+        swap_chain(swap_chain const &)            = delete;
+        swap_chain &operator=(swap_chain const &) = delete;
 
         auto get_frame_buffer(int index) -> VkFramebuffer { return swap_chain_framebuffers_[index]; }
         auto get_render_pass() -> VkRenderPass { return render_pass_; }
@@ -41,7 +41,7 @@ namespace dae
         auto acquire_next_image(uint32_t *image_index) -> VkResult;
         auto submit_command_buffers(VkCommandBuffer const *buffers, uint32_t *image_index) -> VkResult;
 
-        auto compare_swap_formats(lve_swap_chain const &swap_chain) const -> bool
+        auto compare_swap_formats(swap_chain const &swap_chain) const -> bool
         {
             return swap_chain.swap_chain_depth_format_ == swap_chain_depth_format_ and swap_chain.swap_chain_image_format_ == swap_chain_image_format_;
         }
@@ -73,11 +73,11 @@ namespace dae
         std::vector<VkImage>        swap_chain_images_;
         std::vector<VkImageView>    swap_chain_image_views_;
 
-        lve_device &device_;
+        device &device_;
         VkExtent2D window_extent_;
 
         VkSwapchainKHR swap_chain_;
-        std::shared_ptr<lve_swap_chain> old_swap_chain_;
+        std::shared_ptr<swap_chain> old_swap_chain_;
 
         std::vector<VkSemaphore> image_available_semaphores_;
         std::vector<VkSemaphore> render_finished_semaphores_;

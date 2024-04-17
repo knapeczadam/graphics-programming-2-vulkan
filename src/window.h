@@ -9,16 +9,16 @@
 
 namespace dae
 {
-    class lve_window
+    class window
     {
     public:
-        lve_window(int width, int height, std::string name);
-        ~lve_window();
+        window(int width, int height, std::string name);
+        ~window();
 
-        lve_window(const lve_window &)            = delete;
-        lve_window(lve_window &&)                 = delete;
-        lve_window &operator=(const lve_window &) = delete;
-        lve_window &operator=(lve_window &&)      = delete;
+        window(window const &)            = delete;
+        window(window &&)                 = delete;
+        window &operator=(window const &) = delete;
+        window &operator=(window &&)      = delete;
 
         [[nodiscard]] auto should_close() const -> bool;
         [[nodiscard]] auto get_extent() const -> VkExtent2D { return {static_cast<uint32_t>(width_), static_cast<uint32_t>(height_)};}

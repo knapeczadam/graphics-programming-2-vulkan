@@ -1,4 +1,4 @@
-﻿#include "lve_model.h"
+﻿#include "model.h"
 
 // Standard includes
 #include <cassert>
@@ -11,7 +11,7 @@
 #include <tiny_obj_loader.h>
 
 // Project includes
-#include "lve_utils.h"
+#include "utils.h"
 
 // GLM includes
 #define GLM_ENABLE_EXPERIMENTAL
@@ -30,9 +30,9 @@
 namespace std
 {
     template<>
-    struct hash<dae::lve_model::lve_vertex>
+    struct hash<dae::model::vertex>
     {
-        auto operator()(dae::lve_model::lve_vertex const &vertex) const noexcept -> size_t
+        auto operator()(dae::model::vertex const &vertex) const noexcept -> size_t
         {
             size_t seed = 0;
             dae::hash_combine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
@@ -45,23 +45,23 @@ namespace std
 
 namespace dae
 {
-    auto lve_model::lve_vertex::get_binding_description() -> std::vector<VkVertexInputBindingDescription>
+    auto model::vertex::get_binding_description() -> std::vector<VkVertexInputBindingDescription>
     {
         std::vector<VkVertexInputBindingDescription> binding_description(1);
         binding_description[0].binding   = 0;
-        binding_description[0].stride    = sizeof(lve_vertex);
+        binding_description[0].stride    = sizeof(vertex);
         binding_description[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
         return binding_description;
     }
 
-    auto lve_model::lve_vertex::get_attribute_descriptions() -> std::vector<VkVertexInputAttributeDescription>
+    auto model::vertex::get_attribute_descriptions() -> std::vector<VkVertexInputAttributeDescription>
     {
         std::vector<VkVertexInputAttributeDescription> attribute_descriptions{};
         VkVertexInputAttributeDescription position{
             .location = 0,
             .binding  = 0,
             .format   = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset   = offsetof(lve_vertex, position)
+            .offset   = offsetof(vertex, position)
         };
         attribute_descriptions.push_back(position);
 
@@ -69,7 +69,7 @@ namespace dae
             .location = 1,
             .binding  = 0,
             .format   = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset   = offsetof(lve_vertex, color)
+            .offset   = offsetof(vertex, color)
         };
         attribute_descriptions.push_back(color);
         
@@ -77,7 +77,7 @@ namespace dae
             .location = 2,
             .binding  = 0,
             .format   = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset   = offsetof(lve_vertex, normal)
+            .offset   = offsetof(vertex, normal)
         };
         attribute_descriptions.push_back(normal);
         
@@ -85,19 +85,19 @@ namespace dae
             .location = 3,
             .binding  = 0,
             .format   = VK_FORMAT_R32G32_SFLOAT,
-            .offset   = offsetof(lve_vertex, uv)
+            .offset   = offsetof(vertex, uv)
         };
         attribute_descriptions.push_back(uv);
         
         return attribute_descriptions;
     }
 
-    bool lve_model::lve_vertex::operator==(lve_vertex const &other) const
+    bool model::vertex::operator==(vertex const &other) const
     {
         return position == other.position and color == other.color and normal == other.normal and uv == other.uv;
     }
 
-    void lve_model::lve_builder::load_model(std::string const &file_path)
+    void model::builder::load_model(std::string const &file_path)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -113,13 +113,13 @@ namespace dae
         vertices.clear();
         indices.clear();
 
-        std::unordered_map<lve_vertex, uint32_t> unique_vertices{};
+        std::unordered_map<vertex, uint32_t> unique_vertices{};
 
         for (auto const &shape : shapes)
         {
             for (auto const &index : shape.mesh.indices)
             {
-                lve_vertex vertex{};
+                vertex vertex{};
 
                 if (index.vertex_index >= 0)
                 {
@@ -163,34 +163,34 @@ namespace dae
         }
     }
 
-    lve_model::lve_model(lve_device &device, lve_builder const &builder)
+    model::model(device &device, builder const &builder)
         : device_{device}
     {
         create_vertex_buffers(builder.vertices);
         create_index_buffers(builder.indices);
     }
 
-    lve_model::~lve_model()
+    model::~model()
     {
     }
 
-    auto lve_model::create_model_from_file(lve_device &device, std::string const &file_path) -> std::unique_ptr<lve_model>
+    auto model::create_model_from_file(device &device, std::string const &file_path) -> std::unique_ptr<model>
     {
-        lve_builder builder{};
+        builder builder{};
         builder.load_model(file_path);
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
-        return std::make_unique<lve_model>(device, builder);
+        return std::make_unique<model>(device, builder);
     }
 
-    auto lve_model::create_model_from_vertices(lve_device &device, std::vector<lve_vertex> const &vertices) -> std::unique_ptr<lve_model>
+    auto model::create_model_from_vertices(device &device, std::vector<vertex> const &vertices) -> std::unique_ptr<model>
     {
-        lve_builder builder{};
+        builder builder{};
         builder.vertices = vertices;
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
-        return std::make_unique<lve_model>(device, builder);
+        return std::make_unique<model>(device, builder);
     }
 
-    void lve_model::bind(VkCommandBuffer command_buffer)
+    void model::bind(VkCommandBuffer command_buffer)
     {
         VkBuffer     buffers[] = {vertex_buffer_->get_buffer()};
         VkDeviceSize offsets[] = {0};
@@ -202,7 +202,7 @@ namespace dae
         }
     }
 
-    void lve_model::draw(VkCommandBuffer command_buffer)
+    void model::draw(VkCommandBuffer command_buffer)
     {
         if (has_index_buffer_)
         {
@@ -214,14 +214,14 @@ namespace dae
         }
     }
 
-    void lve_model::create_vertex_buffers(std::vector<lve_vertex> const &vertices)
+    void model::create_vertex_buffers(std::vector<vertex> const &vertices)
     {
         vertex_count_ = static_cast<uint32_t>(vertices.size());
         assert(vertex_count_ >= 3 and "Vertex count must be at least 3!");
         VkDeviceSize buffer_size = sizeof(vertices[0]) * vertex_count_;
         uint32_t vertex_size = sizeof(vertices[0]);
 
-        lve_buffer staging_buffer {
+        buffer staging_buffer {
             device_,
             vertex_size,
             vertex_count_,
@@ -230,9 +230,9 @@ namespace dae
         };
 
         staging_buffer.map();
-        staging_buffer.write_to_buffer(const_cast<lve_vertex*>(vertices.data()));
+        staging_buffer.write_to_buffer(const_cast<vertex*>(vertices.data()));
 
-        vertex_buffer_ = std::make_unique<lve_buffer>(
+        vertex_buffer_ = std::make_unique<buffer>(
             device_,
             vertex_size,
             vertex_count_,
@@ -244,7 +244,7 @@ namespace dae
         device_.copy_buffer(staging_buffer.get_buffer(), vertex_buffer_->get_buffer(), buffer_size);
     }
 
-    void lve_model::create_index_buffers(std::vector<uint32_t> const& indices)
+    void model::create_index_buffers(std::vector<uint32_t> const& indices)
     {
         index_count_ = static_cast<uint32_t>(indices.size());
         has_index_buffer_ = index_count_ > 0;
@@ -257,7 +257,7 @@ namespace dae
         VkDeviceSize buffer_size = sizeof(indices[0]) * index_count_;
         uint32_t index_size = sizeof(indices[0]);
 
-        lve_buffer staging_buffer {
+        buffer staging_buffer {
             device_,
             index_size,
             index_count_,
@@ -268,7 +268,7 @@ namespace dae
         staging_buffer.map();
         staging_buffer.write_to_buffer((void*) indices.data());
 
-        index_buffer_ = std::make_unique<lve_buffer>(
+        index_buffer_ = std::make_unique<buffer>(
             device_,
             index_size,
             index_count_,

@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 // Project includes
-#include "lve_window.h"
-#include "lve_device.h"
-#include "lve_swap_chain.h"
+#include "window.h"
+#include "device.h"
+#include "swap_chain.h"
 
 // Standard includes
 #include <memory>
@@ -12,14 +12,14 @@
 
 namespace dae
 {
-    class lve_renderer
+    class renderer
     {
     public:
-        lve_renderer(lve_window &window, lve_device &device);
-        ~lve_renderer();
+        renderer(window &window, device &device);
+        ~renderer();
 
-        lve_renderer(lve_renderer const &)            = delete;
-        lve_renderer &operator=(lve_renderer const &) = delete;
+        renderer(renderer const &)            = delete;
+        renderer &operator=(renderer const &) = delete;
 
         [[nodiscard]] auto get_swap_chain_render_pass() const -> VkRenderPass { return swap_chain_->get_render_pass(); }
         [[nodiscard]] auto get_aspect_ratio() const -> float { return swap_chain_->extent_aspect_ratio(); }
@@ -47,9 +47,9 @@ namespace dae
         void recreate_swap_chain();
         
     private:
-        lve_window                      &window_;
-        lve_device                      &device_;
-        std::unique_ptr<lve_swap_chain> swap_chain_;
+        window                      &window_;
+        device                      &device_;
+        std::unique_ptr<swap_chain> swap_chain_;
         std::vector<VkCommandBuffer>    command_buffers_;
 
         uint32_t current_image_index_ = {};

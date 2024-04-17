@@ -9,7 +9,7 @@
 namespace dae
 {
     // Forward declarations
-    class lve_device;
+    class device;
 
     struct pipeline_config_info
     {
@@ -33,20 +33,20 @@ namespace dae
         uint32_t         subpass         = 0;
     };
 
-    class lve_pipeline
+    class pipeline
     {
     public:
-        lve_pipeline() = default;
-        lve_pipeline(
-            lve_device &device,
+        pipeline() = default;
+        pipeline(
+            device &device,
             std::string const &vertex_file_path,
             std::string const &fragment_file_path,
             pipeline_config_info const &config_info);
 
-        ~lve_pipeline();
+        ~pipeline();
 
-        lve_pipeline(lve_pipeline const &) = delete;
-        lve_pipeline &operator=(lve_pipeline const &) = delete;
+        pipeline(pipeline const &) = delete;
+        pipeline &operator=(pipeline const &) = delete;
 
         void bind(VkCommandBuffer command_buffer);
 
@@ -62,7 +62,7 @@ namespace dae
 
         void create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module);
 
-        lve_device &device_;
+        device &device_;
         VkPipeline graphics_pipeline_;
         VkShaderModule vertex_shader_module_;
         VkShaderModule fragment_shader_module_;

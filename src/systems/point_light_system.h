@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "../lve_pipeline.h"
-#include "../lve_device.h"
-#include "../lve_game_object.h"
-#include "../lve_camera.h"
-#include "../lve_frame_info.h"
+#include "../pipeline.h"
+#include "../device.h"
+#include "../game_object.h"
+#include "../camera.h"
+#include "../frame_info.h"
 
 // Standard includes
 #include <memory>
@@ -16,7 +16,7 @@ namespace dae
     class point_light_system
     {
     public:
-        point_light_system(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        point_light_system(device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
         ~point_light_system();
 
         point_light_system(point_light_system const &)            = delete;
@@ -30,9 +30,9 @@ namespace dae
         void create_pipeline(VkRenderPass render_pass);
         
     private:
-        lve_device                     &device_;
+        device                     &device_;
         
-        std::unique_ptr<lve_pipeline>  pipeline_;
+        std::unique_ptr<pipeline>  pipeline_;
         VkPipelineLayout               pipeline_layout_;
         
     };

@@ -1,11 +1,11 @@
-﻿#include "lve_window.h"
+﻿#include "window.h"
 
 // Standard includes
 #include <stdexcept>
 
 namespace dae
 {
-    lve_window::lve_window(int width, int height, std::string name)
+    window::window(int width, int height, std::string name)
         : width_(width)
         , height_(height)
         , window_name_(std::move(name))
@@ -13,13 +13,13 @@ namespace dae
         init_window();
     }
 
-    lve_window::~lve_window()
+    window::~window()
     {
         glfwDestroyWindow(window_ptr_);
         glfwTerminate();
     }
 
-    void lve_window::create_window_surface(VkInstance instance, VkSurfaceKHR *surface_ptr)
+    void window::create_window_surface(VkInstance instance, VkSurfaceKHR *surface_ptr)
     {
         if (glfwCreateWindowSurface(instance, window_ptr_, nullptr, surface_ptr) != VK_SUCCESS)
         {
@@ -28,21 +28,21 @@ namespace dae
         }
     }
 
-    void lve_window::framebuffer_resize_callback(GLFWwindow *window_ptr, int width, int height)
+    void window::framebuffer_resize_callback(GLFWwindow *window_ptr, int width, int height)
     {
-        auto updated_window = reinterpret_cast<lve_window*>(glfwGetWindowUserPointer(window_ptr));
+        auto updated_window = reinterpret_cast<window*>(glfwGetWindowUserPointer(window_ptr));
         updated_window->frame_buffer_resized_ = true;
         updated_window->width_ = width;
         updated_window->height_ = height;
         
     }
 
-    auto lve_window::should_close() const -> bool
+    auto window::should_close() const -> bool
     {
         return glfwWindowShouldClose(window_ptr_);
     }
 
-    void lve_window::init_window()
+    void window::init_window()
     {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // we are not using OpenGL, hence the GLFW_NO_API

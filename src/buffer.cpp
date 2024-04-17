@@ -4,7 +4,7 @@
  * Initially based off VulkanBuffer by Sascha Willems -
  * https://github.com/SaschaWillems/Vulkan/blob/master/base/VulkanBuffer.h
  */
-#include "lve_buffer.h"
+#include "buffer.h"
 
 // Standard includes
 #include <cassert>
@@ -21,7 +21,7 @@ namespace dae
      *
      * @return VkResult of the buffer mapping call
      */
-    auto lve_buffer::get_alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment) -> VkDeviceSize
+    auto buffer::get_alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment) -> VkDeviceSize
     {
         if (min_offset_alignment > 0)
         {
@@ -30,14 +30,14 @@ namespace dae
         return instance_size;
     }
 
-    lve_buffer::lve_buffer(
-        lve_device            &device,
+    buffer::buffer(
+        device                &device,
         VkDeviceSize          instanceSize,
         uint32_t              instanceCount,
         VkBufferUsageFlags    usageFlags,
         VkMemoryPropertyFlags memoryPropertyFlags,
         VkDeviceSize          minOffsetAlignment)
-        : lve_device_{device},
+        : device_{device},
           instance_count_{instanceCount},
           instance_size_{instanceSize},
           usage_flags_{usageFlags},
@@ -48,11 +48,11 @@ namespace dae
         device.create_buffer(buffer_size_, usageFlags, memoryPropertyFlags, buffer_, memory_);
     }
 
-    lve_buffer::~lve_buffer()
+    buffer::~buffer()
     {
         unmap();
-        vkDestroyBuffer(lve_device_.device(), buffer_, nullptr);
-        vkFreeMemory(lve_device_.device(), memory_, nullptr);
+        vkDestroyBuffer(device_.get_logical_device(), buffer_, nullptr);
+        vkFreeMemory(device_.get_logical_device(), memory_, nullptr);
     }
 
     /**
@@ -64,10 +64,10 @@ namespace dae
      *
      * @return VkResult of the buffer mapping call
      */
-    auto lve_buffer::map(VkDeviceSize size, VkDeviceSize offset) -> VkResult
+    auto buffer::map(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
         assert(buffer_ and memory_ and "Called map on buffer before create");
-        return vkMapMemory(lve_device_.device(), memory_, offset, size, 0, &mapped_);
+        return vkMapMemory(device_.get_logical_device(), memory_, offset, size, 0, &mapped_);
     }
 
     /**
@@ -75,11 +75,11 @@ namespace dae
      *
      * @note Does not return a result as vkUnmapMemory can't fail
      */
-    void lve_buffer::unmap()
+    void buffer::unmap()
     {
         if (mapped_)
         {
-            vkUnmapMemory(lve_device_.device(), memory_);
+            vkUnmapMemory(device_.get_logical_device(), memory_);
             mapped_ = nullptr;
         }
     }
@@ -93,7 +93,7 @@ namespace dae
      * @param offset (Optional) Byte offset from beginning of mapped region
      *
      */
-    void lve_buffer::write_to_buffer(void *data, VkDeviceSize size, VkDeviceSize offset)
+    void buffer::write_to_buffer(void *data, VkDeviceSize size, VkDeviceSize offset)
     {
         assert(mapped_ and "Cannot copy to unmapped buffer");
 
@@ -120,14 +120,14 @@ namespace dae
      *
      * @return VkResult of the flush call
      */
-    auto lve_buffer::flush(VkDeviceSize size, VkDeviceSize offset) -> VkResult
+    auto buffer::flush(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory_;
         mappedRange.offset = offset;
         mappedRange.size   = size;
-        return vkFlushMappedMemoryRanges(lve_device_.device(), 1, &mappedRange);
+        return vkFlushMappedMemoryRanges(device_.get_logical_device(), 1, &mappedRange);
     }
 
     /**
@@ -141,14 +141,14 @@ namespace dae
      *
      * @return VkResult of the invalidate call
      */
-    auto lve_buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) -> VkResult
+    auto buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory_;
         mappedRange.offset = offset;
         mappedRange.size   = size;
-        return vkInvalidateMappedMemoryRanges(lve_device_.device(), 1, &mappedRange);
+        return vkInvalidateMappedMemoryRanges(device_.get_logical_device(), 1, &mappedRange);
     }
 
     /**
@@ -159,7 +159,7 @@ namespace dae
      *
      * @return VkDescriptorBufferInfo of specified offset and range
      */
-    auto lve_buffer::descriptor_info(VkDeviceSize size, VkDeviceSize offset) -> VkDescriptorBufferInfo
+    auto buffer::descriptor_info(VkDeviceSize size, VkDeviceSize offset) -> VkDescriptorBufferInfo
     {
         return VkDescriptorBufferInfo{
             buffer_,
@@ -175,7 +175,7 @@ namespace dae
      * @param index Used in offset calculation
      *
      */
-    void lve_buffer::write_to_index(void *data, int index)
+    void buffer::write_to_index(void *data, int index)
     {
         write_to_buffer(data, instance_size_, index * alignment_size_);
     }
@@ -186,7 +186,7 @@ namespace dae
      * @param index Used in offset calculation
      *
      */
-    auto lve_buffer::flush_index(int index) -> VkResult { return flush(alignment_size_, index * alignment_size_); }
+    auto buffer::flush_index(int index) -> VkResult { return flush(alignment_size_, index * alignment_size_); }
 
     /**
      * Create a buffer info descriptor
@@ -195,7 +195,7 @@ namespace dae
      *
      * @return VkDescriptorBufferInfo for instance at index
      */
-    auto lve_buffer::descriptor_info_for_index(int index) -> VkDescriptorBufferInfo
+    auto buffer::descriptor_info_for_index(int index) -> VkDescriptorBufferInfo
     {
         return descriptor_info(alignment_size_, index * alignment_size_);
     }
@@ -209,7 +209,7 @@ namespace dae
      *
      * @return VkResult of the invalidate call
      */
-    auto lve_buffer::invalidate_index(int index) -> VkResult
+    auto buffer::invalidate_index(int index) -> VkResult
     {
         return invalidate(alignment_size_, index * alignment_size_);
     }

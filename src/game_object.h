@@ -5,14 +5,13 @@
 #include <unordered_map>
 
 // Project includes
-#include "lve_model.h"
+#include "model.h"
 
 // GLM includes
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace dae
 {
-
     struct transform_component
     {
         glm::vec3 translation = {};
@@ -33,36 +32,36 @@ namespace dae
         float light_intensity = 1.0f;
     };
 
-    class lve_game_object
+    class game_object
     {
     public:
         // Type aliases
         using id_t = unsigned int;
-        using map = std::unordered_map<id_t, lve_game_object>;
+        using map = std::unordered_map<id_t, game_object>;
         
     public:
-        lve_game_object(lve_game_object const &)            = delete;
-        lve_game_object &operator=(lve_game_object const &) = delete;
-        lve_game_object(lve_game_object &&)                 = default;
-        lve_game_object &operator=(lve_game_object &&)      = default;
+        game_object(game_object const &)            = delete;
+        game_object &operator=(game_object const &) = delete;
+        game_object(game_object &&)                 = default;
+        game_object &operator=(game_object &&)      = default;
 
         
-        static auto create_game_object(std::string const &name) -> lve_game_object
+        static auto create_game_object(std::string const &name) -> game_object
         {
             static id_t current_id = 0;
-            return lve_game_object{current_id++, name};
+            return game_object{current_id++, name};
         }
 
-        static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> lve_game_object;
+        static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> game_object;
 
         [[nodiscard]] auto get_id() const -> id_t { return id_; }
         [[nodiscard]] auto get_name() const -> std::string { return name_; }
 
     private:
-        lve_game_object(id_t id, std::string const  &name) : id_{id}, name_{name} {}
+        game_object(id_t id, std::string name) : id_{id}, name_{std::move(name)} {}
 
     public:
-        std::shared_ptr<lve_model> model     = {};
+        std::shared_ptr<model> model     = {};
         glm::vec3                  color     = {};
         transform_component        transform = {};
 

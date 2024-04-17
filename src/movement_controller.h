@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "lve_game_object.h"
-#include "lve_window.h"
+#include "game_object.h"
+#include "window.h"
 
 namespace dae
 {
@@ -22,7 +22,7 @@ namespace dae
     class movement_controller
     {
     public:
-        void move(GLFWwindow *window_ptr, float dt, lve_game_object &game_object);
+        void move(GLFWwindow *window_ptr, float dt, game_object &game_object);
         
     private:
         float move_speed = 3.0f;

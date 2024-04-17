@@ -1,4 +1,4 @@
-﻿#include "lve_renderer.h"
+﻿#include "renderer.h"
 
 // Standard includes
 #include <array>
@@ -6,7 +6,7 @@
 
 namespace dae
 {
-    lve_renderer::lve_renderer(lve_window &window, lve_device &device)
+    renderer::renderer(window &window, device &device)
         : window_{window}
         , device_{device}
     {
@@ -14,12 +14,12 @@ namespace dae
         create_command_buffers();
     }
 
-    lve_renderer::~lve_renderer()
+    renderer::~renderer()
     {
         free_command_buffers();    
     }
 
-    auto lve_renderer::begin_frame() -> VkCommandBuffer
+    auto renderer::begin_frame() -> VkCommandBuffer
     {
         assert(not is_frame_started_ and "Can't call begin_frame while already in progess");
         
@@ -50,7 +50,7 @@ namespace dae
         return command_buffer;
     }
 
-    void lve_renderer::end_frame()
+    void renderer::end_frame()
     {
         assert(is_frame_started_ and "Can't call end_frame while frame is not in progress");
         auto command_buffer = get_current_command_buffer();
@@ -72,10 +72,10 @@ namespace dae
         }
 
         is_frame_started_ = false;
-        current_frame_index_ = (current_frame_index_ + 1) % lve_swap_chain::MAX_FRAMES_IN_FLIGHT;
+        current_frame_index_ = (current_frame_index_ + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
     }
 
-    void lve_renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
+    void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
     {
         assert(is_frame_started_ and "Can't call begin_swap_chain_render_pass if frame is not in progesss");
         assert(command_buffer == get_current_command_buffer() and "Can't begin render pass on command buffer from a different frame");
@@ -108,7 +108,7 @@ namespace dae
         vkCmdSetScissor(command_buffer, 0, 1, &scissor);
     }
 
-    void lve_renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
+    void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
     {
         assert(is_frame_started_ and "Can't call end_swap_chain_render_pass if frame is not in progesss");
         assert(command_buffer == get_current_command_buffer() and "Can't end render pass on command buffer from a different frame");
@@ -116,9 +116,9 @@ namespace dae
         vkCmdEndRenderPass(command_buffer);
     }
 
-    void lve_renderer::create_command_buffers()
+    void renderer::create_command_buffers()
     {
-        command_buffers_.resize(lve_swap_chain::MAX_FRAMES_IN_FLIGHT);
+        command_buffers_.resize(swap_chain::MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -126,24 +126,24 @@ namespace dae
         alloc_info.commandPool        = device_.get_command_pool();
         alloc_info.commandBufferCount = static_cast<uint32_t>(command_buffers_.size());
 
-        if (vkAllocateCommandBuffers(device_.device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(device_.get_logical_device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to allocate command buffers!"};
         }
 
     }
 
-    void lve_renderer::free_command_buffers()
+    void renderer::free_command_buffers()
     {
         vkFreeCommandBuffers(
-            device_.device(),
+            device_.get_logical_device(),
             device_.get_command_pool(),
             static_cast<uint32_t>(command_buffers_.size()),
             command_buffers_.data());
         command_buffers_.clear();
     }
 
-    void lve_renderer::recreate_swap_chain()
+    void renderer::recreate_swap_chain()
     {
         auto extent = window_.get_extent();
         while (extent.width == 0 or extent.height == 0)
@@ -152,15 +152,15 @@ namespace dae
             glfwWaitEvents();
         }
 
-        vkDeviceWaitIdle(device_.device());
+        vkDeviceWaitIdle(device_.get_logical_device());
         if (swap_chain_ == nullptr)
         {
-            swap_chain_ = std::make_unique<lve_swap_chain>(device_, extent);
+            swap_chain_ = std::make_unique<swap_chain>(device_, extent);
         }
         else
         {
-            std::shared_ptr<lve_swap_chain> old_swap_chain = std::move(swap_chain_);
-            swap_chain_ = std::make_unique<lve_swap_chain>(device_, extent, old_swap_chain);
+            std::shared_ptr<swap_chain> old_swap_chain = std::move(swap_chain_);
+            swap_chain_ = std::make_unique<swap_chain>(device_, extent, old_swap_chain);
 
             if (not old_swap_chain->compare_swap_formats(*swap_chain_))
             {

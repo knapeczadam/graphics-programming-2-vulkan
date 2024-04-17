@@ -1,12 +1,12 @@
-﻿#include "lve_app.h"
+﻿#include "app.h"
 
 // Project includes
-#include "lve_camera.h"
+#include "camera.h"
 #include "systems/render_system_2d.h"
 #include "systems/render_system_3d.h"
 #include "systems/point_light_system.h"
 #include "movement_controller.h"
-#include "lve_buffer.h"
+#include "buffer.h"
 
 // Standard includes
 #include <array>
@@ -22,26 +22,26 @@
 
 namespace dae
 {
-    lve_app::lve_app()
+    app::app()
     {
-        global_pool_ = lve_descriptor_pool::builder(device_)
-                       .set_max_sets(lve_swap_chain::MAX_FRAMES_IN_FLIGHT)
-                       .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, lve_swap_chain::MAX_FRAMES_IN_FLIGHT)
+        global_pool_ = descriptor_pool::builder(device_)
+                       .set_max_sets(swap_chain::MAX_FRAMES_IN_FLIGHT)
+                       .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .build();
         
         load_game_objects();
     }
 
-    lve_app::~lve_app()
+    app::~app()
     {
     }
 
-    void lve_app::run()
+    void app::run()
     {
-        std::vector<std::unique_ptr<lve_buffer>> ubo_buffers(lve_swap_chain::MAX_FRAMES_IN_FLIGHT);
+        std::vector<std::unique_ptr<buffer>> ubo_buffers(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < ubo_buffers.size(); ++i)
         {
-            ubo_buffers[i] = std::make_unique<lve_buffer>(
+            ubo_buffers[i] = std::make_unique<buffer>(
                 device_,
                 sizeof(global_ubo),
                 1,
@@ -51,15 +51,15 @@ namespace dae
             ubo_buffers[i]->map();
         }
 
-        auto global_set_layout = lve_descriptor_set_layout::builder(device_)
+        auto global_set_layout = descriptor_set_layout::builder(device_)
                                  .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                  .build();
 
-        std::vector<VkDescriptorSet> global_descriptor_sets(lve_swap_chain::MAX_FRAMES_IN_FLIGHT);
+        std::vector<VkDescriptorSet> global_descriptor_sets(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
         {
             auto buffer_info = ubo_buffers[i]->descriptor_info();
-            lve_descriptor_writer(*global_set_layout, *global_pool_)
+            descriptor_writer(*global_set_layout, *global_pool_)
                 .write_buffer(0, &buffer_info)
                 .build(global_descriptor_sets[i]);
         }
@@ -67,12 +67,13 @@ namespace dae
         render_system_3d render_system_3d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         render_system_2d render_system_2d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         point_light_system point_light_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        lve_camera camera{};
-        // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{0.5f, 0.0f, 1.0f});
-        camera.set_view_target(glm::vec3{-1.0f, -2.0f, -20.0f}, glm::vec3{2.0f, -2.0f, 2.5f});
+        camera camera{};
+        // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
+        // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});
 
-        auto viewer_object = lve_game_object::create_game_object("viewer");
-        viewer_object.transform.translation.z = -2.5f;
+        auto viewer_object = game_object::create_game_object("viewer");
+        viewer_object.transform.translation = {0.0f, -1.5f, -5.0f};
+        viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
 
         auto current_time = std::chrono::high_resolution_clock::now();
@@ -127,61 +128,13 @@ namespace dae
                 renderer_.end_frame();
             }
         }
-        vkDeviceWaitIdle(device_.device());
+        vkDeviceWaitIdle(device_.get_logical_device());
     }
-    std::unique_ptr<lve_model> createCubeModel(lve_device& device, glm::vec3 offset) {
-      lve_model::lve_builder modelBuilder{};
-      modelBuilder.vertices = {
-          // left face (white)
-          {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-          {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-          {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-          {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-     
-          // right face (yellow)
-          {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-          {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-          {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-          {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-     
-          // top face (orange, remember y axis points down)
-          {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-          {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-          {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-          {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-     
-          // bottom face (red)
-          {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-          {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-          {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-          {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-     
-          // nose face (blue)
-          {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-          {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-          {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-          {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-     
-          // tail face (green)
-          {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-          {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-          {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-          {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-      };
-      for (auto& v : modelBuilder.vertices) {
-        v.position += offset;
-      }
-
-      modelBuilder.indices = {0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,  8,  9,  10, 8,  11, 9,
-                              12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21};
-     
-      return std::make_unique<lve_model>(device, modelBuilder);
-    }
-
-    std::unique_ptr<lve_model> create_oval_model(lve_device &device, glm::vec3 offset, float radiusX, float radiusY,
+    
+    std::unique_ptr<model> create_oval_model(device &device, glm::vec3 offset, float radiusX, float radiusY,
                                                  int segments)
     {
-        lve_model::lve_builder modelBuilder{};
+        model::builder modelBuilder{};
 
         // Generate vertices for the oval shape
         for (int i = 0; i <= segments; ++i)
@@ -208,12 +161,12 @@ namespace dae
         modelBuilder.indices.push_back(segments);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<lve_model>(device, modelBuilder);
+        return std::make_unique<model>(device, modelBuilder);
     }
 
-    std::unique_ptr<lve_model> create_n_gon_model(lve_device &device, glm::vec3 offset, float radius, int sides)
+    std::unique_ptr<model> create_n_gon_model(device &device, glm::vec3 offset, float radius, int sides)
     {
-        lve_model::lve_builder modelBuilder{};
+        model::builder modelBuilder{};
 
         // Calculate the angle between each vertex based on the number of sides
         float angleIncrement = glm::two_pi<float>() / static_cast<float>(sides);
@@ -243,34 +196,34 @@ namespace dae
         modelBuilder.indices.push_back(sides - 1);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<lve_model>(device, modelBuilder);
+        return std::make_unique<model>(device, modelBuilder);
     }
     
-    void lve_app::load_game_objects()
+    void app::load_game_objects()
     {
-        std::shared_ptr<lve_model> model = lve_model::create_model_from_file(device_, "models/smooth_vase.obj");
-        auto go1 = lve_game_object::create_game_object("3d");
-        go1.model = model;
-        go1.transform.translation = {-0.5f, 0.5f, 0.0f};
-        go1.transform.scale = glm::vec3{3.0f, 1.5f, 2.0f};
-        game_objects_.emplace(go1.get_id(), std::move(go1));
+        std::shared_ptr<model> model = model::create_model_from_file(device_, "models/suzanne.obj");
+        auto go = game_object::create_game_object("3d");
+        go.model = model;
+        go.transform.translation = {-1.2f, 0.0f, 2.5f};
+        go.transform.scale = glm::vec3{-0.5f};
+        game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = lve_model::create_model_from_file(device_, "models/flat_vase.obj");
-        auto go2 = lve_game_object::create_game_object("3d");
-        go2.model = model;
-        go2.transform.translation = {0.5f, 0.5f, 0.0f};
-        go2.transform.scale = glm::vec3{3};
-        game_objects_.emplace(go2.get_id(), std::move(go2));
+        model = model::create_model_from_file(device_, "models/beetle.obj");
+        go = game_object::create_game_object("3d");
+        go.model = model;
+        go.transform.translation = {-0.2f, 2.0f, 1.5f};
+        go.transform.scale = glm::vec3{-5.8f};
+        game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = lve_model::create_model_from_file(device_, "models/quad.obj");
-        auto go3 = lve_game_object::create_game_object("3d");
-        go3.model = model;
-        go3.transform.translation = {0.0f, 0.5f, 0.0f};
-        go3.transform.scale = glm::vec3{3};
-        game_objects_.emplace(go3.get_id(), std::move(go3));
+        model = model::create_model_from_file(device_, "models/quad.obj");
+        go = game_object::create_game_object("3d");
+        go.model = model;
+        go.transform.translation = {0.0f, 0.0f, 0.0f};
+        go.transform.scale = glm::vec3{3};
+        game_objects_.emplace(go.get_id(), std::move(go));
 
-        auto point_light = lve_game_object::make_point_light(0.2f);
-        game_objects_.emplace(point_light.get_id(), std::move(point_light));
+        go = game_object::make_point_light(0.2f);
+        game_objects_.emplace(go.get_id(), std::move(go));
         
         std::vector<glm::vec3> light_colors{
             {1.f, .1f, .1f},
@@ -283,34 +236,28 @@ namespace dae
 
         for (int i = 0; i < light_colors.size(); ++i)
         {
-            auto point_light = lve_game_object::make_point_light(0.2f);
+            auto point_light = game_object::make_point_light(0.2f);
             point_light.color = light_colors[i];
             auto rotate_light = glm::rotate(
                 glm::mat4{1.0f},
                 (i * glm::two_pi<float>()) / light_colors.size(),
                 {0.0f, -1.0f, 0.0f}
             );
-            point_light.transform.translation = glm::vec3{rotate_light * glm::vec4{-1.0f, -1.0f, -1.0f, 1.0f}};
+            point_light.transform.translation = glm::vec3{rotate_light * glm::vec4{-1.0f, -1.0f, 0.0f, 1.0f}};
             game_objects_.emplace(point_light.get_id(), std::move(point_light));
         }
 
 
-        // model = lve_model::create_model_from_vertices(device_, vertices);;
+        go  = game_object::create_game_object("2d");
         model = create_oval_model(device_, {}, 0.5f, 0.5f, 50);
-        auto go4  = lve_game_object::create_game_object("2d");
-        go4.model = model;
-        go4.transform.translation = {0.0f, 0.0f, -2.0f};
-        // go4.color = {1.0f, 0.0f, 1.0f};
-        // go4.transform.rotation = glm::vec3{.25f * glm::two_pi<float>()};
-        game_objects_.emplace(go4.get_id(), std::move(go4));
+        go.model = model;
+        go.transform.translation = {2.0f, -1.0f, 0.0f};
+        game_objects_.emplace(go.get_id(), std::move(go));
         
-        // model = lve_model::create_model_from_vertices(device_, vertices);;
+        go  = game_object::create_game_object("2d");
         model = create_n_gon_model(device_, {}, 0.5f, 3);
-        auto go5  = lve_game_object::create_game_object("2d");
-        go5.model = model;
-        go5.transform.translation = {0.0f, 0.0f, +2.0f};
-        // go4.color = {1.0f, 0.0f, 1.0f};
-        // go4.transform.rotation = glm::vec3{.25f * glm::two_pi<float>()};
-        game_objects_.emplace(go5.get_id(), std::move(go5));
+        go.model = model;
+        go.transform.translation = {-2.0f, -1.0f, 0.0f};
+        game_objects_.emplace(go.get_id(), std::move(go));
     }
 }

@@ -20,7 +20,7 @@ namespace dae
         float radius;
     };
     
-    point_light_system::point_light_system(lve_device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+    point_light_system::point_light_system(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
         : device_{device}
     {
         create_pipeline_layout(global_set_layout);
@@ -29,7 +29,7 @@ namespace dae
 
     point_light_system::~point_light_system()
     {
-        vkDestroyPipelineLayout(device_.device(), pipeline_layout_, nullptr);
+        vkDestroyPipelineLayout(device_.get_logical_device(), pipeline_layout_, nullptr);
     }
 
     void point_light_system::update(frame_info &frame_info, global_ubo &ubo)
@@ -112,7 +112,7 @@ void point_light_system::render(frame_info &frame_info)
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
-        if (vkCreatePipelineLayout(device_.device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(device_.get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create pipeline layout!"};
         }
@@ -123,12 +123,12 @@ void point_light_system::render(frame_info &frame_info)
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
         pipeline_config_info pipeline_config{};
-        lve_pipeline::default_pipeline_config_info(pipeline_config);
+        pipeline::default_pipeline_config_info(pipeline_config);
         pipeline_config.attribute_descriptions.clear();
         pipeline_config.binding_descriptions.clear();
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
-        pipeline_ = std::make_unique<lve_pipeline>(
+        pipeline_ = std::make_unique<pipeline>(
             device_,
             "shaders/point_light.vert.spv",
             "shaders/point_light.frag.spv",

@@ -1,23 +1,23 @@
 ﻿#pragma once
 
-#include "lve_device.h"
+#include "device.h"
 
 namespace dae
 {
-    class lve_buffer
+    class buffer
     {
     public:
-        lve_buffer(
-            lve_device &device,
+        buffer(
+            device &device,
             VkDeviceSize instance_size,
             uint32_t instance_count,
             VkBufferUsageFlags usage_flags,
             VkMemoryPropertyFlags memory_property_flags,
             VkDeviceSize min_offset_alignment = 1);
-        ~lve_buffer();
+        ~buffer();
 
-        lve_buffer(lve_buffer const &) = delete;
-        lve_buffer &operator=(lve_buffer const &) = delete;
+        buffer(buffer const &) = delete;
+        buffer &operator=(buffer const &) = delete;
 
         auto map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) -> VkResult;
         void unmap();
@@ -44,7 +44,7 @@ namespace dae
     private:
         static auto get_alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment) -> VkDeviceSize;
 
-        lve_device     &lve_device_;
+        device         &device_;
         void           *mapped_      = nullptr;
         VkBuffer       buffer_       = VK_NULL_HANDLE;
         VkDeviceMemory memory_       = VK_NULL_HANDLE;

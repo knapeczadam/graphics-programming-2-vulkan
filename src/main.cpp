@@ -1,6 +1,6 @@
 
 // Project includes
-#include "lve_app.h"
+#include "app.h"
 
 // Standard includes
 #include <cstdlib>
@@ -9,7 +9,7 @@
 
 int main()
 {
-    dae::lve_app app{};
+    dae::app app{};
 
     try
     {

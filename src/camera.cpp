@@ -1,4 +1,4 @@
-﻿#include "lve_camera.h"
+﻿#include "camera.h"
 
 // Standard includes
 #include <cassert>
@@ -6,7 +6,7 @@
 
 namespace dae
 {
-    void lve_camera::set_orthographic_projection(float left, float right, float top, float bottom, float near,
+    void camera::set_orthographic_projection(float left, float right, float top, float bottom, float near,
         float far)
     {
         projection_matrix_ = glm::mat4{1.0f};
@@ -18,7 +18,7 @@ namespace dae
         projection_matrix_[3][2] = -near / (far - near);
     }
 
-    void lve_camera::set_perspective_projection(float fovy, float aspect, float near, float far)
+    void camera::set_perspective_projection(float fovy, float aspect, float near, float far)
     {
         assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
         float const tan_half_fovy = std::tan(fovy / 2.0f);
@@ -30,7 +30,7 @@ namespace dae
         projection_matrix_[3][2] = -(far * near) / (far - near);
     }
 
-    void lve_camera::set_view_direction(glm::vec3 position, glm::vec3 direction, glm::vec3 up)
+    void camera::set_view_direction(glm::vec3 position, glm::vec3 direction, glm::vec3 up)
     {
           const glm::vec3 w{glm::normalize(direction)};
           const glm::vec3 u{glm::normalize(glm::cross(w, up))};
@@ -51,12 +51,12 @@ namespace dae
           view_matrix_[3][2] = -glm::dot(w, position);
     }
 
-    void lve_camera::set_view_target(glm::vec3 position, glm::vec3 target, glm::vec3 up)
+    void camera::set_view_target(glm::vec3 position, glm::vec3 target, glm::vec3 up)
     {
         set_view_direction(position, target - position, up);
     }
 
-    void lve_camera::set_view_yxz(glm::vec3 position, glm::vec3 rotation)
+    void camera::set_view_yxz(glm::vec3 position, glm::vec3 rotation)
     {
         const float c3 = glm::cos(rotation.z);
         const float s3 = glm::sin(rotation.z);

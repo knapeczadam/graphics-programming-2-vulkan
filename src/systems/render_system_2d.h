@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "../lve_pipeline.h"
-#include "../lve_device.h"
-#include "../lve_game_object.h"
-#include "../lve_camera.h"
-#include "../lve_frame_info.h"
+#include "../pipeline.h"
+#include "../device.h"
+#include "../game_object.h"
+#include "../camera.h"
+#include "../frame_info.h"
 
 // Standard includes
 #include <memory>
@@ -16,7 +16,7 @@ namespace dae
     class render_system_2d
     {
     public:
-        render_system_2d(lve_device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        render_system_2d(device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
         ~render_system_2d();
 
         render_system_2d(render_system_2d const &)            = delete;
@@ -29,9 +29,9 @@ namespace dae
         void create_pipeline(VkRenderPass render_pass);
         
     private:
-        lve_device                     &device_;
+        device                     &device_;
         
-        std::unique_ptr<lve_pipeline>  pipeline_;
+        std::unique_ptr<pipeline>  pipeline_;
         VkPipelineLayout               pipeline_layout_;
         
     };

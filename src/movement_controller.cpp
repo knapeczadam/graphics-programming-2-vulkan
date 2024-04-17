@@ -2,7 +2,7 @@
 
 namespace dae
 {
-    void movement_controller::move(GLFWwindow* window_ptr, float dt, lve_game_object& game_object)
+    void movement_controller::move(GLFWwindow* window_ptr, float dt, game_object& game_object)
     {
         double mouse_x, mouse_y;
         glm::vec3 rotate{0};

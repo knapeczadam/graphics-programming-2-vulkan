@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "lve_window.h"
+#include "window.h"
 
 // std lib headers
 #include <string>
@@ -25,26 +25,26 @@ namespace dae
         [[nodiscard]] auto is_complete() const -> bool { return graphics_family_has_value and present_family_has_value; }
     };
 
-    class lve_device
+    class device
     {
     public:
 #ifdef NDEBUG
-        const bool enable_validation_layers = false;
+        bool const enable_validation_layers = false;
 #else
-        const bool enable_validation_layers = true;
+        bool const enable_validation_layers = true;
 #endif
 
-        lve_device(lve_window &window);
-        ~lve_device();
+        device(window &window);
+        ~device();
 
         // Not copyable or movable
-        lve_device(const lve_device &)       = delete;
-        void operator=(const lve_device &)   = delete;
-        lve_device(lve_device &&)            = delete;
-        lve_device &operator=(lve_device &&) = delete;
+        device(device const &)         = delete;
+        void operator=(device const &) = delete;
+        device(device &&)              = delete;
+        device &operator=(device &&)   = delete;
 
         [[nodiscard]] auto get_command_pool() const -> VkCommandPool { return command_pool_; }
-        [[nodiscard]] auto device() const -> VkDevice { return device_; }
+        [[nodiscard]] auto get_logical_device() const -> VkDevice { return device_; }
         [[nodiscard]] auto surface() const -> VkSurfaceKHR { return surface_; }
         [[nodiscard]] auto graphics_queue() const -> VkQueue { return graphics_queue_; }
         [[nodiscard]] auto present_queue() const -> VkQueue { return present_queue_; }
@@ -52,7 +52,7 @@ namespace dae
         auto get_swap_chain_support() -> swap_chain_support_details { return query_swap_chain_support(physical_device_); }
         auto find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties) -> uint32_t;
         auto find_physical_queue_families() -> queue_family_indices { return find_queue_families(physical_device_); }
-        auto find_supported_format(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) -> VkFormat;
+        auto find_supported_format(std::vector<VkFormat> const &candidates, VkImageTiling tiling, VkFormatFeatureFlags features) -> VkFormat;
 
         // Buffer Helper Functions
         void create_buffer(
@@ -67,7 +67,7 @@ namespace dae
         void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layer_count);
 
         void create_image_with_info(
-            const VkImageCreateInfo &image_info,
+            VkImageCreateInfo const &image_info,
             VkMemoryPropertyFlags properties,
             VkImage &image,
             VkDeviceMemory &image_memory);
@@ -95,7 +95,7 @@ namespace dae
         VkInstance instance_;
         VkDebugUtilsMessengerEXT debug_messenger_;
         VkPhysicalDevice physical_device_ = VK_NULL_HANDLE;
-        lve_window &window_;
+        window &window_;
         VkCommandPool command_pool_;
 
         VkDevice device_;
