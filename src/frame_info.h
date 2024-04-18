@@ -14,15 +14,16 @@ namespace dae
     
     struct point_light
     {
-        glm::vec4 position{}; // ignore w
-        glm::vec4 color{}; // w is intensity
+        glm::vec4 position {}; // ignore w
+        glm::vec4 color    {}; // w is intensity
     };
     
     struct global_ubo
     {
-        glm::mat4 projection{1.0f};
-        glm::mat4 view{1.0f};
-        glm::vec4 ambient_light_color{1.0f, 1.0f, 1.0f, 0.02f};
+        glm::mat4 projection          {1.0f};
+        glm::mat4 view                {1.0f};
+        glm::mat4 inverse_view        {1.0f};
+        glm::vec4 ambient_light_color {1.0f, 1.0f, 1.0f, 0.02f};
         point_light point_lights[MAX_LIGHTS];
         int num_lights;
     };

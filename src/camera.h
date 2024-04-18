@@ -17,11 +17,13 @@ namespace dae
         void set_view_target(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3{0.0f, -1.0f, 0.0f});
         void set_view_yxz(glm::vec3 position, glm::vec3 rotation);
 
-        auto get_projection() const -> glm::mat4 { return projection_matrix_; }
-        auto get_view() const -> glm::mat4 { return view_matrix_; }
+        [[nodiscard]] auto get_projection() const -> glm::mat4 { return projection_matrix_; }
+        [[nodiscard]] auto get_view() const -> glm::mat4 { return view_matrix_; }
+        [[nodiscard]] auto get_inverse_view() const -> glm::mat4 { return inverse_view_matrix_; }
 
     private:
-        glm::mat4 projection_matrix_ {1.0f};
-        glm::mat4 view_matrix_{1.0f};
+        glm::mat4 projection_matrix_   {1.0f};
+        glm::mat4 view_matrix_         {1.0f};
+        glm::mat4 inverse_view_matrix_ {1.0f};
     };
 }
