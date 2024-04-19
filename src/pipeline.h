@@ -51,6 +51,7 @@ namespace dae
         void bind(VkCommandBuffer command_buffer);
 
         static void default_pipeline_config_info(pipeline_config_info &config_info);
+        static void enable_alpha_blending(pipeline_config_info &config_info);
 
     private:
         static auto read_file(std::string const &file_path) -> std::vector<char>;

@@ -3,6 +3,7 @@
 // Standard includes
 #include <stdexcept>
 #include <array>
+#include <map>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
@@ -61,6 +62,16 @@ namespace dae
 
 void point_light_system::render(frame_info &frame_info)
     {
+        std::map<float, game_object::id_t> sorted;
+        for (auto &go : frame_info.game_objects | std::views::values)
+        {
+            if (go.get_name() != "point_light") continue;
+
+            auto offset = frame_info.camera.get_position() - go.transform.translation;
+            float dis_squared = glm::dot(offset, offset);
+            sorted[dis_squared] = go.get_id();
+        }
+        
         pipeline_->bind(frame_info.command_buffer);
 
         vkCmdBindDescriptorSets(
@@ -74,14 +85,14 @@ void point_light_system::render(frame_info &frame_info)
             nullptr
         );
         
-        for (auto &obj : frame_info.game_objects | std::views::values)
+        for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
-            if (obj.get_name() != "point_light") continue;
+            auto &go = frame_info.game_objects.at(it->second);
 
             point_light_push_constants push{};
-            push.position = glm::vec4{obj.transform.translation, 1.0f};
-            push.color    = glm::vec4{obj.color, obj.point_light->light_intensity};
-            push.radius   = obj.transform.scale.x;
+            push.position = glm::vec4{go.transform.translation, 1.0f};
+            push.color    = glm::vec4{go.color, go.point_light->light_intensity};
+            push.radius   = go.transform.scale.x;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
@@ -124,6 +135,7 @@ void point_light_system::render(frame_info &frame_info)
         
         pipeline_config_info pipeline_config{};
         pipeline::default_pipeline_config_info(pipeline_config);
+        pipeline::enable_alpha_blending(pipeline_config);
         pipeline_config.attribute_descriptions.clear();
         pipeline_config.binding_descriptions.clear();
         pipeline_config.render_pass = render_pass;

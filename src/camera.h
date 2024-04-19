@@ -20,6 +20,7 @@ namespace dae
         [[nodiscard]] auto get_projection() const -> glm::mat4 { return projection_matrix_; }
         [[nodiscard]] auto get_view() const -> glm::mat4 { return view_matrix_; }
         [[nodiscard]] auto get_inverse_view() const -> glm::mat4 { return inverse_view_matrix_; }
+        [[nodiscard]] auto get_position() const -> glm::vec3 { return glm::vec3{inverse_view_matrix_[3]}; }
 
     private:
         glm::mat4 projection_matrix_   {1.0f};
