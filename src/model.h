@@ -24,6 +24,7 @@ namespace dae
             glm::vec3 color    = {};
             glm::vec3 normal   = {};
             glm::vec2 uv       = {};
+            glm::vec3 tangent  = {};
 
             static auto get_binding_description() -> std::vector<VkVertexInputBindingDescription>;
             static auto get_attribute_descriptions() -> std::vector<VkVertexInputAttributeDescription>;

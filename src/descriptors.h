@@ -40,7 +40,7 @@ namespace dae
         [[nodiscard]] auto get_descriptor_set_layout() const -> VkDescriptorSetLayout { return descriptor_set_layout_; }
 
     private:
-        device                   &device_;
+        device                       &device_;
         VkDescriptorSetLayout        descriptor_set_layout_;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 

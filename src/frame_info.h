@@ -30,11 +30,11 @@ namespace dae
     
     struct frame_info
     {
-        int                  frame_index;
-        float                frame_time;
-        VkCommandBuffer      command_buffer;
+        int              frame_index;
+        float            frame_time;
+        VkCommandBuffer  command_buffer;
         camera           &camera;
-        VkDescriptorSet      global_descriptor_set;
+        VkDescriptorSet  global_descriptor_set;
         game_object::map &game_objects;
     };
 }

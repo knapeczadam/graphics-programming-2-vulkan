@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\app.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\movement_controller.cpp" />
     <ClCompile Include="src\buffer.cpp" />
     <ClCompile Include="src\camera.cpp" />
@@ -113,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app.h" />
+    <ClInclude Include="src\texture.h" />
     <ClInclude Include="src\movement_controller.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\camera.h" />
@@ -187,6 +189,7 @@
     <Import Project="props\vulkan.props" />
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
+    <Import Project="props\stb.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -196,6 +199,7 @@
     <Import Project="props\vulkan.props" />
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
+    <Import Project="props\stb.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -205,6 +209,7 @@
     <Import Project="props\vulkan.props" />
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
+    <Import Project="props\stb.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -214,6 +219,7 @@
     <Import Project="props\vulkan.props" />
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
+    <Import Project="props\stb.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />

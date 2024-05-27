@@ -45,6 +45,7 @@ namespace dae
 
         [[nodiscard]] auto get_command_pool() const -> VkCommandPool { return command_pool_; }
         [[nodiscard]] auto get_logical_device() const -> VkDevice { return device_; }
+        [[nodiscard]] auto get_physical_device() const -> VkPhysicalDevice { return physical_device_; }
         [[nodiscard]] auto surface() const -> VkSurfaceKHR { return surface_; }
         [[nodiscard]] auto graphics_queue() const -> VkQueue { return graphics_queue_; }
         [[nodiscard]] auto present_queue() const -> VkQueue { return present_queue_; }

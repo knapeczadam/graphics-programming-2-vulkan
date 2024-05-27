@@ -149,7 +149,7 @@ namespace dae
                 {
                     vertex.uv = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
-                        attrib.texcoords[2 * index.texcoord_index + 1]
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                     };
                 }
 
@@ -159,6 +159,36 @@ namespace dae
                     vertices.push_back(vertex);
                 }
                 indices.push_back(unique_vertices[vertex]);
+            }
+
+            // Cheap tangent calculation
+            for (size_t i = 0; i < indices.size(); i += 3)
+            {
+                vertex &v0 = vertices[indices[i + 0]];
+                vertex &v1 = vertices[indices[i + 1]];
+                vertex &v2 = vertices[indices[i + 2]];
+
+                glm::vec3 edge0 = v1.position - v0.position;
+                glm::vec3 edge1 = v2.position - v0.position;
+
+                glm::vec2 uv0 = v0.uv;
+                glm::vec2 uv1 = v1.uv;
+                glm::vec2 uv2 = v2.uv;
+
+                glm::vec2 diff_x = {uv1.x - uv0.x, uv2.x - uv0.x};
+                glm::vec2 diff_y = {uv1.y - uv0.y, uv2.y - uv0.y};
+                float r = 1.0f / (diff_x.x * diff_y.y - diff_y.x * diff_x.y);
+
+                glm::vec3 tangent = (edge0 * diff_y.y - edge1 * diff_y.x) * r;
+                v0.tangent += tangent;
+                v1.tangent += tangent;
+                v2.tangent += tangent;
+            }
+
+            // Create the tangents (reject)
+            for (auto &vertex : vertices)
+            {
+                vertex.tangent = glm::normalize(reject(vertex.tangent, vertex.normal));
             }
         }
     }

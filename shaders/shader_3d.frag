@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 frag_color;
 layout (location = 1) in vec3 frag_pos_world;
 layout (location = 2) in vec3 frag_normal_world;
+layout (location = 3) in vec2 frag_uv;
 
 layout (location = 0) out vec4 out_color;
 
@@ -21,6 +22,8 @@ layout (set = 0, binding = 0) uniform global_ubo
     point_light point_lights[10];
     int num_lights;
 } ubo;
+
+layout (set = 0, binding = 1) uniform sampler2D image;
 
 layout (push_constant) uniform Push 
 {
@@ -58,5 +61,6 @@ void main()
         
     }
 
-    out_color = vec4(diffuse_light * frag_color + specular_light * frag_color, 1.0f);
+    vec4 image_color = texture(image, frag_uv);
+    out_color = vec4((diffuse_light * frag_color + specular_light * frag_color) * image_color, 1.0f);
 }

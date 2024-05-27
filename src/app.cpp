@@ -7,6 +7,7 @@
 #include "systems/point_light_system.h"
 #include "movement_controller.h"
 #include "buffer.h"
+#include "texture.h"
 
 // Standard includes
 #include <array>
@@ -27,6 +28,7 @@ namespace dae
         global_pool_ = descriptor_pool::builder(device_)
                        .set_max_sets(swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swap_chain::MAX_FRAMES_IN_FLIGHT)
+                       .add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .build();
         
         load_game_objects();
@@ -53,7 +55,15 @@ namespace dae
 
         auto global_set_layout = descriptor_set_layout::builder(device_)
                                  .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+                                 .add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
+
+        texture texture{device_, "textures/vehicle_diffuse.png"};
+
+        VkDescriptorImageInfo image_info{};
+        image_info.sampler     = texture.sampler();
+        image_info.imageView   = texture.image_view();
+        image_info.imageLayout = texture.image_layout();
 
         std::vector<VkDescriptorSet> global_descriptor_sets(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
@@ -61,6 +71,7 @@ namespace dae
             auto buffer_info = ubo_buffers[i]->descriptor_info();
             descriptor_writer(*global_set_layout, *global_pool_)
                 .write_buffer(0, &buffer_info)
+                .write_image(1, &image_info)
                 .build(global_descriptor_sets[i]);
         }
         
@@ -221,6 +232,13 @@ namespace dae
         go.model = model;
         go.transform.translation = {0.0f, 0.0f, 0.0f};
         go.transform.scale = glm::vec3{3};
+        game_objects_.emplace(go.get_id(), std::move(go));
+        
+        model = model::create_model_from_file(device_, "models/vehicle.obj");
+        go = game_object::create_game_object("3d");
+        go.model = model;
+        go.transform.translation = {0.0f, 2.0f, 0.0f};
+        go.transform.scale = glm::vec3{0.1f};
         game_objects_.emplace(go.get_id(), std::move(go));
 
         go = game_object::make_point_light(0.2f);
