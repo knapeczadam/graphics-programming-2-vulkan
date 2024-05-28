@@ -99,7 +99,6 @@ void point_light_system::render(frame_info &frame_info)
             );
             vkCmdDraw(frame_info.command_buffer, 6, 1, 0, 0);
         }
-        
     }
 
     void point_light_system::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)

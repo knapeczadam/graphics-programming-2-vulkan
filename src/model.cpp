@@ -88,6 +88,14 @@ namespace dae
             .offset   = offsetof(vertex, uv)
         };
         attribute_descriptions.push_back(uv);
+
+        VkVertexInputAttributeDescription tangent{
+            .location = 4,
+            .binding  = 0,
+            .format   = VK_FORMAT_R32G32B32_SFLOAT,
+            .offset   = offsetof(vertex, tangent)
+        };
+        attribute_descriptions.push_back(tangent);
         
         return attribute_descriptions;
     }
@@ -167,28 +175,31 @@ namespace dae
                 vertex &v0 = vertices[indices[i + 0]];
                 vertex &v1 = vertices[indices[i + 1]];
                 vertex &v2 = vertices[indices[i + 2]];
-
-                glm::vec3 edge0 = v1.position - v0.position;
-                glm::vec3 edge1 = v2.position - v0.position;
-
+            
+                glm::vec3 edge1 = v1.position - v0.position;
+                glm::vec3 edge2 = v2.position - v0.position;
+            
                 glm::vec2 uv0 = v0.uv;
                 glm::vec2 uv1 = v1.uv;
                 glm::vec2 uv2 = v2.uv;
+            
+                glm::vec2 delta_uv1 = uv1 - uv0;
+                glm::vec2 delta_uv2 = uv2 - uv0;
 
-                glm::vec2 diff_x = {uv1.x - uv0.x, uv2.x - uv0.x};
-                glm::vec2 diff_y = {uv1.y - uv0.y, uv2.y - uv0.y};
-                float r = 1.0f / (diff_x.x * diff_y.y - diff_y.x * diff_x.y);
+                float f = 1.0f / (delta_uv1.x * delta_uv2.y - delta_uv2.x * delta_uv1.y);
 
-                glm::vec3 tangent = (edge0 * diff_y.y - edge1 * diff_y.x) * r;
-                v0.tangent += tangent;
-                v1.tangent += tangent;
-                v2.tangent += tangent;
-            }
+                glm::vec3 tangent = f * (delta_uv2.y * edge1 - delta_uv1.y * edge2);
+                tangent = glm::normalize(tangent);
 
-            // Create the tangents (reject)
-            for (auto &vertex : vertices)
-            {
-                vertex.tangent = glm::normalize(reject(vertex.tangent, vertex.normal));
+                float sx = delta_uv1.x;
+                float sy = delta_uv2.x;
+                float tx = delta_uv1.y;
+                float ty = delta_uv2.y;
+                float handedness = (sx * ty - sy * tx) > 0.0f ? 1.0f : -1.0f;
+                tangent *= handedness;
+                v0.tangent = tangent;
+                v1.tangent = tangent;
+                v2.tangent = tangent;
             }
         }
     }

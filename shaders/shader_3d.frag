@@ -23,8 +23,6 @@ layout (set = 0, binding = 0) uniform global_ubo
     int num_lights;
 } ubo;
 
-layout (set = 0, binding = 1) uniform sampler2D image;
-
 layout (push_constant) uniform Push 
 {
     mat4 model_matrix;
@@ -61,6 +59,5 @@ void main()
         
     }
 
-    vec4 image_color = texture(image, frag_uv);
-    out_color = vec4((diffuse_light * frag_color + specular_light * frag_color) * image_color, 1.0f);
+    out_color = vec4(diffuse_light * frag_color + specular_light * frag_color, 1.0f);
 }
