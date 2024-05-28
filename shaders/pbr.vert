@@ -1,6 +1,48 @@
 #version 450
 
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 color;
+layout (location = 2) in vec3 normal;
+layout (location = 3) in vec2 uv;
+layout (location = 4) in vec3 tangent;
+
+layout (location = 0) out vec3 frag_color;
+layout (location = 1) out vec3 frag_pos_world;
+layout (location = 2) out vec3 frag_normal_world;
+layout (location = 3) out vec2 frag_uv;
+layout (location = 4) out vec3 frag_tangent_world;
+
+struct point_light
+{
+    vec4 position; // ignore w
+    vec4 color; // w is intensity
+};
+
+layout (set = 0, binding = 0) uniform global_ubo
+{
+    mat4 projection;
+    mat4 view;
+    mat4 inverse_view;
+    vec4 ambient_light_color; // w is intensity
+    point_light point_lights[10];
+    int num_lights;
+} ubo;
+
+// There must be no more than one push constant block statically used per shader entry point.
+layout (push_constant) uniform Push
+{
+    mat4 model_matrix;
+    mat4 normal_matrix;
+} push;
+
 void main()
 {
-    
+    vec4 position_world = push.model_matrix * vec4(position, 1.0f);
+    gl_Position = ubo.projection * (ubo.view * position_world);
+
+    frag_normal_world = normalize(mat3(push.normal_matrix) * normal);
+    frag_tangent_world = normalize(mat3(push.normal_matrix) * tangent.xyz);
+    frag_pos_world = position_world.xyz;
+    frag_color = color;
+    frag_uv = uv;
 }

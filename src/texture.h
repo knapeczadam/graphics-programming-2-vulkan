@@ -16,7 +16,7 @@ namespace dae
     class texture
     {
     public:
-        texture(device &device, std::string const &file_path);
+        texture(device &device, std::string const &file_path, VkFormat format);
         ~texture();
 
         texture(texture const &)            = delete;
@@ -34,15 +34,15 @@ namespace dae
 
     private:
         device         &device_;
-        VkImage        image_;
-        VkDeviceMemory image_memory_;
-        VkImageView    image_view_;
-        VkSampler      sampler_;
-        VkFormat       image_format_;
-        VkImageLayout  image_layout_;
+        VkImage        image_        = VK_NULL_HANDLE;
+        VkDeviceMemory image_memory_ = VK_NULL_HANDLE;
+        VkImageView    image_view_   = VK_NULL_HANDLE;
+        VkSampler      sampler_      = VK_NULL_HANDLE;
+        VkFormat       image_format_ = VK_FORMAT_UNDEFINED;
+        VkImageLayout  image_layout_ = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        int width_;
-        int height_;
-        int mip_levels_;
+        int width_      = 0;
+        int height_     = 0;
+        int mip_levels_ = 0;
     };
 }

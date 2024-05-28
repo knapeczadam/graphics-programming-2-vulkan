@@ -1,13 +1,14 @@
 ﻿#include "app.h"
 
 // Project includes
+#include "buffer.h"
 #include "camera.h"
+#include "movement_controller.h"
+#include "texture.h"
+#include "systems/pbr_system.h"
+#include "systems/point_light_system.h"
 #include "systems/render_system_2d.h"
 #include "systems/render_system_3d.h"
-#include "systems/point_light_system.h"
-#include "movement_controller.h"
-#include "buffer.h"
-#include "texture.h"
 
 // Standard includes
 #include <array>
@@ -19,7 +20,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-
 
 namespace dae
 {
@@ -56,14 +56,36 @@ namespace dae
         auto global_set_layout = descriptor_set_layout::builder(device_)
                                  .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                  .add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+                                 .add_binding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+                                 .add_binding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+                                 .add_binding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
 
-        texture texture{device_, "textures/vehicle_diffuse.png"};
+        texture diffuse_texture{device_, "textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture normal_texture{device_, "textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture specular_texture{device_, "textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture gloss_texture{device_, "textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_SRGB};
 
-        VkDescriptorImageInfo image_info{};
-        image_info.sampler     = texture.sampler();
-        image_info.imageView   = texture.image_view();
-        image_info.imageLayout = texture.image_layout();
+        VkDescriptorImageInfo diffuse_image_info{};
+        diffuse_image_info.sampler     = diffuse_texture.sampler();
+        diffuse_image_info.imageView   = diffuse_texture.image_view();
+        diffuse_image_info.imageLayout = diffuse_texture.image_layout();
+
+        VkDescriptorImageInfo normal_image_info{};
+        normal_image_info.sampler     = normal_texture.sampler();
+        normal_image_info.imageView   = normal_texture.image_view();
+        normal_image_info.imageLayout = normal_texture.image_layout();
+
+        VkDescriptorImageInfo specular_image_info{};
+        specular_image_info.sampler     = specular_texture.sampler();
+        specular_image_info.imageView   = specular_texture.image_view();
+        specular_image_info.imageLayout = specular_texture.image_layout();
+
+        VkDescriptorImageInfo emission_image_info{};
+        emission_image_info.sampler     = gloss_texture.sampler();
+        emission_image_info.imageView   = gloss_texture.image_view();
+        emission_image_info.imageLayout = gloss_texture.image_layout();
+        
 
         std::vector<VkDescriptorSet> global_descriptor_sets(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
@@ -71,13 +93,17 @@ namespace dae
             auto buffer_info = ubo_buffers[i]->descriptor_info();
             descriptor_writer(*global_set_layout, *global_pool_)
                 .write_buffer(0, &buffer_info)
-                .write_image(1, &image_info)
+                .write_image(1, &diffuse_image_info)
+                .write_image(2, &normal_image_info)
+                .write_image(3, &specular_image_info)
+                .write_image(4, &emission_image_info)
                 .build(global_descriptor_sets[i]);
         }
         
         render_system_3d render_system_3d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         render_system_2d render_system_2d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         point_light_system point_light_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        pbr_system pbr_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
         // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});
@@ -135,6 +161,7 @@ namespace dae
                 renderer_.begin_swap_chain_render_pass(command_buffer);
                 render_system_2d.render(frame_info);
                 render_system_3d.render_game_objects(frame_info);
+                pbr_system.render_game_objects(frame_info);
                 point_light_system.render(frame_info);
                 renderer_.end_swap_chain_render_pass(command_buffer);
                 renderer_.end_frame();
@@ -235,7 +262,7 @@ namespace dae
         game_objects_.emplace(go.get_id(), std::move(go));
         
         model = model::create_model_from_file(device_, "models/vehicle.obj");
-        go = game_object::create_game_object("3d");
+        go = game_object::create_game_object("pbr");
         go.model = model;
         go.transform.translation = {0.0f, 2.0f, 0.0f};
         go.transform.scale = glm::vec3{0.1f};

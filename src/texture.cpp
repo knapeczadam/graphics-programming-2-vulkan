@@ -13,8 +13,9 @@
 
 namespace dae
 {
-    texture::texture(device &device, std::string const &file_path)
+    texture::texture(device &device, std::string const &file_path, VkFormat format)
         : device_{device}
+        , image_format_{format}
     {
         int text_channels, bytes_per_pixel;
 
@@ -30,8 +31,6 @@ namespace dae
 
         staging_buffer.map();
         staging_buffer.write_to_buffer(pixels);
-
-        image_format_ = VK_FORMAT_R8G8B8A8_SRGB;
 
         VkImageCreateInfo image_info{};
         image_info.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
