@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\app.cpp" />
+    <ClCompile Include="src\systems\i_system.cpp" />
+    <ClCompile Include="src\systems\pbr_system.cpp" />
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\movement_controller.cpp" />
     <ClCompile Include="src\buffer.cpp" />
@@ -114,6 +116,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app.h" />
+    <ClInclude Include="src\systems\i_system.h" />
+    <ClInclude Include="src\systems\pbr_system.h" />
     <ClInclude Include="src\texture.h" />
     <ClInclude Include="src\movement_controller.h" />
     <ClInclude Include="src\buffer.h" />
@@ -136,6 +140,8 @@
     <Content Include="CMakeLists.txt" />
     <Content Include="compile.bat" />
     <Content Include=".env.cmake" />
+    <Content Include="shaders\pbr.frag" />
+    <Content Include="shaders\pbr.vert" />
     <Content Include="shaders\shader_2d.frag" />
     <Content Include="shaders\shader_2d.vert" />
     <Content Include="shaders\point_light.frag" />

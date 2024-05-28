@@ -22,15 +22,10 @@ namespace dae
     };
     
     point_light_system::point_light_system(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : device_{device}
+        : i_system{device}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
-    }
-
-    point_light_system::~point_light_system()
-    {
-        vkDestroyPipelineLayout(device_.get_logical_device(), pipeline_layout_, nullptr);
     }
 
     void point_light_system::update(frame_info &frame_info, global_ubo &ubo)

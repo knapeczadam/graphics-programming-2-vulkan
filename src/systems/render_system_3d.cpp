@@ -2,7 +2,6 @@
 
 // Standard includes
 #include <stdexcept>
-#include <array>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
@@ -20,15 +19,10 @@ namespace dae
     };
     
     render_system_3d::render_system_3d(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : device_{device}
+        : i_system{device}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
-    }
-
-    render_system_3d::~render_system_3d()
-    {
-        vkDestroyPipelineLayout(device_.get_logical_device(), pipeline_layout_, nullptr);
     }
 
 void render_system_3d::render_game_objects(frame_info &frame_info)

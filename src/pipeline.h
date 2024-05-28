@@ -5,7 +5,6 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-
 namespace dae
 {
     // Forward declarations

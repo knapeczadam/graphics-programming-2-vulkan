@@ -4,4 +4,6 @@ C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\shader_3d.vert -o shaders\shader_3d
 C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\shader_3d.frag -o shaders\shader_3d.frag.spv
 C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\point_light.vert -o shaders\point_light.vert.spv
 C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\point_light.frag -o shaders\point_light.frag.spv
+C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\pbr.vert -o shaders\pbr.vert.spv
+C:\VulkanSDK\1.3.261.1\Bin\glslc.exe shaders\pbr.frag -o shaders\pbr.frag.spv
 pause
