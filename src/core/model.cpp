@@ -1,7 +1,7 @@
 ﻿#include "model.h"
 
 // Project includes
-#include "util/utils.h"
+#include "src/util/utils.h"
 
 // Standard includes
 #include <cassert>
@@ -19,7 +19,7 @@
 
 #if defined(CMAKE_BUILD)
 #ifndef ENGINE_DIR
-#define ENGINE_DIR "../"
+#define ENGINE_DIR "../../../"
 #endif
 #else
 #ifndef ENGINE_DIR

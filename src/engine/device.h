@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // Project includes
-#include "core/window.h"
+#include "src/core/window.h"
 
 // std lib headers
 #include <vector>

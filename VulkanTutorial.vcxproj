@@ -123,6 +123,7 @@
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
     <Import Project="props\stb.props" />
+    <Import Project="props\nlohmann.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,6 +134,7 @@
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
     <Import Project="props\stb.props" />
+    <Import Project="props\nlohmann.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -143,6 +145,7 @@
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
     <Import Project="props\stb.props" />
+    <Import Project="props\nlohmann.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,6 +156,7 @@
     <Import Project="props\pre-build.props" />
     <Import Project="props\tol.props" />
     <Import Project="props\stb.props" />
+    <Import Project="props\nlohmann.props" />
     <Import Project="props\post_build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -209,7 +213,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -225,7 +229,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

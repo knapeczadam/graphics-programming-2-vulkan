@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 
 # Fetch GLFW
-fetchContent_declare(
+fetchcontent_declare(
         glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG        3.4
@@ -18,7 +18,7 @@ fetchContent_declare(
 fetchcontent_makeavailable(glfw)
 
 # Fetch GLM
-fetchContent_declare(
+fetchcontent_declare(
         glm
         GIT_REPOSITORY https://github.com/g-truc/glm.git
         GIT_TAG        1.0.1
@@ -26,14 +26,28 @@ fetchContent_declare(
 fetchcontent_makeavailable(glm)
 
 # Fetch TINYOBJ
-fetchContent_declare(
+fetchcontent_declare(
         tinyobj
         GIT_REPOSITORY https://github.com/tinyobjloader/tinyobjloader.git
         GIT_TAG        v2.0.0rc13
 )
 fetchcontent_makeavailable(tinyobj)
 
-FetchContent_MakeAvailable(glfw)
+# Fetch STB
+fetchcontent_declare(
+        stb
+        GIT_REPOSITORY https://github.com/nothings/stb.git
+        GIT_TAG        449758bd74ce14b7d0ba9b24a3dbc4386702a0e0
+)
+fetchcontent_makeavailable(stb)
+
+# Fetch JSON
+fetchcontent_declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG        v3.11.3
+)
+fetchcontent_makeavailable(json)
 
 # Find the required packages
 find_package(Vulkan REQUIRED)
@@ -41,6 +55,8 @@ find_package(Vulkan REQUIRED)
 # Include Directories
 include_directories(${Vulkan_INCLUDE_DIRS})
 include_directories(${tinyobj_SOURCE_DIR})
+include_directories(${stb_SOURCE_DIR})
+include_directories(${json_SOURCE_DIR})
 
 # If using validation layers, copy the required JSON files (optional)
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -72,13 +88,13 @@ find_program(GLSL_VALIDATOR glslangValidator HINTS
 
 # get all .vert and .frag files in shaders directory
 file(GLOB_RECURSE GLSL_SOURCE_FILES
-        "${PROJECT_SOURCE_DIR}/shaders/*.frag"
-        "${PROJECT_SOURCE_DIR}/shaders/*.vert"
+        "${PROJECT_SOURCE_DIR}/data/shaders/*.frag"
+        "${PROJECT_SOURCE_DIR}/data/shaders/*.vert"
 )
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
     get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/shaders/${FILE_NAME}.spv")
+    set(SPIRV "${PROJECT_SOURCE_DIR}/data/shaders/${FILE_NAME}.spv")
     add_custom_command(
             OUTPUT ${SPIRV}
             COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}

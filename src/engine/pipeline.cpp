@@ -1,8 +1,8 @@
 ﻿#include "pipeline.h"
 
 // Project includes
-#include "core/model.h"
-#include "engine/device.h"
+#include "src/core/model.h"
+#include "src/engine/device.h"
 
 // Standard includes
 #include <cassert>
@@ -12,14 +12,13 @@
 
 #if defined(CMAKE_BUILD)
 #ifndef ENGINE_DIR
-#define ENGINE_DIR "../"
+#define ENGINE_DIR "../../../"
 #endif
 #else
 #ifndef ENGINE_DIR
 #define ENGINE_DIR ""
 #endif
 #endif
-
 
 namespace dae
 {

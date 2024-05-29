@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "engine/buffer.h"
-#include "engine/device.h"
+#include "src/engine/buffer.h"
+#include "src/engine/device.h"
 
 // Standard includes
 #include <memory>

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // Project includes
-#include "engine/device.h"
+#include "src/engine/device.h"
 
 // Standard includes
 #include <memory>

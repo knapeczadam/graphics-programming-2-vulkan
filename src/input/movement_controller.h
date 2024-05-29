@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "core/game_object.h"
-#include "core/window.h"
+#include "src/core/game_object.h"
+#include "src/core/window.h"
 
 namespace dae
 {
