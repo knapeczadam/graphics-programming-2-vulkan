@@ -86,7 +86,7 @@ namespace dae
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
-        if (vkCreatePipelineLayout(device_ptr_->get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(device_ptr_->logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create pipeline layout!"};
         }

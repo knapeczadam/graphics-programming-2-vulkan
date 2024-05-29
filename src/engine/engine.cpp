@@ -108,10 +108,10 @@ namespace dae
                 .build(global_descriptor_sets[i]);
         }
         
-        render_system_3d render_system_3d {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        render_system_2d render_system_2d {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        point_light_system point_light_system {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        pbr_system pbr_system {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        render_system_3d render_system_3d {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        render_system_2d render_system_2d {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        point_light_system point_light_system {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        pbr_system pbr_system {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
         // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});
@@ -139,13 +139,13 @@ namespace dae
             camera_controller.move(window_ptr_->get_glfw_window(), frame_time, viewer_object);
             camera.set_view_yxz(viewer_object.transform.translation, viewer_object.transform.rotation);
             
-            float aspect = renderer_ptr_->get_aspect_ratio();
+            float aspect = renderer_ptr_->aspect_ratio();
             camera.set_orthographic_projection(-aspect, aspect, -1, 1, -1, 1);
             camera.set_perspective_projection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
             if (auto command_buffer = renderer_ptr_->begin_frame())
             {
-                int frame_index = renderer_ptr_->get_frame_index();
+                int frame_index = renderer_ptr_->frame_index();
                 
                 frame_info frame_info{
                     frame_index,
@@ -176,7 +176,7 @@ namespace dae
                 renderer_ptr_->end_frame();
             }
         }
-        vkDeviceWaitIdle(device_ptr_->get_logical_device());
+        vkDeviceWaitIdle(device_ptr_->logical_device());
     }
 
     std::unique_ptr<model> create_oval_model(device *device_ptr, glm::vec3 offset, float radiusX, float radiusY,

@@ -86,7 +86,7 @@ namespace dae
         sampler_info.anisotropyEnable        = VK_TRUE;
         sampler_info.maxAnisotropy           = 4.0f;
 
-        vkCreateSampler(device_ptr_->get_logical_device(), &sampler_info, nullptr, &sampler_);
+        vkCreateSampler(device_ptr_->logical_device(), &sampler_info, nullptr, &sampler_);
 
         VkImageViewCreateInfo view_info{};
         view_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -103,17 +103,17 @@ namespace dae
         view_info.components.b                    = VK_COMPONENT_SWIZZLE_B;
         view_info.components.a                    = VK_COMPONENT_SWIZZLE_A;
 
-        vkCreateImageView(device_ptr_->get_logical_device(), &view_info, nullptr, &image_view_);
+        vkCreateImageView(device_ptr_->logical_device(), &view_info, nullptr, &image_view_);
 
         stbi_image_free(pixels);
     }
 
     texture::~texture()
     {
-        vkDestroyImage(device_ptr_->get_logical_device(), image_, nullptr);
-        vkFreeMemory(device_ptr_->get_logical_device(), image_memory_, nullptr);
-        vkDestroyImageView(device_ptr_->get_logical_device(), image_view_, nullptr);
-        vkDestroySampler(device_ptr_->get_logical_device(), sampler_, nullptr);
+        vkDestroyImage(device_ptr_->logical_device(), image_, nullptr);
+        vkFreeMemory(device_ptr_->logical_device(), image_memory_, nullptr);
+        vkDestroyImageView(device_ptr_->logical_device(), image_view_, nullptr);
+        vkDestroySampler(device_ptr_->logical_device(), sampler_, nullptr);
     }
 
     void texture::transition_image_layout(VkImageLayout old_layout, VkImageLayout new_layout)
@@ -175,7 +175,7 @@ namespace dae
     void texture::generate_mipmaps()
     {
         VkFormatProperties format_properties;
-        vkGetPhysicalDeviceFormatProperties(device_ptr_->get_physical_device(), image_format_, &format_properties);
+        vkGetPhysicalDeviceFormatProperties(device_ptr_->physical_device(), image_format_, &format_properties);
 
         if (not (format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
         {

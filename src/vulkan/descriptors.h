@@ -32,7 +32,7 @@ namespace dae
             [[nodiscard]] auto build() const -> std::unique_ptr<descriptor_set_layout>;
 
         private:
-            device *device_ptr_;
+            device *device_ptr_ = nullptr;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings_{};
         };
 
@@ -45,9 +45,9 @@ namespace dae
         [[nodiscard]] auto get_descriptor_set_layout() const -> VkDescriptorSetLayout { return descriptor_set_layout_; }
 
     private:
-        device                       *device_ptr_;
-        VkDescriptorSetLayout        descriptor_set_layout_;
-        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
+        device                *device_ptr_           = nullptr;
+        VkDescriptorSetLayout descriptor_set_layout_ = VK_NULL_HANDLE;
+        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings_ = {};
 
         friend class descriptor_writer;
     };
@@ -68,10 +68,10 @@ namespace dae
             [[nodiscard]] auto build() const -> std::unique_ptr<descriptor_pool>;
 
         private:
-            device                            *device_ptr_;
-            std::vector<VkDescriptorPoolSize> pool_sizes_{};
-            uint32_t                          max_sets_      = 1000;
-            VkDescriptorPoolCreateFlags       pool_flags_    = 0;
+            device                            *device_ptr_ = nullptr;
+            std::vector<VkDescriptorPoolSize> pool_sizes_  = {};
+            uint32_t                          max_sets_    = 1000;
+            VkDescriptorPoolCreateFlags       pool_flags_  = 0;
         };
 
         descriptor_pool(
@@ -80,8 +80,9 @@ namespace dae
             VkDescriptorPoolCreateFlags pool_flags,
             const std::vector<VkDescriptorPoolSize> &pool_sizes);
         ~descriptor_pool();
-        descriptor_pool(const descriptor_pool &) = delete;
-        descriptor_pool &operator=(const descriptor_pool &) = delete;
+        
+        descriptor_pool(const descriptor_pool &other)            = delete;
+        descriptor_pool &operator=(const descriptor_pool &other) = delete;
 
         auto allocate_descriptor(const VkDescriptorSetLayout descriptor_set_layout, VkDescriptorSet &descriptor) const -> bool;
         void free_descriptors(std::vector<VkDescriptorSet> &descriptors) const;
@@ -89,8 +90,8 @@ namespace dae
         void reset_pool();
 
     private:
-        device           *device_ptr_;
-        VkDescriptorPool descriptor_pool_;
+        device           *device_ptr_     = nullptr;
+        VkDescriptorPool descriptor_pool_ = VK_NULL_HANDLE;
 
         friend class descriptor_writer;
     };
@@ -107,8 +108,8 @@ namespace dae
         void overwrite(VkDescriptorSet &set);
 
     private:
-        descriptor_set_layout         *set_layout_ptr_;
-        descriptor_pool               *pool_ptr_;
-        std::vector<VkWriteDescriptorSet> writes_;
+        descriptor_set_layout             *set_layout_ptr_ = nullptr;
+        descriptor_pool                   *pool_ptr_       = nullptr;
+        std::vector<VkWriteDescriptorSet> writes_          = {};
     };
 }

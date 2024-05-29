@@ -43,7 +43,7 @@ namespace dae
 
         is_frame_started_ = true;
 
-        auto command_buffer = get_current_command_buffer();
+        auto command_buffer = current_command_buffer();
         VkCommandBufferBeginInfo begin_info{};
         begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -58,7 +58,7 @@ namespace dae
     void renderer::end_frame()
     {
         assert(is_frame_started_ and "Can't call end_frame while frame is not in progress");
-        auto command_buffer = get_current_command_buffer();
+        auto command_buffer = current_command_buffer();
         
         if (vkEndCommandBuffer(command_buffer) != VK_SUCCESS)
         {
@@ -83,15 +83,15 @@ namespace dae
     void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
     {
         assert(is_frame_started_ and "Can't call begin_swap_chain_render_pass if frame is not in progesss");
-        assert(command_buffer == get_current_command_buffer() and "Can't begin render pass on command buffer from a different frame");
+        assert(command_buffer == current_command_buffer() and "Can't begin render pass on command buffer from a different frame");
         
         VkRenderPassBeginInfo render_pass_info{};
         render_pass_info.sType       = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        render_pass_info.renderPass  = swap_chain_->get_render_pass();
+        render_pass_info.renderPass  = swap_chain_->render_pass();
         render_pass_info.framebuffer = swap_chain_->get_frame_buffer(current_image_index_);
 
         render_pass_info.renderArea.offset = {0, 0};
-        render_pass_info.renderArea.extent = swap_chain_->get_swap_chain_extent();
+        render_pass_info.renderArea.extent = swap_chain_->swap_chain_extent();
 
         std::array<VkClearValue, 2> clear_values{};
         clear_values[0].color            = {{0.01f, 0.01f, 0.01f, 0.1f}};
@@ -104,11 +104,11 @@ namespace dae
         VkViewport viewport{};
         viewport.x        = 0.0f;
         viewport.y        = 0.0f;
-        viewport.width    = static_cast<float>(swap_chain_->get_swap_chain_extent().width);
-        viewport.height   = static_cast<float>(swap_chain_->get_swap_chain_extent().height);\
+        viewport.width    = static_cast<float>(swap_chain_->swap_chain_extent().width);
+        viewport.height   = static_cast<float>(swap_chain_->swap_chain_extent().height);\
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
-        VkRect2D scissor{{0, 0}, swap_chain_->get_swap_chain_extent()};
+        VkRect2D scissor{{0, 0}, swap_chain_->swap_chain_extent()};
         vkCmdSetViewport(command_buffer, 0, 1, &viewport);
         vkCmdSetScissor(command_buffer, 0, 1, &scissor);
     }
@@ -116,7 +116,7 @@ namespace dae
     void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
     {
         assert(is_frame_started_ and "Can't call end_swap_chain_render_pass if frame is not in progesss");
-        assert(command_buffer == get_current_command_buffer() and "Can't end render pass on command buffer from a different frame");
+        assert(command_buffer == current_command_buffer() and "Can't end render pass on command buffer from a different frame");
         
         vkCmdEndRenderPass(command_buffer);
     }
@@ -128,10 +128,10 @@ namespace dae
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandPool        = device_ptr_->get_command_pool();
+        alloc_info.commandPool        = device_ptr_->command_pool();
         alloc_info.commandBufferCount = static_cast<uint32_t>(command_buffers_.size());
 
-        if (vkAllocateCommandBuffers(device_ptr_->get_logical_device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(device_ptr_->logical_device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to allocate command buffers!"};
         }
@@ -141,8 +141,8 @@ namespace dae
     void renderer::free_command_buffers()
     {
         vkFreeCommandBuffers(
-            device_ptr_->get_logical_device(),
-            device_ptr_->get_command_pool(),
+            device_ptr_->logical_device(),
+            device_ptr_->command_pool(),
             static_cast<uint32_t>(command_buffers_.size()),
             command_buffers_.data());
         command_buffers_.clear();
@@ -157,7 +157,7 @@ namespace dae
             glfwWaitEvents();
         }
 
-        vkDeviceWaitIdle(device_ptr_->get_logical_device());
+        vkDeviceWaitIdle(device_ptr_->logical_device());
         if (swap_chain_ == nullptr)
         {
             swap_chain_ = std::make_unique<swap_chain>(device_ptr_, extent);

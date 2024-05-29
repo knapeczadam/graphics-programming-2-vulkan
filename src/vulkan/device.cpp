@@ -42,13 +42,13 @@ namespace dae
 
     void destroy_debug_utils_messenger_ext(
         VkInstance instance,
-        VkDebugUtilsMessengerEXT const debugMessenger,
+        VkDebugUtilsMessengerEXT const debug_messenger,
         const VkAllocationCallbacks *allocator_ptr)
     {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr)
         {
-            func(instance, debugMessenger, allocator_ptr);
+            func(instance, debug_messenger, allocator_ptr);
         }
     }
 
@@ -96,7 +96,7 @@ namespace dae
         create_info.sType            = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
 
-        auto extensions = get_required_extensions();
+        auto extensions = required_extensions();
         create_info.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
@@ -293,7 +293,7 @@ namespace dae
         return true;
     }
 
-    auto device::get_required_extensions() -> std::vector<const char*>
+    auto device::required_extensions() -> std::vector<const char*>
     {
         uint32_t glfw_extension_count = 0;
         const char **glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
@@ -324,7 +324,7 @@ namespace dae
         }
 
         std::cout << "required extensions:" << '\n';
-        auto required_extensions = get_required_extensions();
+        auto required_extensions = this->required_extensions();
         for (const auto &required : required_extensions)
         {
             std::cout << "\t" << required << '\n';

@@ -34,9 +34,9 @@ namespace dae
 
     pipeline::~pipeline()
     {
-        vkDestroyShaderModule(device_ptr_->get_logical_device(), vertex_shader_module_, nullptr);
-        vkDestroyShaderModule(device_ptr_->get_logical_device(), fragment_shader_module_, nullptr);
-        vkDestroyPipeline(device_ptr_->get_logical_device(), graphics_pipeline_, nullptr);
+        vkDestroyShaderModule(device_ptr_->logical_device(), vertex_shader_module_, nullptr);
+        vkDestroyShaderModule(device_ptr_->logical_device(), fragment_shader_module_, nullptr);
+        vkDestroyPipeline(device_ptr_->logical_device(), graphics_pipeline_, nullptr);
     }
 
     void pipeline::bind(VkCommandBuffer command_buffer)
@@ -209,7 +209,7 @@ namespace dae
         pipeline_info.basePipelineIndex  = -1;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
-        if (vkCreateGraphicsPipelines(device_ptr_->get_logical_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
+        if (vkCreateGraphicsPipelines(device_ptr_->logical_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create graphics pipeline!"};
         }
@@ -222,7 +222,7 @@ namespace dae
         create_info.codeSize = code.size();
         create_info.pCode    = reinterpret_cast<uint32_t const *>(code.data());
 
-        if (vkCreateShaderModule(device_ptr_->get_logical_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+        if (vkCreateShaderModule(device_ptr_->logical_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create shader module!"};
         }

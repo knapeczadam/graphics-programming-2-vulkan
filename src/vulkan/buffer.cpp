@@ -35,27 +35,27 @@ namespace dae
 
     buffer::buffer(
         device                *device_ptr,
-        VkDeviceSize          instanceSize,
-        uint32_t              instanceCount,
-        VkBufferUsageFlags    usageFlags,
-        VkMemoryPropertyFlags memoryPropertyFlags,
-        VkDeviceSize          minOffsetAlignment)
+        VkDeviceSize          instance_size,
+        uint32_t              instance_count,
+        VkBufferUsageFlags    usage_flags,
+        VkMemoryPropertyFlags memory_property_flags,
+        VkDeviceSize          min_offset_alignment)
         : device_ptr_{device_ptr},
-          instance_count_{instanceCount},
-          instance_size_{instanceSize},
-          usage_flags_{usageFlags},
-          memory_property_flags_{memoryPropertyFlags}
+          instance_count_{instance_count},
+          instance_size_{instance_size},
+          usage_flags_{usage_flags},
+          memory_property_flags_{memory_property_flags}
     {
-        alignment_size_ = get_alignment(instanceSize, minOffsetAlignment);
-        buffer_size_ = alignment_size_ * instanceCount;
-        device_ptr->create_buffer(buffer_size_, usageFlags, memoryPropertyFlags, buffer_, memory_);
+        alignment_size_ = get_alignment(instance_size, min_offset_alignment);
+        buffer_size_ = alignment_size_ * instance_count;
+        device_ptr->create_buffer(buffer_size_, usage_flags, memory_property_flags, buffer_, memory_);
     }
 
     buffer::~buffer()
     {
         unmap();
-        vkDestroyBuffer(device_ptr_->get_logical_device(), buffer_, nullptr);
-        vkFreeMemory(device_ptr_->get_logical_device(), memory_, nullptr);
+        vkDestroyBuffer(device_ptr_->logical_device(), buffer_, nullptr);
+        vkFreeMemory(device_ptr_->logical_device(), memory_, nullptr);
     }
 
     /**
@@ -70,7 +70,7 @@ namespace dae
     auto buffer::map(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
         assert(buffer_ and memory_ and "Called map on buffer before create");
-        return vkMapMemory(device_ptr_->get_logical_device(), memory_, offset, size, 0, &mapped_);
+        return vkMapMemory(device_ptr_->logical_device(), memory_, offset, size, 0, &mapped_);
     }
 
     /**
@@ -82,7 +82,7 @@ namespace dae
     {
         if (mapped_)
         {
-            vkUnmapMemory(device_ptr_->get_logical_device(), memory_);
+            vkUnmapMemory(device_ptr_->logical_device(), memory_);
             mapped_ = nullptr;
         }
     }
@@ -106,9 +106,9 @@ namespace dae
         }
         else
         {
-            char *memOffset = (char*)mapped_;
-            memOffset += offset;
-            memcpy(memOffset, data, size);
+            char *mem_offset = (char*)mapped_;
+            mem_offset += offset;
+            memcpy(mem_offset, data, size);
         }
     }
 
@@ -125,12 +125,12 @@ namespace dae
      */
     auto buffer::flush(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
-        VkMappedMemoryRange mappedRange = {};
-        mappedRange.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        mappedRange.memory = memory_;
-        mappedRange.offset = offset;
-        mappedRange.size   = size;
-        return vkFlushMappedMemoryRanges(device_ptr_->get_logical_device(), 1, &mappedRange);
+        VkMappedMemoryRange mapped_range = {};
+        mapped_range.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+        mapped_range.memory = memory_;
+        mapped_range.offset = offset;
+        mapped_range.size   = size;
+        return vkFlushMappedMemoryRanges(device_ptr_->logical_device(), 1, &mapped_range);
     }
 
     /**
@@ -146,12 +146,12 @@ namespace dae
      */
     auto buffer::invalidate(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
-        VkMappedMemoryRange mappedRange = {};
-        mappedRange.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-        mappedRange.memory = memory_;
-        mappedRange.offset = offset;
-        mappedRange.size   = size;
-        return vkInvalidateMappedMemoryRanges(device_ptr_->get_logical_device(), 1, &mappedRange);
+        VkMappedMemoryRange mapped_range = {};
+        mapped_range.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+        mapped_range.memory = memory_;
+        mapped_range.offset = offset;
+        mapped_range.size   = size;
+        return vkInvalidateMappedMemoryRanges(device_ptr_->logical_device(), 1, &mapped_range);
     }
 
     /**

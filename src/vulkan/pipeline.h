@@ -46,7 +46,7 @@ namespace dae
 
         ~pipeline();
 
-        pipeline(pipeline const &other) = delete;
+        pipeline(pipeline const &other)            = delete;
         pipeline &operator=(pipeline const &other) = delete;
 
         void bind(VkCommandBuffer command_buffer);
@@ -64,9 +64,9 @@ namespace dae
 
         void create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module);
 
-        device *device_ptr_;
-        VkPipeline graphics_pipeline_;
-        VkShaderModule vertex_shader_module_;
-        VkShaderModule fragment_shader_module_;
+        device         *device_ptr_            = nullptr;
+        VkPipeline     graphics_pipeline_      = VK_NULL_HANDLE;
+        VkShaderModule vertex_shader_module_   = VK_NULL_HANDLE;
+        VkShaderModule fragment_shader_module_ = VK_NULL_HANDLE;
     };
 }

@@ -12,6 +12,6 @@ namespace dae
 
     i_system::~i_system()
     {
-        vkDestroyPipelineLayout(device_ptr_->get_logical_device(), pipeline_layout_, nullptr);
+        vkDestroyPipelineLayout(device_ptr_->logical_device(), pipeline_layout_, nullptr);
     }
 }

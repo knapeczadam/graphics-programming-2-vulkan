@@ -12,7 +12,7 @@ namespace dae
     {
     public:
         buffer(
-            device *device_ptr_,
+            device *device_ptr,
             VkDeviceSize instance_size,
             uint32_t instance_count,
             VkBufferUsageFlags usage_flags,
@@ -37,27 +37,27 @@ namespace dae
         auto invalidate_index(int index) -> VkResult;
 
         [[nodiscard]] auto get_buffer() const -> VkBuffer { return buffer_; }
-        [[nodiscard]] auto get_mapped_memory() const -> void * { return mapped_; }
-        [[nodiscard]] auto get_instance_count() const -> uint32_t { return instance_count_; }
-        [[nodiscard]] auto get_instance_size() const -> VkDeviceSize { return instance_size_; }
-        [[nodiscard]] auto get_alignment_size() const -> VkDeviceSize { return instance_size_; }
-        [[nodiscard]] auto get_usage_flags() const -> VkBufferUsageFlags { return usage_flags_; }
-        [[nodiscard]] auto get_memory_property_flags() const -> VkMemoryPropertyFlags { return memory_property_flags_; }
-        [[nodiscard]] auto get_buffer_size() const -> VkDeviceSize { return buffer_size_; }
+        [[nodiscard]] auto mapped_memory() const -> void * { return mapped_; }
+        [[nodiscard]] auto instance_count() const -> uint32_t { return instance_count_; }
+        [[nodiscard]] auto instance_size() const -> VkDeviceSize { return instance_size_; }
+        [[nodiscard]] auto alignment_size() const -> VkDeviceSize { return instance_size_; }
+        [[nodiscard]] auto usage_flags() const -> VkBufferUsageFlags { return usage_flags_; }
+        [[nodiscard]] auto memory_property_flags() const -> VkMemoryPropertyFlags { return memory_property_flags_; }
+        [[nodiscard]] auto buffer_size() const -> VkDeviceSize { return buffer_size_; }
 
     private:
         static auto get_alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment) -> VkDeviceSize;
 
-        device         *device_ptr_;
+        device         *device_ptr_ = nullptr;
         void           *mapped_      = nullptr;
         VkBuffer       buffer_       = VK_NULL_HANDLE;
         VkDeviceMemory memory_       = VK_NULL_HANDLE;
 
-        VkDeviceSize          buffer_size_;
-        uint32_t              instance_count_;
-        VkDeviceSize          instance_size_;
-        VkDeviceSize          alignment_size_;
-        VkBufferUsageFlags    usage_flags_;
-        VkMemoryPropertyFlags memory_property_flags_;
+        VkDeviceSize          buffer_size_           = 0;
+        uint32_t              instance_count_        = 0;
+        VkDeviceSize          instance_size_         = 0;
+        VkDeviceSize          alignment_size_        = 0;
+        VkBufferUsageFlags    usage_flags_           = 0 ;
+        VkMemoryPropertyFlags memory_property_flags_ = 0;
     };
 }

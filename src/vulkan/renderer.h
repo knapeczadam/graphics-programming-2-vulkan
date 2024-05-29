@@ -28,16 +28,16 @@ namespace dae
 
         void init(window *window_ptr, device *device_ptr);
 
-        [[nodiscard]] auto get_swap_chain_render_pass() const -> VkRenderPass { return swap_chain_->get_render_pass(); }
-        [[nodiscard]] auto get_aspect_ratio() const -> float { return swap_chain_->extent_aspect_ratio(); }
+        [[nodiscard]] auto swap_chain_render_pass() const -> VkRenderPass { return swap_chain_->render_pass(); }
+        [[nodiscard]] auto aspect_ratio() const -> float { return swap_chain_->extent_aspect_ratio(); }
         [[nodiscard]] auto is_frame_in_progress() const -> bool { return is_frame_started_; }
-        [[nodiscard]] auto get_current_command_buffer() const -> VkCommandBuffer
+        [[nodiscard]] auto current_command_buffer() const -> VkCommandBuffer
         {
             assert(is_frame_started_ and "Cannot get command buffer when frame not in progress!");
             return command_buffers_[current_frame_index_];
         }
 
-        [[nodiscard]] auto get_frame_index() const -> int
+        [[nodiscard]] auto frame_index() const -> int
         {
             assert(is_frame_started_ and "Cannot get frame index when frame not in progress!");
             return current_frame_index_;
@@ -57,8 +57,8 @@ namespace dae
         void recreate_swap_chain();
         
     private:
-        window                      *window_ptr_;
-        device                      *device_ptr_;
+        window                      *window_ptr_ = nullptr;
+        device                      *device_ptr_ = nullptr;
         std::unique_ptr<swap_chain> swap_chain_;
         std::vector<VkCommandBuffer> command_buffers_;
 

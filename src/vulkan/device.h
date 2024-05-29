@@ -50,9 +50,9 @@ namespace dae
 
         void init(window *window_ptr);
 
-        [[nodiscard]] auto get_command_pool() const -> VkCommandPool { return command_pool_; }
-        [[nodiscard]] auto get_logical_device() const -> VkDevice { return device_; }
-        [[nodiscard]] auto get_physical_device() const -> VkPhysicalDevice { return physical_device_; }
+        [[nodiscard]] auto command_pool() const -> VkCommandPool { return command_pool_; }
+        [[nodiscard]] auto logical_device() const -> VkDevice { return device_; }
+        [[nodiscard]] auto physical_device() const -> VkPhysicalDevice { return physical_device_; }
         [[nodiscard]] auto surface() const -> VkSurfaceKHR { return surface_; }
         [[nodiscard]] auto graphics_queue() const -> VkQueue { return graphics_queue_; }
         [[nodiscard]] auto present_queue() const -> VkQueue { return present_queue_; }
@@ -96,7 +96,7 @@ namespace dae
 
         // helper functions
         auto is_device_suitable(VkPhysicalDevice device) -> bool;
-        auto get_required_extensions() -> std::vector<const char*>;
+        auto required_extensions() -> std::vector<const char*>;
         auto check_validation_layer_support() -> bool;
         auto find_queue_families(VkPhysicalDevice device) -> queue_family_indices;
         void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &create_info);
@@ -104,16 +104,16 @@ namespace dae
         auto check_device_extension_support(VkPhysicalDevice device) -> bool;
         auto query_swap_chain_support(VkPhysicalDevice device) -> swap_chain_support_details;
 
-        VkInstance instance_;
-        VkDebugUtilsMessengerEXT debug_messenger_;
-        VkPhysicalDevice physical_device_ = VK_NULL_HANDLE;
-        window *window_ptr_;
-        VkCommandPool command_pool_;
+        VkInstance               instance_        = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT debug_messenger_ = VK_NULL_HANDLE;
+        VkPhysicalDevice         physical_device_ = VK_NULL_HANDLE;
+        window                   *window_ptr_     = nullptr;
+        VkCommandPool            command_pool_    = VK_NULL_HANDLE;
 
-        VkDevice device_;
-        VkSurfaceKHR surface_;
-        VkQueue graphics_queue_;
-        VkQueue present_queue_;
+        VkDevice     device_         = VK_NULL_HANDLE;
+        VkSurfaceKHR surface_        = VK_NULL_HANDLE;
+        VkQueue      graphics_queue_ = VK_NULL_HANDLE;
+        VkQueue      present_queue_  = VK_NULL_HANDLE;
 
         const std::vector<const char*> validation_layers_ = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> device_extensions_ = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
