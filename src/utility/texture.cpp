@@ -1,7 +1,8 @@
 ﻿#include "texture.h"
 
 // Project includes
-#include "src/engine/buffer.h"
+#include "src/vulkan/buffer.h"
+#include "src/vulkan/device.h"
 
 // Standard includes
 #include <cmath>
@@ -23,8 +24,8 @@
 
 namespace dae
 {
-    texture::texture(device &device, std::string const &file_path, VkFormat format)
-        : device_{device}
+    texture::texture(device *device_ptr, std::string const &file_path, VkFormat format)
+        : device_ptr_{device_ptr}
         , image_format_{format}
     {
         int text_channels, bytes_per_pixel;
@@ -34,7 +35,7 @@ namespace dae
         mip_levels_ = static_cast<uint32_t>(std::floor(std::log2(std::max(width_, height_)))) + 1;
 
         buffer staging_buffer{
-            device_,
+            device_ptr_,
             4,
             static_cast<uint32_t>(width_ * height_),
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -58,9 +59,9 @@ namespace dae
         image_info.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
         image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        device_.create_image_with_info(image_info,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image_, image_memory_);
+        device_ptr_->create_image_with_info(image_info,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image_, image_memory_);
         transition_image_layout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        device_.copy_buffer_to_image(staging_buffer.get_buffer(), image_, static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), 1);
+        device_ptr_->copy_buffer_to_image(staging_buffer.get_buffer(), image_, static_cast<uint32_t>(width_), static_cast<uint32_t>(height_), 1);
         generate_mipmaps();
 
         image_layout_ = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -85,7 +86,7 @@ namespace dae
         sampler_info.anisotropyEnable        = VK_TRUE;
         sampler_info.maxAnisotropy           = 4.0f;
 
-        vkCreateSampler(device_.get_logical_device(), &sampler_info, nullptr, &sampler_);
+        vkCreateSampler(device_ptr_->get_logical_device(), &sampler_info, nullptr, &sampler_);
 
         VkImageViewCreateInfo view_info{};
         view_info.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -102,22 +103,22 @@ namespace dae
         view_info.components.b                    = VK_COMPONENT_SWIZZLE_B;
         view_info.components.a                    = VK_COMPONENT_SWIZZLE_A;
 
-        vkCreateImageView(device_.get_logical_device(), &view_info, nullptr, &image_view_);
+        vkCreateImageView(device_ptr_->get_logical_device(), &view_info, nullptr, &image_view_);
 
         stbi_image_free(pixels);
     }
 
     texture::~texture()
     {
-        vkDestroyImage(device_.get_logical_device(), image_, nullptr);
-        vkFreeMemory(device_.get_logical_device(), image_memory_, nullptr);
-        vkDestroyImageView(device_.get_logical_device(), image_view_, nullptr);
-        vkDestroySampler(device_.get_logical_device(), sampler_, nullptr);
+        vkDestroyImage(device_ptr_->get_logical_device(), image_, nullptr);
+        vkFreeMemory(device_ptr_->get_logical_device(), image_memory_, nullptr);
+        vkDestroyImageView(device_ptr_->get_logical_device(), image_view_, nullptr);
+        vkDestroySampler(device_ptr_->get_logical_device(), sampler_, nullptr);
     }
 
     void texture::transition_image_layout(VkImageLayout old_layout, VkImageLayout new_layout)
     {
-        VkCommandBuffer command_buffer = device_.begin_single_time_commands();
+        VkCommandBuffer command_buffer = device_ptr_->begin_single_time_commands();
         
         VkImageMemoryBarrier barrier{};
         barrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -168,20 +169,20 @@ namespace dae
             1,
             &barrier);
 
-        device_.end_single_time_commands(command_buffer);
+        device_ptr_->end_single_time_commands(command_buffer);
     }
 
     void texture::generate_mipmaps()
     {
         VkFormatProperties format_properties;
-        vkGetPhysicalDeviceFormatProperties(device_.get_physical_device(), image_format_, &format_properties);
+        vkGetPhysicalDeviceFormatProperties(device_ptr_->get_physical_device(), image_format_, &format_properties);
 
         if (not (format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
         {
             throw std::runtime_error("texture image format does not support linear blitting!");
         }
 
-        VkCommandBuffer command_buffer = device_.begin_single_time_commands();
+        VkCommandBuffer command_buffer = device_ptr_->begin_single_time_commands();
 
         VkImageMemoryBarrier barrier{};
         barrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -279,6 +280,6 @@ namespace dae
             1,
             &barrier);
 
-        device_.end_single_time_commands(command_buffer);
+        device_ptr_->end_single_time_commands(command_buffer);
     }
 }

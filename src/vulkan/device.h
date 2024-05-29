@@ -1,13 +1,19 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/core/window.h"
+#include "src/utility/singleton.h"
 
 // std lib headers
 #include <vector>
 
+// vulkan headers
+#include <vulkan/vulkan.h>
+
 namespace dae
 {
+    // Forward declarations
+    class window;
+    
     struct swap_chain_support_details
     {
         VkSurfaceCapabilitiesKHR        capabilities;
@@ -25,7 +31,7 @@ namespace dae
         [[nodiscard]] auto is_complete() const -> bool { return graphics_family_has_value and present_family_has_value; }
     };
 
-    class device
+    class device final : public singleton<device>
     {
     public:
 #ifdef NDEBUG
@@ -34,14 +40,15 @@ namespace dae
         bool const enable_validation_layers = true;
 #endif
 
-        device(window &window);
-        ~device();
+        ~device() override;
 
         // Not copyable or movable
-        device(device const &)         = delete;
-        void operator=(device const &) = delete;
-        device(device &&)              = delete;
-        device &operator=(device &&)   = delete;
+        device(device const &other)            = delete;
+        device(device &&other)                 = delete;
+        device &operator=(device const &other) = delete;
+        device &operator=(device &&other)      = delete;
+
+        void init(window *window_ptr);
 
         [[nodiscard]] auto get_command_pool() const -> VkCommandPool { return command_pool_; }
         [[nodiscard]] auto get_logical_device() const -> VkDevice { return device_; }
@@ -76,6 +83,10 @@ namespace dae
         VkPhysicalDeviceProperties properties;
 
     private:
+        friend class singleton<device>;
+        device() = default;
+
+    private:
         void create_instance();
         void setup_debug_messenger();
         void create_surface();
@@ -96,7 +107,7 @@ namespace dae
         VkInstance instance_;
         VkDebugUtilsMessengerEXT debug_messenger_;
         VkPhysicalDevice physical_device_ = VK_NULL_HANDLE;
-        window &window_;
+        window *window_ptr_;
         VkCommandPool command_pool_;
 
         VkDevice device_;

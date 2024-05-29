@@ -2,7 +2,7 @@
 
 // Project includes
 #include "src/core/model.h"
-#include "src/engine/device.h"
+#include "src/vulkan/device.h"
 
 // Standard includes
 #include <cassert>
@@ -23,20 +23,20 @@
 namespace dae
 {
     pipeline::pipeline(
-        device &device,
+        device *device_ptr,
         std::string const &vertex_file_path,
         std::string const &fragment_file_path,
         pipeline_config_info const &config_info)
-        : device_{device}
+        : device_ptr_{device_ptr}
     {
         create_graphics_pipeline(vertex_file_path, fragment_file_path, config_info);
     }
 
     pipeline::~pipeline()
     {
-        vkDestroyShaderModule(device_.get_logical_device(), vertex_shader_module_, nullptr);
-        vkDestroyShaderModule(device_.get_logical_device(), fragment_shader_module_, nullptr);
-        vkDestroyPipeline(device_.get_logical_device(), graphics_pipeline_, nullptr);
+        vkDestroyShaderModule(device_ptr_->get_logical_device(), vertex_shader_module_, nullptr);
+        vkDestroyShaderModule(device_ptr_->get_logical_device(), fragment_shader_module_, nullptr);
+        vkDestroyPipeline(device_ptr_->get_logical_device(), graphics_pipeline_, nullptr);
     }
 
     void pipeline::bind(VkCommandBuffer command_buffer)
@@ -209,7 +209,7 @@ namespace dae
         pipeline_info.basePipelineIndex  = -1;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
-        if (vkCreateGraphicsPipelines(device_.get_logical_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
+        if (vkCreateGraphicsPipelines(device_ptr_->get_logical_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create graphics pipeline!"};
         }
@@ -222,7 +222,7 @@ namespace dae
         create_info.codeSize = code.size();
         create_info.pCode    = reinterpret_cast<uint32_t const *>(code.data());
 
-        if (vkCreateShaderModule(device_.get_logical_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+        if (vkCreateShaderModule(device_ptr_->get_logical_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create shader module!"};
         }

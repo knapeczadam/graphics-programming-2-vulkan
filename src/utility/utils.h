@@ -16,8 +16,11 @@ namespace dae
         (hash_combine(seed, rest), ...);
     };
 
-    inline auto reject(glm::vec3 const &v1, glm::vec3 const &v2) -> glm::vec3
+    namespace math
     {
-        return v1 - v2 * (glm::dot(v1, v2) / glm::dot(v2, v2));
+        inline auto reject(glm::vec3 const &v1, glm::vec3 const &v2) -> glm::vec3
+        {
+            return v1 - v2 * (glm::dot(v1, v2) / glm::dot(v2, v2));
+        }
     }
 }

@@ -1,7 +1,8 @@
 ﻿#include "model.h"
 
 // Project includes
-#include "src/util/utils.h"
+#include "src/vulkan/device.h"
+#include "src/utility/utils.h"
 
 // Standard includes
 #include <cassert>
@@ -204,8 +205,8 @@ namespace dae
         }
     }
 
-    model::model(device &device, builder const &builder)
-        : device_{device}
+    model::model(device *device_ptr, builder const &builder)
+        : device_ptr_{device_ptr}
     {
         create_vertex_buffers(builder.vertices);
         create_index_buffers(builder.indices);
@@ -215,20 +216,20 @@ namespace dae
     {
     }
 
-    auto model::create_model_from_file(device &device, std::string const &file_path) -> std::unique_ptr<model>
+    auto model::create_model_from_file(device *device_ptr, std::string const &file_path) -> std::unique_ptr<model>
     {
         builder builder{};
         builder.load_model(file_path);
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
-        return std::make_unique<model>(device, builder);
+        return std::make_unique<model>(device_ptr, builder);
     }
 
-    auto model::create_model_from_vertices(device &device, std::vector<vertex> const &vertices) -> std::unique_ptr<model>
+    auto model::create_model_from_vertices(device *device_ptr, std::vector<vertex> const &vertices) -> std::unique_ptr<model>
     {
         builder builder{};
         builder.vertices = vertices;
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
-        return std::make_unique<model>(device, builder);
+        return std::make_unique<model>(device_ptr, builder);
     }
 
     void model::bind(VkCommandBuffer command_buffer)
@@ -263,7 +264,7 @@ namespace dae
         uint32_t vertex_size = sizeof(vertices[0]);
 
         buffer staging_buffer {
-            device_,
+            device_ptr_,
             vertex_size,
             vertex_count_,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -274,7 +275,7 @@ namespace dae
         staging_buffer.write_to_buffer(const_cast<vertex*>(vertices.data()));
 
         vertex_buffer_ = std::make_unique<buffer>(
-            device_,
+            device_ptr_,
             vertex_size,
             vertex_count_,
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
@@ -282,7 +283,7 @@ namespace dae
         );
 
 
-        device_.copy_buffer(staging_buffer.get_buffer(), vertex_buffer_->get_buffer(), buffer_size);
+        device_ptr_->copy_buffer(staging_buffer.get_buffer(), vertex_buffer_->get_buffer(), buffer_size);
     }
 
     void model::create_index_buffers(std::vector<uint32_t> const& indices)
@@ -299,7 +300,7 @@ namespace dae
         uint32_t index_size = sizeof(indices[0]);
 
         buffer staging_buffer {
-            device_,
+            device_ptr_,
             index_size,
             index_count_,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -310,13 +311,13 @@ namespace dae
         staging_buffer.write_to_buffer((void*) indices.data());
 
         index_buffer_ = std::make_unique<buffer>(
-            device_,
+            device_ptr_,
             index_size,
             index_count_,
             VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         );
 
-        device_.copy_buffer(staging_buffer.get_buffer(), index_buffer_->get_buffer(), buffer_size);
+        device_ptr_->copy_buffer(staging_buffer.get_buffer(), index_buffer_->get_buffer(), buffer_size);
     }
 }

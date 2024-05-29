@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-// Project includes
-#include "src/engine/device.h"
-
 // Standard includes
 #include <memory>
 #include <vector>
@@ -12,13 +9,16 @@
 
 namespace dae
 {
-    class swap_chain
+    // Forward declarations
+    class device;
+    
+    class swap_chain final
     {
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2; // at most 2 command buffers to the device's graphics queue at once
 
-        swap_chain(device &device_ref, VkExtent2D window_extent);
-        swap_chain(device &device_ref, VkExtent2D window_extent, std::shared_ptr<swap_chain> const &previous);
+        swap_chain(device *device_ptr, VkExtent2D window_extent);
+        swap_chain(device *device_ptr, VkExtent2D window_extent, std::shared_ptr<swap_chain> const &previous);
         ~swap_chain();
 
         swap_chain(swap_chain const &)            = delete;
@@ -72,7 +72,7 @@ namespace dae
         std::vector<VkImage>        swap_chain_images_;
         std::vector<VkImageView>    swap_chain_image_views_;
 
-        device &device_;
+        device     *device_ptr_;
         VkExtent2D window_extent_;
 
         VkSwapchainKHR swap_chain_;

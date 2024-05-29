@@ -5,7 +5,7 @@
 #include <vector>
 
 // Vulkan includes
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.h>
 
 namespace dae
 {
@@ -34,20 +34,20 @@ namespace dae
         uint32_t         subpass         = 0;
     };
 
-    class pipeline
+    class pipeline final
     {
     public:
         pipeline() = default;
         pipeline(
-            device &device,
+            device *device_ptr,
             std::string const &vertex_file_path,
             std::string const &fragment_file_path,
             pipeline_config_info const &config_info);
 
         ~pipeline();
 
-        pipeline(pipeline const &) = delete;
-        pipeline &operator=(pipeline const &) = delete;
+        pipeline(pipeline const &other) = delete;
+        pipeline &operator=(pipeline const &other) = delete;
 
         void bind(VkCommandBuffer command_buffer);
 
@@ -64,7 +64,7 @@ namespace dae
 
         void create_shader_module(std::vector<char> const &code, VkShaderModule *shader_module);
 
-        device &device_;
+        device *device_ptr_;
         VkPipeline graphics_pipeline_;
         VkShaderModule vertex_shader_module_;
         VkShaderModule fragment_shader_module_;

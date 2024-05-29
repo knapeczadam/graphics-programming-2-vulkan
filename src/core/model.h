@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/engine/buffer.h"
-#include "src/engine/device.h"
+#include "src/vulkan/buffer.h"
 
 // Standard includes
 #include <memory>
+#include <string>
 #include <vector>
 
 // GLM includes
@@ -15,6 +15,9 @@
 
 namespace dae
 {
+    // Forward declarations
+    class device;
+    
     class model
     {
     public:
@@ -40,14 +43,14 @@ namespace dae
             void load_model(std::string const &file_path);
         };
         
-        model(device &device, builder const &builder);
+        model(device *device_ptr, builder const &builder);
         ~model();
 
         model(model const &)            = delete;
         model &operator=(model const &) = delete;
 
-        static auto create_model_from_file(device &device, std::string const &file_path) -> std::unique_ptr<model>;
-        static auto create_model_from_vertices(device &device, std::vector<vertex> const &vertices) -> std::unique_ptr<model>;
+        static auto create_model_from_file(device *device_ptr, std::string const &file_path) -> std::unique_ptr<model>;
+        static auto create_model_from_vertices(device *device_ptr, std::vector<vertex> const &vertices) -> std::unique_ptr<model>;
 
         void bind(VkCommandBuffer command_buffer);
         void draw(VkCommandBuffer command_buffer);
@@ -58,7 +61,7 @@ namespace dae
         
 
     private:
-        device     &device_;
+        device     *device_ptr_;
         
         std::unique_ptr<buffer> vertex_buffer_;
         uint32_t                    vertex_count_;

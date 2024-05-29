@@ -1,22 +1,27 @@
 ﻿#include "renderer.h"
 
+// Project includes
+#include "src/engine/window.h"
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <array>
 #include <stdexcept>
 
 namespace dae
 {
-    renderer::renderer(window &window, device &device)
-        : window_{window}
-        , device_{device}
-    {
-        recreate_swap_chain();
-        create_command_buffers();
-    }
-
     renderer::~renderer()
     {
         free_command_buffers();    
+    }
+
+    void renderer::init(window *window_ptr, device *device_ptr)
+    {
+        window_ptr_ = window_ptr;
+        device_ptr_ = device_ptr;
+        
+        recreate_swap_chain();
+        create_command_buffers();
     }
 
     auto renderer::begin_frame() -> VkCommandBuffer
@@ -61,9 +66,9 @@ namespace dae
         }
         
         auto result = swap_chain_->submit_command_buffers(&command_buffer, &current_image_index_);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR or result == VK_SUBOPTIMAL_KHR or window_.was_window_resized())
+        if (result == VK_ERROR_OUT_OF_DATE_KHR or result == VK_SUBOPTIMAL_KHR or window_ptr_->was_window_resized())
         {
-            window_.reset_window_resized_flag();
+            window_ptr_->reset_window_resized_flag();
             recreate_swap_chain();
         }
         else if (result != VK_SUCCESS)
@@ -123,10 +128,10 @@ namespace dae
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandPool        = device_.get_command_pool();
+        alloc_info.commandPool        = device_ptr_->get_command_pool();
         alloc_info.commandBufferCount = static_cast<uint32_t>(command_buffers_.size());
 
-        if (vkAllocateCommandBuffers(device_.get_logical_device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(device_ptr_->get_logical_device(), &alloc_info, command_buffers_.data()) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to allocate command buffers!"};
         }
@@ -136,8 +141,8 @@ namespace dae
     void renderer::free_command_buffers()
     {
         vkFreeCommandBuffers(
-            device_.get_logical_device(),
-            device_.get_command_pool(),
+            device_ptr_->get_logical_device(),
+            device_ptr_->get_command_pool(),
             static_cast<uint32_t>(command_buffers_.size()),
             command_buffers_.data());
         command_buffers_.clear();
@@ -145,22 +150,22 @@ namespace dae
 
     void renderer::recreate_swap_chain()
     {
-        auto extent = window_.get_extent();
+        auto extent = window_ptr_->get_extent();
         while (extent.width == 0 or extent.height == 0)
         {
-            extent = window_.get_extent();
+            extent = window_ptr_->get_extent();
             glfwWaitEvents();
         }
 
-        vkDeviceWaitIdle(device_.get_logical_device());
+        vkDeviceWaitIdle(device_ptr_->get_logical_device());
         if (swap_chain_ == nullptr)
         {
-            swap_chain_ = std::make_unique<swap_chain>(device_, extent);
+            swap_chain_ = std::make_unique<swap_chain>(device_ptr_, extent);
         }
         else
         {
             std::shared_ptr<swap_chain> old_swap_chain = std::move(swap_chain_);
-            swap_chain_ = std::make_unique<swap_chain>(device_, extent, old_swap_chain);
+            swap_chain_ = std::make_unique<swap_chain>(device_ptr_, extent, old_swap_chain);
 
             if (not old_swap_chain->compare_swap_formats(*swap_chain_))
             {

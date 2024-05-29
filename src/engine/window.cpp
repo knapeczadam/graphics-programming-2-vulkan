@@ -5,14 +5,6 @@
 
 namespace dae
 {
-    window::window(int width, int height, std::string name)
-        : width_(width)
-        , height_(height)
-        , window_name_(std::move(name))
-    {
-        init_window();
-    }
-
     window::~window()
     {
         glfwDestroyWindow(window_ptr_);
@@ -35,6 +27,15 @@ namespace dae
         updated_window->width_ = width;
         updated_window->height_ = height;
         
+    }
+
+    void window::init(int width, int height, std::string const &name)
+    {
+        width_ = width;
+        height_ = height;
+        window_name_ = name;
+
+        init_window();
     }
 
     auto window::should_close() const -> bool

@@ -1,25 +1,32 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/core/window.h"
-#include "src/engine/device.h"
-#include "src/engine/swap_chain.h"
+#include "src/vulkan/swap_chain.h"
+#include "src/utility/singleton.h"
 
 // Standard includes
 #include <cassert>
 #include <memory>
 #include <vector>
 
+
 namespace dae
 {
-    class renderer
+    // Forward declarations
+    class window;
+    class device;
+    
+    class renderer final : public singleton<renderer>
     {
     public:
-        renderer(window &window, device &device);
-        ~renderer();
+        ~renderer() override;
 
-        renderer(renderer const &)            = delete;
-        renderer &operator=(renderer const &) = delete;
+        renderer(renderer const &other)            = delete;
+        renderer(renderer &&other)                 = delete;
+        renderer &operator=(renderer const &other) = delete;
+        renderer &operator=(renderer &&other)      = delete;
+
+        void init(window *window_ptr, device *device_ptr);
 
         [[nodiscard]] auto get_swap_chain_render_pass() const -> VkRenderPass { return swap_chain_->get_render_pass(); }
         [[nodiscard]] auto get_aspect_ratio() const -> float { return swap_chain_->extent_aspect_ratio(); }
@@ -42,20 +49,21 @@ namespace dae
         void end_swap_chain_render_pass(VkCommandBuffer command_buffer);
 
     private:
+        friend class singleton<renderer>;
+        renderer() = default;
+        
         void create_command_buffers();
         void free_command_buffers();
         void recreate_swap_chain();
         
     private:
-        window                      &window_;
-        device                      &device_;
+        window                      *window_ptr_;
+        device                      *device_ptr_;
         std::unique_ptr<swap_chain> swap_chain_;
-        std::vector<VkCommandBuffer>    command_buffers_;
+        std::vector<VkCommandBuffer> command_buffers_;
 
         uint32_t current_image_index_ = {};
         int      current_frame_index_ = {};
         bool     is_frame_started_    = {};
-        
-        
     };
 }

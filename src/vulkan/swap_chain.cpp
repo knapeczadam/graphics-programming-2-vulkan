@@ -1,5 +1,8 @@
 ﻿#include "swap_chain.h"
 
+// Project includes
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <array>
 #include <iostream>
@@ -9,15 +12,15 @@
 
 namespace dae
 {
-    swap_chain::swap_chain(device &device_ref, VkExtent2D window_extent)
-        : device_{device_ref}, window_extent_{window_extent}
+    swap_chain::swap_chain(device *device_ptr, VkExtent2D window_extent)
+        : device_ptr_{device_ptr}, window_extent_{window_extent}
     {
         init();
     }
 
-    swap_chain::swap_chain(device &device_ref, VkExtent2D window_extent,
+    swap_chain::swap_chain(device *device_ptr, VkExtent2D window_extent,
         std::shared_ptr<swap_chain> const &previous)
-        : device_{device_ref}
+        : device_ptr_{device_ptr}
         , window_extent_{window_extent}
         , old_swap_chain_{previous}
     {
@@ -31,50 +34,50 @@ namespace dae
     {
         for (auto image_view : swap_chain_image_views_)
         {
-            vkDestroyImageView(device_.get_logical_device(), image_view, nullptr);
+            vkDestroyImageView(device_ptr_->get_logical_device(), image_view, nullptr);
         }
         swap_chain_image_views_.clear();
 
         if (swap_chain_ != nullptr)
         {
-            vkDestroySwapchainKHR(device_.get_logical_device(), swap_chain_, nullptr);
+            vkDestroySwapchainKHR(device_ptr_->get_logical_device(), swap_chain_, nullptr);
             swap_chain_ = nullptr;
         }
 
         for (int i = 0; i < depth_images_.size(); i++)
         {
-            vkDestroyImageView(device_.get_logical_device(), depth_image_views_[i], nullptr);
-            vkDestroyImage(device_.get_logical_device(), depth_images_[i], nullptr);
-            vkFreeMemory(device_.get_logical_device(), depth_image_memories_[i], nullptr);
+            vkDestroyImageView(device_ptr_->get_logical_device(), depth_image_views_[i], nullptr);
+            vkDestroyImage(device_ptr_->get_logical_device(), depth_images_[i], nullptr);
+            vkFreeMemory(device_ptr_->get_logical_device(), depth_image_memories_[i], nullptr);
         }
 
         for (auto framebuffer : swap_chain_framebuffers_)
         {
-            vkDestroyFramebuffer(device_.get_logical_device(), framebuffer, nullptr);
+            vkDestroyFramebuffer(device_ptr_->get_logical_device(), framebuffer, nullptr);
         }
 
-        vkDestroyRenderPass(device_.get_logical_device(), render_pass_, nullptr);
+        vkDestroyRenderPass(device_ptr_->get_logical_device(), render_pass_, nullptr);
 
         // cleanup synchronization objects
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            vkDestroySemaphore(device_.get_logical_device(), render_finished_semaphores_[i], nullptr);
-            vkDestroySemaphore(device_.get_logical_device(), image_available_semaphores_[i], nullptr);
-            vkDestroyFence(device_.get_logical_device(), in_flight_fences_[i], nullptr);
+            vkDestroySemaphore(device_ptr_->get_logical_device(), render_finished_semaphores_[i], nullptr);
+            vkDestroySemaphore(device_ptr_->get_logical_device(), image_available_semaphores_[i], nullptr);
+            vkDestroyFence(device_ptr_->get_logical_device(), in_flight_fences_[i], nullptr);
         }
     }
 
     auto swap_chain::acquire_next_image(uint32_t *image_index) -> VkResult
     {
         vkWaitForFences(
-            device_.get_logical_device(),
+            device_ptr_->get_logical_device(),
             1,
             &in_flight_fences_[current_frame_],
             VK_TRUE,
             std::numeric_limits<uint64_t>::max());
 
         VkResult result = vkAcquireNextImageKHR(
-            device_.get_logical_device(),
+            device_ptr_->get_logical_device(),
             swap_chain_,
             std::numeric_limits<uint64_t>::max(),
             image_available_semaphores_[current_frame_], // must be a not signaled semaphore
@@ -88,7 +91,7 @@ namespace dae
     {
         if (images_in_flight_[*image_index] != VK_NULL_HANDLE)
         {
-            vkWaitForFences(device_.get_logical_device(), 1, &images_in_flight_[*image_index], VK_TRUE, UINT64_MAX);
+            vkWaitForFences(device_ptr_->get_logical_device(), 1, &images_in_flight_[*image_index], VK_TRUE, UINT64_MAX);
         }
         images_in_flight_[*image_index] = in_flight_fences_[current_frame_];
 
@@ -108,8 +111,8 @@ namespace dae
         submit_info.signalSemaphoreCount = 1;
         submit_info.pSignalSemaphores = signal_semaphores;
 
-        vkResetFences(device_.get_logical_device(), 1, &in_flight_fences_[current_frame_]);
-        if (vkQueueSubmit(device_.graphics_queue(), 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)
+        vkResetFences(device_ptr_->get_logical_device(), 1, &in_flight_fences_[current_frame_]);
+        if (vkQueueSubmit(device_ptr_->graphics_queue(), 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
@@ -126,7 +129,7 @@ namespace dae
 
         present_info.pImageIndices = image_index;
 
-        auto result = vkQueuePresentKHR(device_.present_queue(), &present_info);
+        auto result = vkQueuePresentKHR(device_ptr_->present_queue(), &present_info);
 
         current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
 
@@ -145,7 +148,7 @@ namespace dae
 
     void swap_chain::create_swap_chain()
     {
-        swap_chain_support_details swap_chain_support = device_.get_swap_chain_support();
+        swap_chain_support_details swap_chain_support = device_ptr_->get_swap_chain_support();
 
         VkSurfaceFormatKHR surface_format = choose_swap_surface_format(swap_chain_support.formats);
         VkPresentModeKHR present_mode     = choose_swap_present_mode(swap_chain_support.present_modes);
@@ -160,7 +163,7 @@ namespace dae
 
         VkSwapchainCreateInfoKHR create_info = {};
         create_info.sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        create_info.surface = device_.surface();
+        create_info.surface = device_ptr_->surface();
 
         create_info.minImageCount    = image_count;
         create_info.imageFormat      = surface_format.format;
@@ -169,7 +172,7 @@ namespace dae
         create_info.imageArrayLayers = 1;
         create_info.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        queue_family_indices indices = device_.find_physical_queue_families();
+        queue_family_indices indices = device_ptr_->find_physical_queue_families();
         uint32_t queue_family_indices[] = {indices.graphics_family, indices.present_family};
 
         if (indices.graphics_family != indices.present_family)
@@ -193,7 +196,7 @@ namespace dae
 
         create_info.oldSwapchain = old_swap_chain_ == nullptr ? VK_NULL_HANDLE : old_swap_chain_->swap_chain_;
 
-        if (vkCreateSwapchainKHR(device_.get_logical_device(), &create_info, nullptr, &swap_chain_) != VK_SUCCESS)
+        if (vkCreateSwapchainKHR(device_ptr_->get_logical_device(), &create_info, nullptr, &swap_chain_) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create swap chain!");
         }
@@ -202,9 +205,9 @@ namespace dae
         // allowed to create a swap chain with more. That's why we'll first query the final number of
         // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
         // retrieve the handles.
-        vkGetSwapchainImagesKHR(device_.get_logical_device(), swap_chain_, &image_count, nullptr);
+        vkGetSwapchainImagesKHR(device_ptr_->get_logical_device(), swap_chain_, &image_count, nullptr);
         swap_chain_images_.resize(image_count);
-        vkGetSwapchainImagesKHR(device_.get_logical_device(), swap_chain_, &image_count, swap_chain_images_.data());
+        vkGetSwapchainImagesKHR(device_ptr_->get_logical_device(), swap_chain_, &image_count, swap_chain_images_.data());
 
         swap_chain_image_format_ = surface_format.format;
         swap_chain_extent_       = extent;
@@ -226,7 +229,7 @@ namespace dae
             view_info.subresourceRange.baseArrayLayer = 0;
             view_info.subresourceRange.layerCount     = 1;
 
-            if (vkCreateImageView(device_.get_logical_device(), &view_info, nullptr, &swap_chain_image_views_[i]) !=
+            if (vkCreateImageView(device_ptr_->get_logical_device(), &view_info, nullptr, &swap_chain_image_views_[i]) !=
                 VK_SUCCESS)
             {
                 throw std::runtime_error("failed to create texture image view!");
@@ -288,7 +291,7 @@ namespace dae
         render_pass_info.dependencyCount = 1;
         render_pass_info.pDependencies   = &dependency;
 
-        if (vkCreateRenderPass(device_.get_logical_device(), &render_pass_info, nullptr, &render_pass_) != VK_SUCCESS)
+        if (vkCreateRenderPass(device_ptr_->get_logical_device(), &render_pass_info, nullptr, &render_pass_) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create render pass!");
         }
@@ -312,7 +315,7 @@ namespace dae
             framebuffer_info.layers          = 1;
 
             if (vkCreateFramebuffer(
-                device_.get_logical_device(),
+                device_ptr_->get_logical_device(),
                 &framebuffer_info,
                 nullptr,
                 &swap_chain_framebuffers_[i]) != VK_SUCCESS)
@@ -350,7 +353,7 @@ namespace dae
             image_info.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
             image_info.flags         = 0;
 
-            device_.create_image_with_info(
+            device_ptr_->create_image_with_info(
                 image_info,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 depth_images_[i],
@@ -367,7 +370,7 @@ namespace dae
             view_info.subresourceRange.baseArrayLayer = 0;
             view_info.subresourceRange.layerCount     = 1;
 
-            if (vkCreateImageView(device_.get_logical_device(), &view_info, nullptr, &depth_image_views_[i]) != VK_SUCCESS)
+            if (vkCreateImageView(device_ptr_->get_logical_device(), &view_info, nullptr, &depth_image_views_[i]) != VK_SUCCESS)
             {
                 throw std::runtime_error("failed to create texture image view!");
             }
@@ -390,11 +393,11 @@ namespace dae
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            if (vkCreateSemaphore(device_.get_logical_device(), &semaphore_info, nullptr, &image_available_semaphores_[i]) !=
+            if (vkCreateSemaphore(device_ptr_->get_logical_device(), &semaphore_info, nullptr, &image_available_semaphores_[i]) !=
                 VK_SUCCESS or
-                vkCreateSemaphore(device_.get_logical_device(), &semaphore_info, nullptr, &render_finished_semaphores_[i]) !=
+                vkCreateSemaphore(device_ptr_->get_logical_device(), &semaphore_info, nullptr, &render_finished_semaphores_[i]) !=
                 VK_SUCCESS or
-                vkCreateFence(device_.get_logical_device(), &fence_info, nullptr, &in_flight_fences_[i]) != VK_SUCCESS)
+                vkCreateFence(device_ptr_->get_logical_device(), &fence_info, nullptr, &in_flight_fences_[i]) != VK_SUCCESS)
             {
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
@@ -461,7 +464,7 @@ namespace dae
 
     auto swap_chain::find_depth_format() -> VkFormat
     {
-        return device_.find_supported_format(
+        return device_ptr_->find_supported_format(
             {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
             VK_IMAGE_TILING_OPTIMAL,
             VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);

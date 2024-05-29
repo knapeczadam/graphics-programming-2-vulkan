@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/core/material.h"
 #include "src/core/model.h"
+#include "src/utility/material.h"
 
 // Standard includes
 #include <memory>

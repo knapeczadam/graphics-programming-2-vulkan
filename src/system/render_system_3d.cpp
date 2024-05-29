@@ -1,5 +1,8 @@
 ﻿#include "render_system_3d.h"
 
+// Project includes
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <ranges>
 #include <stdexcept>
@@ -17,8 +20,8 @@ namespace dae
         glm::mat4 normal_matrix{1.0f};
     };
     
-    render_system_3d::render_system_3d(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : i_system{device}
+    render_system_3d::render_system_3d(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+        : i_system{device_ptr}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
@@ -77,7 +80,7 @@ void render_system_3d::render_game_objects(frame_info &frame_info)
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
-        if (vkCreatePipelineLayout(device_.get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(device_ptr_->get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create pipeline layout!"};
         }
@@ -92,7 +95,7 @@ void render_system_3d::render_game_objects(frame_info &frame_info)
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            device_,
+            device_ptr_,
             "data/shaders/shader_3d.vert.spv",
             "data/shaders/shader_3d.frag.spv",
             pipeline_config);

@@ -2,7 +2,7 @@
 
 // Project includes
 #include "src/core/game_object.h"
-#include "src/core/window.h"
+#include "src/engine/window.h"
 
 namespace dae
 {

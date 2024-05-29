@@ -1,20 +1,20 @@
 ﻿#pragma once
 
-// Project includes
-#include "src/engine/device.h"
-
 // Standard includes
 #include <string>
 
 // Vulkan includes
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.h>
 
 namespace dae
 {
+    // Forward declarations
+    class device;
+    
     class texture
     {
     public:
-        texture(device &device, std::string const &file_path, VkFormat format);
+        texture(device *device_ptr, std::string const &file_path, VkFormat format);
         ~texture();
 
         texture(texture const &)            = delete;
@@ -31,7 +31,7 @@ namespace dae
         void generate_mipmaps();
 
     private:
-        device         &device_;
+        device         *device_ptr_;
         VkImage        image_        = VK_NULL_HANDLE;
         VkDeviceMemory image_memory_ = VK_NULL_HANDLE;
         VkImageView    image_view_   = VK_NULL_HANDLE;

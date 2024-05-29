@@ -1,5 +1,8 @@
 ﻿#include "point_light_system.h"
 
+// Project includes
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <array>
 #include <map>
@@ -20,8 +23,8 @@ namespace dae
         float radius;
     };
     
-    point_light_system::point_light_system(device& device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : i_system{device}
+    point_light_system::point_light_system(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
+        : i_system{device_ptr}
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(render_pass);
@@ -116,7 +119,7 @@ void point_light_system::render(frame_info &frame_info)
         pipeline_layout_info.pushConstantRangeCount = 1;
         pipeline_layout_info.pPushConstantRanges    = &push_constant_range;
 
-        if (vkCreatePipelineLayout(device_.get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(device_ptr_->get_logical_device(), &pipeline_layout_info, nullptr, &pipeline_layout_) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create pipeline layout!"};
         }
@@ -134,7 +137,7 @@ void point_light_system::render(frame_info &frame_info)
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            device_,
+            device_ptr_,
             "data/shaders/point_light.vert.spv",
             "data/shaders/point_light.frag.spv",
             pipeline_config);

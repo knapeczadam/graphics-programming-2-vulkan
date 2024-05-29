@@ -1,14 +1,16 @@
-﻿#include "app.h"
+﻿#include "engine.h"
 
 // Project includes
-#include "src/core/camera.h"
-#include "src/engine/buffer.h"
+#include "src/engine/camera.h"
 #include "src/input/movement_controller.h"
 #include "src/system/pbr_system.h"
 #include "src/system/point_light_system.h"
 #include "src/system/render_system_2d.h"
 #include "src/system/render_system_3d.h"
-#include "src/util/texture.h"
+#include "src/utility/texture.h"
+#include "src/vulkan/buffer.h"
+#include "src/vulkan/renderer.h"
+#include "src/vulkan/device.h"
 
 // Standard includes
 #include <chrono>
@@ -21,9 +23,18 @@
 
 namespace dae
 {
-    app::app()
+    engine::engine()
     {
-        global_pool_ = descriptor_pool::builder(device_)
+        window_ptr_= &window::instance();
+        window_ptr_->init(width, height, "Hello Vulkan!");
+
+        device_ptr_ = &device::instance();
+        device_ptr_->init(window_ptr_);
+
+        renderer_ptr_ = &renderer::instance();
+        renderer_ptr_->init(window_ptr_, device_ptr_);
+        
+        global_pool_ = descriptor_pool::builder(device_ptr_)
                        .set_max_sets(swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swap_chain::MAX_FRAMES_IN_FLIGHT)
@@ -32,17 +43,15 @@ namespace dae
         load_game_objects();
     }
 
-    app::~app()
+    void engine::run(std::function<void()> const &load)
     {
-    }
-
-    void app::run()
-    {
+        load();
+        
         std::vector<std::unique_ptr<buffer>> ubo_buffers(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < ubo_buffers.size(); ++i)
         {
             ubo_buffers[i] = std::make_unique<buffer>(
-                device_,
+                device_ptr_,
                 sizeof(global_ubo),
                 1,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -51,7 +60,7 @@ namespace dae
             ubo_buffers[i]->map();
         }
 
-        auto global_set_layout = descriptor_set_layout::builder(device_)
+        auto global_set_layout = descriptor_set_layout::builder(device_ptr_)
                                  .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                  .add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .add_binding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -59,10 +68,11 @@ namespace dae
                                  .add_binding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
 
-        texture diffuse_texture{device_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_B8G8R8A8_UNORM};
-        texture normal_texture{device_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture specular_texture{device_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
-        texture gloss_texture{device_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_UNORM};
+
+        texture diffuse_texture{device_ptr_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_B8G8R8A8_UNORM};
+        texture normal_texture{device_ptr_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture specular_texture{device_ptr_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture gloss_texture{device_ptr_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_UNORM};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();
@@ -89,7 +99,7 @@ namespace dae
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
         {
             auto buffer_info = ubo_buffers[i]->descriptor_info();
-            descriptor_writer(*global_set_layout, *global_pool_)
+            descriptor_writer(global_set_layout.get(), global_pool_.get())
                 .write_buffer(0, &buffer_info)
                 .write_image(1, &diffuse_image_info)
                 .write_image(2, &normal_image_info)
@@ -98,10 +108,10 @@ namespace dae
                 .build(global_descriptor_sets[i]);
         }
         
-        render_system_3d render_system_3d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        render_system_2d render_system_2d {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        point_light_system point_light_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        pbr_system pbr_system {device_, renderer_.get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        render_system_3d render_system_3d {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        render_system_2d render_system_2d {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        point_light_system point_light_system {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        pbr_system pbr_system {device_ptr_, renderer_ptr_->get_swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
         camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
         // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});
@@ -116,7 +126,7 @@ namespace dae
         //---------------------------------------------------------
         // GAME LOOP
         //---------------------------------------------------------
-        while (not window_.should_close())
+        while (not window_ptr_->should_close())
         {
             glfwPollEvents();
 
@@ -126,16 +136,16 @@ namespace dae
 
             // frame_time = glm::min(frame_time, max_frame_time);
 
-            camera_controller.move(window_.get_glfw_window(), frame_time, viewer_object);
+            camera_controller.move(window_ptr_->get_glfw_window(), frame_time, viewer_object);
             camera.set_view_yxz(viewer_object.transform.translation, viewer_object.transform.rotation);
             
-            float aspect = renderer_.get_aspect_ratio();
+            float aspect = renderer_ptr_->get_aspect_ratio();
             camera.set_orthographic_projection(-aspect, aspect, -1, 1, -1, 1);
             camera.set_perspective_projection(glm::radians(50.0f), aspect, 0.1f, 10.0f);
 
-            if (auto command_buffer = renderer_.begin_frame())
+            if (auto command_buffer = renderer_ptr_->begin_frame())
             {
-                int frame_index = renderer_.get_frame_index();
+                int frame_index = renderer_ptr_->get_frame_index();
                 
                 frame_info frame_info{
                     frame_index,
@@ -156,20 +166,21 @@ namespace dae
                 ubo_buffers[frame_index]->flush();
                 
                 // render
-                renderer_.begin_swap_chain_render_pass(command_buffer);
+                renderer_ptr_->begin_swap_chain_render_pass(command_buffer);
                 render_system_2d.render(frame_info);
                 render_system_3d.render_game_objects(frame_info);
                 pbr_system.render_game_objects(frame_info);
                 point_light_system.render(frame_info);
-                renderer_.end_swap_chain_render_pass(command_buffer);
-                renderer_.end_frame();
+                
+                renderer_ptr_->end_swap_chain_render_pass(command_buffer);
+                renderer_ptr_->end_frame();
             }
         }
-        vkDeviceWaitIdle(device_.get_logical_device());
+        vkDeviceWaitIdle(device_ptr_->get_logical_device());
     }
-    
-    std::unique_ptr<model> create_oval_model(device &device, glm::vec3 offset, float radiusX, float radiusY,
-                                                 int segments)
+
+    std::unique_ptr<model> create_oval_model(device *device_ptr, glm::vec3 offset, float radiusX, float radiusY,
+                                             int segments)
     {
         model::builder modelBuilder{};
 
@@ -198,10 +209,10 @@ namespace dae
         modelBuilder.indices.push_back(segments);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<model>(device, modelBuilder);
+        return std::make_unique<model>(device_ptr, modelBuilder);
     }
 
-    std::unique_ptr<model> create_n_gon_model(device &device, glm::vec3 offset, float radius, int sides)
+    std::unique_ptr<model> create_n_gon_model(device *device_ptr, glm::vec3 offset, float radius, int sides)
     {
         model::builder modelBuilder{};
 
@@ -233,33 +244,33 @@ namespace dae
         modelBuilder.indices.push_back(sides - 1);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<model>(device, modelBuilder);
+        return std::make_unique<model>(device_ptr, modelBuilder);
     }
     
-    void app::load_game_objects()
+    void engine::load_game_objects()
     {
-        std::shared_ptr<model> model = model::create_model_from_file(device_, "data/assets/models/suzanne.obj");
+        std::shared_ptr<model> model = model::create_model_from_file(device_ptr_, "data/assets/models/suzanne.obj");
         auto go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-1.2f, 0.0f, 2.5f};
         go.transform.scale = glm::vec3{-0.5f};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "data/assets/models/beetle.obj");
+        model = model::create_model_from_file(device_ptr_, "data/assets/models/beetle.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-0.2f, 2.0f, 1.5f};
         go.transform.scale = glm::vec3{-5.8f};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "data/assets/models/quad.obj");
+        model = model::create_model_from_file(device_ptr_, "data/assets/models/quad.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {0.0f, 0.0f, 0.0f};
         go.transform.scale = glm::vec3{3};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "data/assets/models/sphere.obj");
+        model = model::create_model_from_file(device_ptr_, "data/assets/models/sphere.obj");
         go = game_object::create_game_object("pbr");
         go.model = model;
         go.transform.translation = {0.0f, -2.2f, 0.0f};
@@ -294,13 +305,13 @@ namespace dae
 
 
         go  = game_object::create_game_object("2d");
-        model = create_oval_model(device_, {}, 0.5f, 0.5f, 50);
+        model = create_oval_model(device_ptr_, {}, 0.5f, 0.5f, 50);
         go.model = model;
         go.transform.translation = {2.0f, -1.0f, 0.0f};
         game_objects_.emplace(go.get_id(), std::move(go));
         
         go  = game_object::create_game_object("2d");
-        model = create_n_gon_model(device_, {}, 0.5f, 3);
+        model = create_n_gon_model(device_ptr_, {}, 0.5f, 3);
         go.model = model;
         go.transform.translation = {-2.0f, -1.0f, 0.0f};
         game_objects_.emplace(go.get_id(), std::move(go));

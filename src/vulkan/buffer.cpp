@@ -6,6 +6,9 @@
  */
 #include "buffer.h"
 
+// Project includes
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <cassert>
 #include <cstring>
@@ -31,13 +34,13 @@ namespace dae
     }
 
     buffer::buffer(
-        device                &device,
+        device                *device_ptr,
         VkDeviceSize          instanceSize,
         uint32_t              instanceCount,
         VkBufferUsageFlags    usageFlags,
         VkMemoryPropertyFlags memoryPropertyFlags,
         VkDeviceSize          minOffsetAlignment)
-        : device_{device},
+        : device_ptr_{device_ptr},
           instance_count_{instanceCount},
           instance_size_{instanceSize},
           usage_flags_{usageFlags},
@@ -45,14 +48,14 @@ namespace dae
     {
         alignment_size_ = get_alignment(instanceSize, minOffsetAlignment);
         buffer_size_ = alignment_size_ * instanceCount;
-        device.create_buffer(buffer_size_, usageFlags, memoryPropertyFlags, buffer_, memory_);
+        device_ptr->create_buffer(buffer_size_, usageFlags, memoryPropertyFlags, buffer_, memory_);
     }
 
     buffer::~buffer()
     {
         unmap();
-        vkDestroyBuffer(device_.get_logical_device(), buffer_, nullptr);
-        vkFreeMemory(device_.get_logical_device(), memory_, nullptr);
+        vkDestroyBuffer(device_ptr_->get_logical_device(), buffer_, nullptr);
+        vkFreeMemory(device_ptr_->get_logical_device(), memory_, nullptr);
     }
 
     /**
@@ -67,7 +70,7 @@ namespace dae
     auto buffer::map(VkDeviceSize size, VkDeviceSize offset) -> VkResult
     {
         assert(buffer_ and memory_ and "Called map on buffer before create");
-        return vkMapMemory(device_.get_logical_device(), memory_, offset, size, 0, &mapped_);
+        return vkMapMemory(device_ptr_->get_logical_device(), memory_, offset, size, 0, &mapped_);
     }
 
     /**
@@ -79,7 +82,7 @@ namespace dae
     {
         if (mapped_)
         {
-            vkUnmapMemory(device_.get_logical_device(), memory_);
+            vkUnmapMemory(device_ptr_->get_logical_device(), memory_);
             mapped_ = nullptr;
         }
     }
@@ -127,7 +130,7 @@ namespace dae
         mappedRange.memory = memory_;
         mappedRange.offset = offset;
         mappedRange.size   = size;
-        return vkFlushMappedMemoryRanges(device_.get_logical_device(), 1, &mappedRange);
+        return vkFlushMappedMemoryRanges(device_ptr_->get_logical_device(), 1, &mappedRange);
     }
 
     /**
@@ -148,7 +151,7 @@ namespace dae
         mappedRange.memory = memory_;
         mappedRange.offset = offset;
         mappedRange.size   = size;
-        return vkInvalidateMappedMemoryRanges(device_.get_logical_device(), 1, &mappedRange);
+        return vkInvalidateMappedMemoryRanges(device_ptr_->get_logical_device(), 1, &mappedRange);
     }
 
     /**

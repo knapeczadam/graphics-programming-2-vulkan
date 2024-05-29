@@ -1,5 +1,8 @@
 ﻿#include "device.h"
 
+// Project includes
+#include "src/engine/window.h"
+
 // Standard includes
 #include <cstring>
 #include <iostream>
@@ -49,17 +52,6 @@ namespace dae
         }
     }
 
-    // class member functions
-    device::device(window &window) : window_{window}
-    {
-        create_instance();
-        setup_debug_messenger();
-        create_surface();
-        pick_physical_device();
-        create_logical_device();
-        create_command_pool();
-    }
-
     device::~device()
     {
         vkDestroyCommandPool(device_, command_pool_, nullptr);
@@ -72,6 +64,17 @@ namespace dae
 
         vkDestroySurfaceKHR(instance_, surface_, nullptr);
         vkDestroyInstance(instance_, nullptr);
+    }
+
+    void device::init(window *window_ptr)
+    {
+        window_ptr_ = window_ptr;
+        create_instance();
+        setup_debug_messenger();
+        create_surface();
+        pick_physical_device();
+        create_logical_device();
+        create_command_pool();
     }
 
     void device::create_instance()
@@ -217,7 +220,7 @@ namespace dae
         }
     }
 
-    void device::create_surface() { window_.create_window_surface(instance_, &surface_); }
+    void device::create_surface() { window_ptr_->create_window_surface(instance_, &surface_); }
 
     auto device::is_device_suitable(VkPhysicalDevice device) -> bool
     {

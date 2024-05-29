@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 // Project includes
+#include "src/engine/frame_info.h"
 #include "src/system/i_system.h"
 
 namespace dae
@@ -8,7 +9,7 @@ namespace dae
     class point_light_system final : public i_system
     {
     public:
-        point_light_system(device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        point_light_system(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
         ~point_light_system() override = default;
 
         point_light_system(point_light_system const &other)            = delete;

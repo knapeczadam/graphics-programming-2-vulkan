@@ -1,18 +1,25 @@
 
 // Project includes
-#include "src/core/app.h"
+#include "engine/scene_config_manager.h"
+#include "engine/scene_loader.h"
+#include "src/engine/engine.h"
 
 // Standard includes
 #include <cstdlib>
 #include <iostream>
 
+void load()
+{
+    dae::scene_config_manager::instance().load_scene_config("data/configs/scene_config.json");
+    dae::scene_loader::instance().load_scenes();
+}
+
 int main()
 {
-    dae::app app{};
-
     try
     {
-        app.run();
+        dae::engine engine{};
+        engine.run(load);
     }
     catch (const std::exception &e)
     {

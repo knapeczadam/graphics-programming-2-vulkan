@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/core/camera.h"
 #include "src/core/game_object.h"
+#include "src/engine/camera.h"
 
 // Vulkan includes
 #include <vulkan/vulkan.h>

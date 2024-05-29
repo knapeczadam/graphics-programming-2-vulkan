@@ -1,5 +1,8 @@
 ﻿#include "descriptors.h"
 
+// Project includes
+#include "src/vulkan/device.h"
+
 // Standard includes
 #include <cassert>
 #include <stdexcept>
@@ -26,14 +29,14 @@ namespace dae
 
     auto descriptor_set_layout::builder::build() const -> std::unique_ptr<descriptor_set_layout>
     {
-        return std::make_unique<descriptor_set_layout>(device_, bindings_);
+        return std::make_unique<descriptor_set_layout>(device_ptr_, bindings_);
     }
 
     // *************** Descriptor Set Layout *********************
 
     descriptor_set_layout::descriptor_set_layout(
-        device &device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
-        : device_{device}, bindings{bindings}
+        device *device_ptr, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+        : device_ptr_{device_ptr}, bindings{bindings}
     {
         std::vector<VkDescriptorSetLayoutBinding> set_layout_bindings{};
         for (auto kv : bindings)
@@ -47,7 +50,7 @@ namespace dae
         descriptor_set_layout_info.pBindings    = set_layout_bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-            device.get_logical_device(),
+            device_ptr->get_logical_device(),
             &descriptor_set_layout_info,
             nullptr,
             &descriptor_set_layout_) != VK_SUCCESS)
@@ -58,7 +61,7 @@ namespace dae
 
     descriptor_set_layout::~descriptor_set_layout()
     {
-        vkDestroyDescriptorSetLayout(device_.get_logical_device(), descriptor_set_layout_, nullptr);
+        vkDestroyDescriptorSetLayout(device_ptr_->get_logical_device(), descriptor_set_layout_, nullptr);
     }
 
     // *************** Descriptor Pool Builder *********************
@@ -83,17 +86,17 @@ namespace dae
 
     auto descriptor_pool::builder::build() const -> std::unique_ptr<descriptor_pool>
     {
-        return std::make_unique<descriptor_pool>(device_, max_sets_, pool_flags_, pool_sizes_);
+        return std::make_unique<descriptor_pool>(device_ptr_, max_sets_, pool_flags_, pool_sizes_);
     }
 
     // *************** Descriptor Pool *********************
 
     descriptor_pool::descriptor_pool(
-        device &device,
+        device *device_ptr,
         uint32_t max_sets,
         VkDescriptorPoolCreateFlags pool_flags,
         const std::vector<VkDescriptorPoolSize> &pool_sizes)
-        : device_{device}
+        : device_ptr_{device_ptr}
     {
         VkDescriptorPoolCreateInfo descriptor_pool_info{};
         descriptor_pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -102,7 +105,7 @@ namespace dae
         descriptor_pool_info.maxSets       = max_sets;
         descriptor_pool_info.flags         = pool_flags;
 
-        if (vkCreateDescriptorPool(device.get_logical_device(), &descriptor_pool_info, nullptr, &descriptor_pool_) !=
+        if (vkCreateDescriptorPool(device_ptr->get_logical_device(), &descriptor_pool_info, nullptr, &descriptor_pool_) !=
             VK_SUCCESS)
         {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -111,7 +114,7 @@ namespace dae
 
     descriptor_pool::~descriptor_pool()
     {
-        vkDestroyDescriptorPool(device_.get_logical_device(), descriptor_pool_, nullptr);
+        vkDestroyDescriptorPool(device_ptr_->get_logical_device(), descriptor_pool_, nullptr);
     }
 
     auto descriptor_pool::allocate_descriptor(const VkDescriptorSetLayout descriptor_set_layout, VkDescriptorSet &descriptor) const -> bool
@@ -124,7 +127,7 @@ namespace dae
 
         // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
         // a new pool whenever an old pool fills up. But this is beyond our current scope
-        if (vkAllocateDescriptorSets(device_.get_logical_device(), &alloc_info, &descriptor) != VK_SUCCESS)
+        if (vkAllocateDescriptorSets(device_ptr_->get_logical_device(), &alloc_info, &descriptor) != VK_SUCCESS)
         {
             return false;
         }
@@ -134,7 +137,7 @@ namespace dae
     void descriptor_pool::free_descriptors(std::vector<VkDescriptorSet> &descriptors) const
     {
         vkFreeDescriptorSets(
-            device_.get_logical_device(),
+            device_ptr_->get_logical_device(),
             descriptor_pool_,
             static_cast<uint32_t>(descriptors.size()),
             descriptors.data());
@@ -142,21 +145,21 @@ namespace dae
 
     void descriptor_pool::reset_pool()
     {
-        vkResetDescriptorPool(device_.get_logical_device(), descriptor_pool_, 0);
+        vkResetDescriptorPool(device_ptr_->get_logical_device(), descriptor_pool_, 0);
     }
 
     // *************** Descriptor Writer *********************
 
-    descriptor_writer::descriptor_writer(descriptor_set_layout &set_layout, descriptor_pool &pool)
-        : set_layout_{set_layout}, pool_{pool}
+    descriptor_writer::descriptor_writer(descriptor_set_layout *set_layout_ptr, descriptor_pool *pool_ptr)
+        : set_layout_ptr_{set_layout_ptr}, pool_ptr_{pool_ptr}
     {
     }
 
     auto descriptor_writer::write_buffer(uint32_t binding, VkDescriptorBufferInfo *buffer_info) -> descriptor_writer &
     {
-        assert(set_layout_.bindings.count(binding) == 1 and "Layout does not contain specified binding");
+        assert(set_layout_ptr_->bindings.count(binding) == 1 and "Layout does not contain specified binding");
 
-        auto &bindingDescription = set_layout_.bindings[binding];
+        auto &bindingDescription = set_layout_ptr_->bindings[binding];
 
         assert(bindingDescription.descriptorCount == 1 and "Binding single descriptor info, but binding expects multiple");
 
@@ -173,9 +176,9 @@ namespace dae
 
     auto descriptor_writer::write_image(uint32_t binding, VkDescriptorImageInfo *image_info) -> descriptor_writer &
     {
-        assert(set_layout_.bindings.count(binding) == 1 and "Layout does not contain specified binding");
+        assert(set_layout_ptr_->bindings.count(binding) == 1 and "Layout does not contain specified binding");
 
-        auto &binding_description = set_layout_.bindings[binding];
+        auto &binding_description = set_layout_ptr_->bindings[binding];
 
         assert(binding_description.descriptorCount == 1 and "Binding single descriptor info, but binding expects multiple");
 
@@ -192,7 +195,7 @@ namespace dae
 
     auto descriptor_writer::build(VkDescriptorSet &set) -> bool
     {
-        bool success = pool_.allocate_descriptor(set_layout_.get_descriptor_set_layout(), set);
+        bool success = pool_ptr_->allocate_descriptor(set_layout_ptr_->get_descriptor_set_layout(), set);
         if (not success)
         {
             return false;
@@ -207,6 +210,6 @@ namespace dae
         {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool_.device_.get_logical_device(), writes_.size(), writes_.data(), 0, nullptr);
+        vkUpdateDescriptorSets(pool_ptr_->device_ptr_->get_logical_device(), writes_.size(), writes_.data(), 0, nullptr);
     }
 }

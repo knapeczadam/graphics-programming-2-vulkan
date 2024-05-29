@@ -1,15 +1,18 @@
 ﻿#pragma once
 
-// Project includes
-#include "src/engine/device.h"
+// Vulkan includes
+#include <vulkan/vulkan.h>
 
 namespace dae
 {
-    class buffer
+    // Forward declarations
+    class device;
+    
+    class buffer final
     {
     public:
         buffer(
-            device &device,
+            device *device_ptr_,
             VkDeviceSize instance_size,
             uint32_t instance_count,
             VkBufferUsageFlags usage_flags,
@@ -17,8 +20,8 @@ namespace dae
             VkDeviceSize min_offset_alignment = 1);
         ~buffer();
 
-        buffer(buffer const &) = delete;
-        buffer &operator=(buffer const &) = delete;
+        buffer(buffer const &other)            = delete;
+        buffer &operator=(buffer const &other) = delete;
 
         auto map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) -> VkResult;
         void unmap();
@@ -45,7 +48,7 @@ namespace dae
     private:
         static auto get_alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment) -> VkDeviceSize;
 
-        device         &device_;
+        device         *device_ptr_;
         void           *mapped_      = nullptr;
         VkBuffer       buffer_       = VK_NULL_HANDLE;
         VkDeviceMemory memory_       = VK_NULL_HANDLE;

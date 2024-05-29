@@ -1,22 +1,25 @@
 ﻿#pragma once
 
-// Project includes
-#include "src/engine/device.h"
-
 // Standard includes
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
+// Vulkan includes
+#include <vulkan/vulkan.h>
+
 namespace dae
 {
-    class descriptor_set_layout
+    // Forward declarations
+    class device;
+    
+    class descriptor_set_layout final
     {
     public:
         class builder
         {
         public:
-            builder(device &device) : device_{device}
+            explicit builder(device *device_ptr) : device_ptr_{device_ptr}
             {
             }
 
@@ -29,32 +32,33 @@ namespace dae
             [[nodiscard]] auto build() const -> std::unique_ptr<descriptor_set_layout>;
 
         private:
-            device &device_;
+            device *device_ptr_;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings_{};
         };
 
-        descriptor_set_layout(device &device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+        descriptor_set_layout(device *device_ptr, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
         ~descriptor_set_layout();
-        descriptor_set_layout(descriptor_set_layout const &)            = delete;
-        descriptor_set_layout &operator=(descriptor_set_layout const &) = delete;
+        
+        descriptor_set_layout(descriptor_set_layout const &other)            = delete;
+        descriptor_set_layout &operator=(descriptor_set_layout const &other) = delete;
 
         [[nodiscard]] auto get_descriptor_set_layout() const -> VkDescriptorSetLayout { return descriptor_set_layout_; }
 
     private:
-        device                       &device_;
+        device                       *device_ptr_;
         VkDescriptorSetLayout        descriptor_set_layout_;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
         friend class descriptor_writer;
     };
 
-    class descriptor_pool
+    class descriptor_pool final
     {
     public:
         class builder
         {
         public:
-            builder(device &device) : device_{device}
+            explicit builder(device *device_ptr) : device_ptr_{device_ptr}
             {
             }
 
@@ -64,14 +68,14 @@ namespace dae
             [[nodiscard]] auto build() const -> std::unique_ptr<descriptor_pool>;
 
         private:
-            device                        &device_;
+            device                            *device_ptr_;
             std::vector<VkDescriptorPoolSize> pool_sizes_{};
             uint32_t                          max_sets_      = 1000;
             VkDescriptorPoolCreateFlags       pool_flags_    = 0;
         };
 
         descriptor_pool(
-            device &device,
+            device *device_ptr,
             uint32_t max_sets,
             VkDescriptorPoolCreateFlags pool_flags,
             const std::vector<VkDescriptorPoolSize> &pool_sizes);
@@ -85,16 +89,16 @@ namespace dae
         void reset_pool();
 
     private:
-        device       &device_;
+        device           *device_ptr_;
         VkDescriptorPool descriptor_pool_;
 
         friend class descriptor_writer;
     };
 
-    class descriptor_writer
+    class descriptor_writer final
     {
     public:
-        descriptor_writer(descriptor_set_layout &set_layout, descriptor_pool &pool);
+        descriptor_writer(descriptor_set_layout *set_layout_ptr, descriptor_pool *pool_ptr);
 
         auto write_buffer(uint32_t binding, VkDescriptorBufferInfo *buffer_info) -> descriptor_writer &;
         auto write_image(uint32_t binding, VkDescriptorImageInfo *image_info) -> descriptor_writer &;
@@ -103,8 +107,8 @@ namespace dae
         void overwrite(VkDescriptorSet &set);
 
     private:
-        descriptor_set_layout         &set_layout_;
-        descriptor_pool               &pool_;
+        descriptor_set_layout         *set_layout_ptr_;
+        descriptor_pool               *pool_ptr_;
         std::vector<VkWriteDescriptorSet> writes_;
     };
 }
