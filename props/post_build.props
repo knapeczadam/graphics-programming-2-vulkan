@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)shaders\*.spv" "$(OutputPath)shaders\" /R /Y</Command>
+      <Command>xcopy "$(SolutionDir)data\shaders\*.spv" "$(OutputPath)data\shaders\" /R /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />

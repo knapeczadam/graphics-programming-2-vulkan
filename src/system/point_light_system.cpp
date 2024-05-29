@@ -135,8 +135,8 @@ void point_light_system::render(frame_info &frame_info)
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
             device_,
-            "shaders/point_light.vert.spv",
-            "shaders/point_light.frag.spv",
+            "data/shaders/point_light.vert.spv",
+            "data/shaders/point_light.frag.spv",
             pipeline_config);
     }
 }

@@ -90,8 +90,8 @@ void render_system_2d::render(frame_info &frame_info)
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
             device_,
-            "shaders/shader_2d.vert.spv",
-            "shaders/shader_2d.frag.spv",
+            "data/shaders/shader_2d.vert.spv",
+            "data/shaders/shader_2d.frag.spv",
             pipeline_config);
     }
 }

@@ -67,14 +67,14 @@
     <Content Include="CMakeLists.txt" />
     <Content Include="compile.bat" />
     <Content Include=".env.cmake" />
-    <Content Include="shaders\pbr.frag" />
-    <Content Include="shaders\pbr.vert" />
-    <Content Include="shaders\shader_2d.frag" />
-    <Content Include="shaders\shader_2d.vert" />
-    <Content Include="shaders\point_light.frag" />
-    <Content Include="shaders\point_light.vert" />
-    <Content Include="shaders\shader_3d.frag" />
-    <Content Include="shaders\shader_3d.vert" />
+    <Content Include="data\shaders\pbr.frag" />
+    <Content Include="data\shaders\pbr.vert" />
+    <Content Include="data\shaders\point_light.frag" />
+    <Content Include="data\shaders\point_light.vert" />
+    <Content Include="data\shaders\shader_2d.frag" />
+    <Content Include="data\shaders\shader_2d.vert" />
+    <Content Include="data\shaders\shader_3d.frag" />
+    <Content Include="data\shaders\shader_3d.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

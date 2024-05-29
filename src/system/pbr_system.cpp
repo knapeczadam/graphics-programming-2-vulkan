@@ -99,8 +99,8 @@ namespace dae
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
             device_,
-            "shaders/pbr.vert.spv",
-            "shaders/pbr.frag.spv",
+            "data/shaders/pbr.vert.spv",
+            "data/shaders/pbr.frag.spv",
             pipeline_config);
     }
 }

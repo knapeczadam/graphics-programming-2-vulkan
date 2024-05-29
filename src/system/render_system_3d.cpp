@@ -93,8 +93,8 @@ void render_system_3d::render_game_objects(frame_info &frame_info)
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
             device_,
-            "shaders/shader_3d.vert.spv",
-            "shaders/shader_3d.frag.spv",
+            "data/shaders/shader_3d.vert.spv",
+            "data/shaders/shader_3d.frag.spv",
             pipeline_config);
     }
 }

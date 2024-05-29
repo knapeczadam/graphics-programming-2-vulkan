@@ -61,10 +61,10 @@ namespace dae
                                  .add_binding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
 
-        texture diffuse_texture{device_, "textures/vehicle_diffuse.png", VK_FORMAT_B8G8R8A8_UNORM};
-        texture normal_texture{device_, "textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture specular_texture{device_, "textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
-        texture gloss_texture{device_, "textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture diffuse_texture{device_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_B8G8R8A8_UNORM};
+        texture normal_texture{device_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture specular_texture{device_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture gloss_texture{device_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_UNORM};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();
@@ -240,28 +240,28 @@ namespace dae
     
     void app::load_game_objects()
     {
-        std::shared_ptr<model> model = model::create_model_from_file(device_, "models/suzanne.obj");
+        std::shared_ptr<model> model = model::create_model_from_file(device_, "data/assets/models/suzanne.obj");
         auto go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-1.2f, 0.0f, 2.5f};
         go.transform.scale = glm::vec3{-0.5f};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "models/beetle.obj");
+        model = model::create_model_from_file(device_, "data/assets/models/beetle.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-0.2f, 2.0f, 1.5f};
         go.transform.scale = glm::vec3{-5.8f};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "models/quad.obj");
+        model = model::create_model_from_file(device_, "data/assets/models/quad.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {0.0f, 0.0f, 0.0f};
         go.transform.scale = glm::vec3{3};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_, "models/sphere.obj");
+        model = model::create_model_from_file(device_, "data/assets/models/sphere.obj");
         go = game_object::create_game_object("pbr");
         go.model = model;
         go.transform.translation = {0.0f, -2.2f, 0.0f};
