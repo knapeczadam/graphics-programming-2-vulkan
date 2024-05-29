@@ -1,5 +1,8 @@
 ﻿#include "model.h"
 
+// Project includes
+#include "util/utils.h"
+
 // Standard includes
 #include <cassert>
 #include <cstring>
@@ -9,9 +12,6 @@
 // TOL includes
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
-
-// Project includes
-#include "utils.h"
 
 // GLM includes
 #define GLM_ENABLE_EXPERIMENTAL

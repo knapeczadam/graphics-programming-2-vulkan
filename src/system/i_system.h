@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "../frame_info.h"
-#include "../pipeline.h"
+#include "engine/frame_info.h"
+#include "engine/pipeline.h"
 
 // Standard includes
 #include <memory>

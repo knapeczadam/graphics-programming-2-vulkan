@@ -1,6 +1,6 @@
 
 // Project includes
-#include "app.h"
+#include "core/app.h"
 
 // Standard includes
 #include <cstdlib>

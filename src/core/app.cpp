@@ -1,14 +1,14 @@
 ﻿#include "app.h"
 
 // Project includes
-#include "buffer.h"
-#include "camera.h"
-#include "movement_controller.h"
-#include "texture.h"
-#include "systems/pbr_system.h"
-#include "systems/point_light_system.h"
-#include "systems/render_system_2d.h"
-#include "systems/render_system_3d.h"
+#include "engine/buffer.h"
+#include "engine/camera.h"
+#include "input/movement_controller.h"
+#include "system/pbr_system.h"
+#include "system/point_light_system.h"
+#include "system/render_system_2d.h"
+#include "system/render_system_3d.h"
+#include "util/texture.h"
 
 // Standard includes
 #include <array>

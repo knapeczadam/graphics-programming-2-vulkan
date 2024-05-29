@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // Project includes
-#include "i_system.h"
+#include "system/i_system.h"
 
 namespace dae
 {

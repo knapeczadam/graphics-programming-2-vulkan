@@ -1,16 +1,16 @@
 ﻿#pragma once
 
+// Project includes
+#include "core/material.h"
+#include "core/model.h"
+
 // Standard includes
 #include <memory>
+#include <string>
 #include <unordered_map>
-
-// Project includes
-#include "model.h"
 
 // GLM includes
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "material.h"
 
 namespace dae
 {

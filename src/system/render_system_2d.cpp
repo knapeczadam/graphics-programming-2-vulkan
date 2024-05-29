@@ -1,14 +1,13 @@
 ﻿#include "render_system_2d.h"
 
 // Standard includes
+#include <ranges>
 #include <stdexcept>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <ranges>
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
 
 namespace dae
 {

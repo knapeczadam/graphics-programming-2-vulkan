@@ -1,12 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "camera.h"
-#include "game_object.h"
+#include "core/game_object.h"
+#include "engine/camera.h"
 
 // Vulkan includes
 #include <vulkan/vulkan.h>
-
 
 namespace dae
 {

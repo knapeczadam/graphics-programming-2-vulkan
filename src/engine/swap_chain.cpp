@@ -1,6 +1,6 @@
 ﻿#include "swap_chain.h"
 
-// std
+// Standard includes
 #include <array>
 #include <cstdlib>
 #include <cstring>

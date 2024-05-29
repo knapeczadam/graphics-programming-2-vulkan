@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-// Project headers
-#include "device.h"
+// Project includes
+#include "engine/device.h"
 
-// Vulkan headers
-#include <vulkan/vulkan.h>
-
-// Standard headers
+// Standard includes
 #include <memory>
 #include <string>
 #include <vector>
+
+// Vulkan includes
+#include <vulkan/vulkan.h>
 
 namespace dae
 {

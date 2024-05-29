@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "window.h"
+// Project includes
+#include "engine/window.h"
 
 // std lib headers
 #include <string>

@@ -1,7 +1,7 @@
 ﻿#include "texture.h"
 
 // Project includes
-#include "buffer.h"
+#include "engine/buffer.h"
 
 // Standard includes
 #include <cmath>

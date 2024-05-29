@@ -3,6 +3,8 @@
 // Standard includes
 #include <string>
 #include <vector>
+
+// Vulkan includes
 #include <vulkan/vulkan_core.h>
 
 namespace dae

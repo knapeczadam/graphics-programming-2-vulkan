@@ -1,16 +1,15 @@
 ﻿#include "point_light_system.h"
 
 // Standard includes
-#include <stdexcept>
 #include <array>
 #include <map>
+#include <ranges>
+#include <stdexcept>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <ranges>
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
 
 namespace dae
 {

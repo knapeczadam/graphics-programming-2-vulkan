@@ -1,17 +1,17 @@
 ﻿#pragma once
 
 // Project includes
-#include "device.h"
-#include "buffer.h"
+#include "engine/buffer.h"
+#include "engine/device.h"
+
+// Standard includes
+#include <memory>
+#include <vector>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
-
-// Standard includes
-#include <vector>
-#include <memory>
 
 namespace dae
 {

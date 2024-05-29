@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 // Project includes
-#include "window.h"
-#include "device.h"
-#include "renderer.h"
-#include "game_object.h"
-#include "descriptors.h"
+#include "core/game_object.h"
+#include "engine/descriptors.h"
+#include "engine/device.h"
+#include "engine/renderer.h"
+#include "engine/window.h"
 
 // Standard includes
 #include <memory>

@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 // Project includes
-#include "window.h"
-#include "device.h"
-#include "swap_chain.h"
+#include "engine/device.h"
+#include "engine/swap_chain.h"
+#include "engine/window.h"
 
 // Standard includes
+#include <cassert>
 #include <memory>
 #include <vector>
-#include <cassert>
 
 namespace dae
 {

@@ -1,14 +1,14 @@
 ﻿#include "pipeline.h"
-#include "model.h"
+
+// Project includes
+#include "core/model.h"
+#include "engine/device.h"
 
 // Standard includes
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <cassert>
-
-// Project includes
-#include "device.h"
 
 #if defined(CMAKE_BUILD)
 #ifndef ENGINE_DIR
