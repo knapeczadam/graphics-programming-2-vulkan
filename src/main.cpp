@@ -5,7 +5,6 @@
 // Standard includes
 #include <cstdlib>
 #include <iostream>
-#include <stdexcept>
 
 int main()
 {

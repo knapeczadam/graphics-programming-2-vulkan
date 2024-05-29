@@ -2,14 +2,13 @@
 
 // Project includes
 #include "core/game_object.h"
+#include "core/window.h"
 #include "engine/descriptors.h"
 #include "engine/device.h"
 #include "engine/renderer.h"
-#include "engine/window.h"
 
 // Standard includes
 #include <memory>
-#include <vector>
 
 namespace dae
 {

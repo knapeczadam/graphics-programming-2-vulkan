@@ -1,10 +1,9 @@
 ﻿#pragma once
 
 // Project includes
-#include "engine/window.h"
+#include "core/window.h"
 
 // std lib headers
-#include <string>
 #include <vector>
 
 namespace dae

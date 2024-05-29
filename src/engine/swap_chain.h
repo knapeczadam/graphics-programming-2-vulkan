@@ -5,7 +5,6 @@
 
 // Standard includes
 #include <memory>
-#include <string>
 #include <vector>
 
 // Vulkan includes

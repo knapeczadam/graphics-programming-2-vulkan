@@ -2,8 +2,6 @@
 
 // Standard includes
 #include <array>
-#include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <limits>
 #include <set>

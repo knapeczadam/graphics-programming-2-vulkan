@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 // Project includes
+#include "core/window.h"
 #include "engine/device.h"
 #include "engine/swap_chain.h"
-#include "engine/window.h"
 
 // Standard includes
 #include <cassert>

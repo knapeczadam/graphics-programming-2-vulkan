@@ -1,8 +1,8 @@
 ﻿#include "app.h"
 
 // Project includes
+#include "core/camera.h"
 #include "engine/buffer.h"
-#include "engine/camera.h"
 #include "input/movement_controller.h"
 #include "system/pbr_system.h"
 #include "system/point_light_system.h"
@@ -11,9 +11,7 @@
 #include "util/texture.h"
 
 // Standard includes
-#include <array>
 #include <chrono>
-#include <stdexcept>
 
 // GLM includes
 #define GLM_FORCE_RADIANS

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // Project includes
-#include "engine/frame_info.h"
+#include "core/frame_info.h"
 #include "engine/pipeline.h"
 
 // Standard includes
