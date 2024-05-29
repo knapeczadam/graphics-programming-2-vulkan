@@ -10,6 +10,8 @@
 // GLM includes
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "material.h"
+
 namespace dae
 {
     struct transform_component
@@ -56,6 +58,11 @@ namespace dae
 
         [[nodiscard]] auto get_id() const -> id_t { return id_; }
         [[nodiscard]] auto get_name() const -> std::string { return name_; }
+        [[nodiscard]] auto get_material() const -> material const & { return material_; }
+        void set_material(float r, float g, float b, float a, float metallic, float roughness)
+        {
+            material_ = material{glm::vec4{r, g, b, a}, metallic, roughness};
+        }
 
     private:
         game_object(id_t id, std::string name) : id_{id}, name_{std::move(name)} {}
@@ -70,5 +77,6 @@ namespace dae
     private:
         id_t        id_;
         std::string name_;
+        material    material_ = {};
     };
 }

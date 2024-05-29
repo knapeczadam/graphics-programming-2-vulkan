@@ -10,6 +10,11 @@ namespace dae
     {
         glm::mat4 model_matrix{1.0f};
         glm::mat4 normal_matrix{1.0f};
+        float r;
+        float g;
+        float b;
+        float metallic;
+        float roughness;
     };
     
     pbr_system::pbr_system(device &device, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
@@ -43,6 +48,11 @@ namespace dae
             pbr_push_constant push{};
             push.model_matrix = obj.transform.mat4();
             push.normal_matrix = obj.transform.normal_matrix();
+            push.r = obj.get_material().base_color.r;
+            push.g = obj.get_material().base_color.g;
+            push.b = obj.get_material().base_color.b;
+            push.metallic = obj.get_material().metallic;
+            push.roughness = obj.get_material().roughness;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,

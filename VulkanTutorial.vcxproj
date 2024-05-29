@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app.h" />
+    <ClInclude Include="src\material.h" />
     <ClInclude Include="src\systems\i_system.h" />
     <ClInclude Include="src\systems\pbr_system.h" />
     <ClInclude Include="src\texture.h" />

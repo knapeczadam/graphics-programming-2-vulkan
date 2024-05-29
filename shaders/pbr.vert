@@ -1,16 +1,16 @@
 #version 450
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 color;
-layout (location = 2) in vec3 normal;
-layout (location = 3) in vec2 uv;
-layout (location = 4) in vec3 tangent;
+layout (location = 0) in vec3 in_position;
+layout (location = 1) in vec3 in_color;
+layout (location = 2) in vec3 in_normal;
+layout (location = 3) in vec2 in_uv;
+layout (location = 4) in vec3 in_tangent;
 
-layout (location = 0) out vec3 frag_color;
-layout (location = 1) out vec3 frag_pos_world;
-layout (location = 2) out vec3 frag_normal_world;
-layout (location = 3) out vec2 frag_uv;
-layout (location = 4) out vec3 frag_tangent_world;
+layout (location = 0) out vec3 out_color;
+layout (location = 1) out vec3 out_position;
+layout (location = 2) out vec3 out_normal;
+layout (location = 3) out vec2 out_uv;
+layout (location = 4) out vec3 out_tangent;
 
 struct point_light
 {
@@ -33,16 +33,21 @@ layout (push_constant) uniform Push
 {
     mat4 model_matrix;
     mat4 normal_matrix;
+    float r;
+    float g;
+    float b;
+    float metallic;
+    float roughness;
 } push;
 
 void main()
 {
-    vec4 position_world = push.model_matrix * vec4(position, 1.0f);
+    vec4 position_world = push.model_matrix * vec4(in_position, 1.0f);
     gl_Position = ubo.projection * (ubo.view * position_world);
 
-    frag_normal_world = normalize(mat3(push.normal_matrix) * normal);
-    frag_tangent_world = normalize(mat3(push.normal_matrix) * tangent.xyz);
-    frag_pos_world = position_world.xyz;
-    frag_color = color;
-    frag_uv = uv;
+    out_normal = normalize(mat3(push.normal_matrix) * in_normal);
+    out_tangent = normalize(mat3(push.normal_matrix) * in_tangent.xyz);
+    out_position = position_world.xyz;
+    out_color = in_color;
+    out_uv = in_uv;
 }
