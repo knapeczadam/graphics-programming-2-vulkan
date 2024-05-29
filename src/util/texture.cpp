@@ -11,6 +11,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#if defined(CMAKE_BUILD)
+#ifndef ENGINE_DIR
+#define ENGINE_DIR "../../../"
+#endif
+#else
+#ifndef ENGINE_DIR
+#define ENGINE_DIR ""
+#endif
+#endif
+
 namespace dae
 {
     texture::texture(device &device, std::string const &file_path, VkFormat format)
@@ -19,7 +29,8 @@ namespace dae
     {
         int text_channels, bytes_per_pixel;
 
-        stbi_uc *pixels = stbi_load(file_path.c_str(), &width_, &height_, &text_channels, STBI_rgb_alpha);
+        std::string const engine_path = ENGINE_DIR + file_path;
+        stbi_uc *pixels = stbi_load(engine_path.c_str(), &width_, &height_, &text_channels, STBI_rgb_alpha);
         mip_levels_ = static_cast<uint32_t>(std::floor(std::log2(std::max(width_, height_)))) + 1;
 
         buffer staging_buffer{
