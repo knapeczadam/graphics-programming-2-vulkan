@@ -27,9 +27,9 @@ namespace dae
         create_pipeline(render_pass);
     }
 
-    void pbr_system::render_game_objects(frame_info &frame_info)
+    void pbr_system::render()
     {
-        
+        auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
 
         vkCmdBindDescriptorSets(
@@ -43,7 +43,7 @@ namespace dae
             nullptr
         );
 
-        for (auto &obj : frame_info.game_objects | std::views::values)
+        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
             if (obj.model == nullptr) continue;
             if (obj.get_name() != "pbr") continue;

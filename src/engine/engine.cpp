@@ -3,6 +3,7 @@
 // Project includes
 #include "src/engine/camera.h"
 #include "src/engine/game_time.h"
+#include "src/input/input_manager.h"
 #include "src/input/movement_controller.h"
 #include "src/system/pbr_system.h"
 #include "src/system/point_light_system.h"
@@ -122,6 +123,10 @@ namespace dae
         viewer_object.transform.translation = {0.0f, -1.5f, -5.0f};
         viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
+        glfwSetKeyCallback(window_ptr_->get_glfw_window(), input_manager::key_callback);
+        
+        global_ubo ubo{};
+        auto &frame_info = frame_info::instance();
 
         using namespace std::chrono;
         using namespace std::chrono_literals;
@@ -152,29 +157,29 @@ namespace dae
             {
                 int frame_index = renderer_ptr_->frame_index();
                 
-                frame_info frame_info{
-                    frame_index,
-                    command_buffer,
-                    camera,
-                    global_descriptor_sets[frame_index],
-                    game_objects_
-                };
+                frame_info.frame_index = frame_index;
+                frame_info.command_buffer = command_buffer;
+                frame_info.camera_ptr = &camera;
+                frame_info.global_descriptor_set = global_descriptor_sets[frame_index];
+                frame_info.game_objects_ptr = &game_objects_;
+                frame_info.ubo_ptr = &ubo;
                 
                 // update
-                global_ubo ubo{};
                 ubo.projection = camera.get_projection();
                 ubo.view = camera.get_view();
                 ubo.inverse_view = camera.get_inverse_view();
-                point_light_system.update(frame_info, ubo);
+                
+                point_light_system.update();
+                
                 ubo_buffers[frame_index]->write_to_buffer(&ubo);
                 ubo_buffers[frame_index]->flush();
                 
                 // render
                 renderer_ptr_->begin_swap_chain_render_pass(command_buffer);
-                render_system_2d.render(frame_info);
-                render_system_3d.render_game_objects(frame_info);
-                pbr_system.render_game_objects(frame_info);
-                point_light_system.render(frame_info);
+                render_system_2d.render();
+                render_system_3d.render();
+                pbr_system.render();
+                point_light_system.render();
                 
                 renderer_ptr_->end_swap_chain_render_pass(command_buffer);
                 renderer_ptr_->end_frame();

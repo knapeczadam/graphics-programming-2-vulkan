@@ -7,6 +7,8 @@
 // Vulkan includes
 #include <vulkan/vulkan.h>
 
+#include "src/utility/singleton.h"
+
 namespace dae
 {
     constexpr int MAX_LIGHTS = 10;
@@ -29,12 +31,25 @@ namespace dae
         int shading_mode;
     };
     
-    struct frame_info
+    class frame_info final : public singleton<frame_info>
     {
+    public:
+        ~frame_info() override = default;
+
+        frame_info(frame_info const &other)            = delete;
+        frame_info(frame_info &&other)                 = delete;
+        frame_info &operator=(frame_info const &other) = delete;
+        frame_info &operator=(frame_info &&other)      = delete;
+        
         int              frame_index;
         VkCommandBuffer  command_buffer;
-        camera           &camera;
+        camera           *camera_ptr;
         VkDescriptorSet  global_descriptor_set;
-        game_object::map &game_objects;
+        game_object::map *game_objects_ptr;
+        global_ubo       *ubo_ptr;
+        
+    private:
+        friend class singleton<frame_info>;
+        frame_info() = default;
     };
 }

@@ -20,7 +20,7 @@ namespace dae
         look_down     = GLFW_KEY_DOWN
         
     };
-    class movement_controller
+    class movement_controller final
     {
     public:
         void move(GLFWwindow *window_ptr, game_object &game_object);

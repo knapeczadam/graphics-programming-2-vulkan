@@ -26,6 +26,7 @@
     <ClCompile Include="src\engine\scene_config_manager.cpp" />
     <ClCompile Include="src\engine\scene_loader.cpp" />
     <ClCompile Include="src\engine\window.cpp" />
+    <ClCompile Include="src\input\input_manager.cpp" />
     <ClCompile Include="src\utility\transform.cpp" />
     <ClCompile Include="src\vulkan\buffer.cpp" />
     <ClCompile Include="src\vulkan\descriptors.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="src\engine\scene_config_manager.h" />
     <ClInclude Include="src\engine\scene_loader.h" />
     <ClInclude Include="src\engine\window.h" />
+    <ClInclude Include="src\input\input_manager.h" />
     <ClInclude Include="src\utility\transform.h" />
     <ClInclude Include="src\vulkan\buffer.h" />
     <ClInclude Include="src\vulkan\descriptors.h" />

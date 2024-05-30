@@ -31,8 +31,9 @@ namespace dae
         create_pipeline(render_pass);
     }
 
-    void point_light_system::update(frame_info &frame_info, global_ubo &ubo)
+    void point_light_system::update()
     {
+        auto &frame_info = frame_info::instance();
         auto rotate_light = glm::rotate(
             glm::mat4{1.0f},
             game_time::instance().delta_time(),
@@ -40,7 +41,7 @@ namespace dae
         );
         
         int light_index = 0;
-        for (auto &obj : frame_info.game_objects | std::views::values)
+        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
             if (obj.point_light == nullptr) continue;
 
@@ -50,22 +51,23 @@ namespace dae
             obj.transform.translation = glm::vec3{rotate_light * glm::vec4{obj.transform.translation, 1.0f}};
 
             // copy light to ubo
-            ubo.point_lights[light_index].position = glm::vec4{obj.transform.translation, 1.0f};
-            ubo.point_lights[light_index].color    = glm::vec4{obj.color, obj.point_light->light_intensity};
+            frame_info.ubo_ptr->point_lights[light_index].position = glm::vec4{obj.transform.translation, 1.0f};
+            frame_info.ubo_ptr->point_lights[light_index].color    = glm::vec4{obj.color, obj.point_light->light_intensity};
 
             ++light_index;
         }
-        ubo.num_lights = light_index;
+        frame_info.ubo_ptr->num_lights = light_index;
     }
 
-void point_light_system::render(frame_info &frame_info)
+void point_light_system::render()
     {
+        auto &frame_info = frame_info::instance();
         std::map<float, game_object::id_t> sorted;
-        for (auto &go : frame_info.game_objects | std::views::values)
+        for (auto &go : *frame_info.game_objects_ptr | std::views::values)
         {
             if (go.get_name() != "point_light") continue;
 
-            auto offset = frame_info.camera.get_position() - go.transform.translation;
+            auto offset = frame_info.camera_ptr->get_position() - go.transform.translation;
             float dis_squared = glm::dot(offset, offset);
             sorted[dis_squared] = go.get_id();
         }
@@ -85,7 +87,7 @@ void point_light_system::render(frame_info &frame_info)
         
         for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
-            auto &go = frame_info.game_objects.at(it->second);
+            auto &go = frame_info.game_objects_ptr->at(it->second);
 
             point_light_push_constants push{};
             push.position = glm::vec4{go.transform.translation, 1.0f};

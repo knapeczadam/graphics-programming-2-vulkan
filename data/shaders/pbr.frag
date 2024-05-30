@@ -22,6 +22,8 @@ layout (set = 0, binding = 0) uniform global_ubo
     vec4 ambient_light_color; // w is intensity
     light lights[10];
     int num_lights;
+    bool use_normal_map;
+    int shading_mode;
 } ubo;
 
 layout (set = 0, binding = 1) uniform sampler2D diffuse_texture;
@@ -159,13 +161,11 @@ vec3 brdf(vec3 n, vec3 l, vec3 v, vec3 albedo, float metallic, float roughness)
     return d * f * g / denom;
 }
 
-bool gUseNormalMap = true;
 vec3 gLightDir = vec3(0.577f, 0.577f, 0.577f);
 float gLightIntensity = 1.0f;
 float gKD = 7.0f;
 float gShininess = 25.0f;
 vec3 gAmbientColor = vec3(0.03f);
-int gShadingMode = 3;
 
 vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, vec3 normal_color, vec3 specular_color, float gloss) 
 {
@@ -181,7 +181,7 @@ vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, v
     normal_color = normal_color * 2.0f - vec3(1.0f);
 
     // Transform normal from tangent-space to world-space
-    normal = gUseNormalMap ? tangent_space * normal_color : normal;
+    normal = ubo.use_normal_map ? tangent_space * normal_color : normal;
 
     // Light direction
     vec3 light_dir = normalize(gLightDir);
@@ -200,15 +200,15 @@ vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, v
     float cos_alpha = clamp(dot(reflected_light, -view_dir), 0.0f, 1.0f);
     vec3 phong = specular_color * pow(cos_alpha, gloss * gShininess);
 
-    if (gShadingMode == 0)
+    if (ubo.shading_mode == 0)
     {
         color = observed_area;
     }
-    else if (gShadingMode == 1)
+    else if (ubo.shading_mode == 1)
     {
         color = diffuse * observed_area;
     }
-    else if (gShadingMode == 2)
+    else if (ubo.shading_mode == 2)
     {
         color = phong * observed_area;
     }

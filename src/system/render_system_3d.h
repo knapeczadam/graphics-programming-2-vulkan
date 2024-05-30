@@ -17,7 +17,7 @@ namespace dae
         render_system_3d &operator=(render_system_3d const &other) = delete;
         render_system_3d &operator=(render_system_3d &&other)      = delete;
         
-        void render_game_objects(frame_info &frame_info);
+        void render();
 
     protected:
         void create_pipeline_layout(VkDescriptorSetLayout global_set_layout) override;

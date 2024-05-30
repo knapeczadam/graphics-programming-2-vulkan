@@ -26,8 +26,9 @@ namespace dae
         create_pipeline(render_pass);
     }
 
-void render_system_2d::render(frame_info &frame_info)
+void render_system_2d::render()
     {
+        auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
 
         vkCmdBindDescriptorSets(
@@ -41,7 +42,7 @@ void render_system_2d::render(frame_info &frame_info)
             nullptr
         );
         
-        for (auto &obj : frame_info.game_objects | std::views::values)
+        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
             if (obj.get_name() != "2d") continue;
             

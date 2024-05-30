@@ -27,8 +27,9 @@ namespace dae
         create_pipeline(render_pass);
     }
 
-void render_system_3d::render_game_objects(frame_info &frame_info)
+void render_system_3d::render()
     {
+        auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
 
         vkCmdBindDescriptorSets(
@@ -42,7 +43,7 @@ void render_system_3d::render_game_objects(frame_info &frame_info)
             nullptr
         );
 
-        for (auto &obj : frame_info.game_objects | std::views::values)
+        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
             if (obj.model == nullptr) continue;
             if (obj.get_name() != "3d") continue;
