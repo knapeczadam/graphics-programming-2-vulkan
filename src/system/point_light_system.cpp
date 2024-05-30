@@ -3,6 +3,7 @@
 // Project includes
 #include "src/engine/game_time.h"
 #include "src/vulkan/device.h"
+#include "src/vulkan/renderer.h"
 
 // Standard includes
 #include <array>
@@ -24,11 +25,10 @@ namespace dae
         float radius;
     };
     
-    point_light_system::point_light_system(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : i_system{device_ptr}
+    point_light_system::point_light_system(VkDescriptorSetLayout global_set_layout)
     {
         create_pipeline_layout(global_set_layout);
-        create_pipeline(render_pass);
+        create_pipeline(renderer::instance().swap_chain_render_pass());
     }
 
     void point_light_system::update()

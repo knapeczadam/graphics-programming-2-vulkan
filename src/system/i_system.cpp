@@ -5,8 +5,8 @@
 
 namespace dae
 {
-    i_system::i_system(device *device_ptr)
-        : device_ptr_(device_ptr)
+    i_system::i_system()
+        : device_ptr_(&device::instance())
     {
     }
 

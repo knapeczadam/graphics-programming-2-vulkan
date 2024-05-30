@@ -9,7 +9,7 @@ namespace dae
     class pbr_system final : public i_system
     {
     public:
-        pbr_system(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout);
+        explicit pbr_system(VkDescriptorSetLayout global_set_layout);
         ~pbr_system() override = default;
 
         pbr_system(pbr_system const &other)            = delete;

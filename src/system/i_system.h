@@ -14,7 +14,7 @@ namespace dae
     class i_system
     {
     public:
-        explicit i_system(device *device_ptr);
+        i_system();
         virtual ~i_system();
 
         i_system(i_system const &other)            = delete;

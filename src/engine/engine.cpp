@@ -32,7 +32,7 @@ namespace dae
         window_ptr_= &window::instance();
         window_ptr_->init(width, height, "Graphics Programming 2 | Adam Knapecz");
 
-        device_ptr_ = &device::instance();
+        device_ptr_   = &device::instance();
         renderer_ptr_ = &renderer::instance();
         
         global_pool_ = descriptor_pool::builder()
@@ -108,10 +108,10 @@ namespace dae
                 .build(global_descriptor_sets[i]);
         }
         
-        render_system_3d render_system_3d {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        render_system_2d render_system_2d {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        point_light_system point_light_system {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
-        pbr_system pbr_system {device_ptr_, renderer_ptr_->swap_chain_render_pass(), global_set_layout->get_descriptor_set_layout()};
+        render_system_3d render_system_3d {global_set_layout->get_descriptor_set_layout()};
+        render_system_2d render_system_2d {global_set_layout->get_descriptor_set_layout()};
+        point_light_system point_light_system {global_set_layout->get_descriptor_set_layout()};
+        pbr_system pbr_system {global_set_layout->get_descriptor_set_layout()};
         camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
         // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});

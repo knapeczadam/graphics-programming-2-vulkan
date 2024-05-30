@@ -34,14 +34,14 @@ namespace dae
 
     auto descriptor_set_layout::builder::build() const -> std::unique_ptr<descriptor_set_layout>
     {
-        return std::make_unique<descriptor_set_layout>(device_ptr_, bindings_);
+        return std::make_unique<descriptor_set_layout>(bindings_);
     }
 
     // *************** Descriptor Set Layout *********************
 
-    descriptor_set_layout::descriptor_set_layout(
-        device *device_ptr, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
-        : device_ptr_{device_ptr}, bindings_{bindings}
+    descriptor_set_layout::descriptor_set_layout(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+        : device_ptr_{&device::instance()}
+        , bindings_{bindings}
     {
         std::vector<VkDescriptorSetLayoutBinding> set_layout_bindings{};
         for (auto kv : bindings)
@@ -55,7 +55,7 @@ namespace dae
         descriptor_set_layout_info.pBindings    = set_layout_bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-            device_ptr->logical_device(),
+            device_ptr_->logical_device(),
             &descriptor_set_layout_info,
             nullptr,
             &descriptor_set_layout_) != VK_SUCCESS)

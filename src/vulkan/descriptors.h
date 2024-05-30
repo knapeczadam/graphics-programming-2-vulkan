@@ -34,7 +34,7 @@ namespace dae
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings_{};
         };
 
-        descriptor_set_layout(device *device_ptr, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+        explicit descriptor_set_layout(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
         ~descriptor_set_layout();
         
         descriptor_set_layout(descriptor_set_layout const &other)            = delete;

@@ -2,6 +2,7 @@
 
 // Project includes
 #include "src/vulkan/device.h"
+#include "src/vulkan/renderer.h"
 
 // Standard includes
 #include <ranges>
@@ -19,11 +20,10 @@ namespace dae
         glm::mat4 transform{1.0f}; 
     };
     
-    render_system_2d::render_system_2d(device *device_ptr, VkRenderPass render_pass, VkDescriptorSetLayout global_set_layout)
-        : i_system{device_ptr}
+    render_system_2d::render_system_2d(VkDescriptorSetLayout global_set_layout)
     {
         create_pipeline_layout(global_set_layout);
-        create_pipeline(render_pass);
+        create_pipeline(renderer::instance().swap_chain_render_pass());
     }
 
 void render_system_2d::render()
