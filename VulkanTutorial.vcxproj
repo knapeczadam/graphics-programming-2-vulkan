@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\factory.cpp" />
     <ClCompile Include="src\core\game_object.cpp" />
     <ClCompile Include="src\core\model.cpp" />
     <ClCompile Include="src\engine\engine.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="src\system\render_system_2d.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\factory.h" />
     <ClInclude Include="src\core\game_object.h" />
     <ClInclude Include="src\core\model.h" />
     <ClInclude Include="src\engine\engine.h" />

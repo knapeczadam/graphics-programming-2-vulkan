@@ -18,7 +18,7 @@ namespace dae
     // Forward declarations
     class device;
     
-    class model
+    class model final
     {
     public:
         struct vertex
@@ -61,13 +61,13 @@ namespace dae
         
 
     private:
-        device     *device_ptr_;
+        device *device_ptr_ = nullptr;
         
-        std::unique_ptr<buffer> vertex_buffer_;
-        uint32_t                    vertex_count_;
+        std::unique_ptr<buffer> vertex_buffer_ = nullptr;
+        uint32_t                vertex_count_  = 0;
 
-        bool                        has_index_buffer_ = false;
-        std::unique_ptr<buffer> index_buffer_;
-        uint32_t                    index_count_;
+        bool                    has_index_buffer_ = false;
+        std::unique_ptr<buffer> index_buffer_     = nullptr;
+        uint32_t                index_count_      = 0;
     };
 }
