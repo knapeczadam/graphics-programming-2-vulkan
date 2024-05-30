@@ -5,7 +5,7 @@
 
 namespace dae
 {
-    class input_manager final
+    class shading_mode_controller final
     {
     public:
         static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);

@@ -17,8 +17,8 @@ namespace dae
         point_light_system &operator=(point_light_system const &other) = delete;
         point_light_system &operator=(point_light_system &&other)      = delete;
 
-        void update();
-        void render();
+        void update() override;
+        void render() override;
 
     protected:
         void create_pipeline_layout(VkDescriptorSetLayout global_set_layout) override;

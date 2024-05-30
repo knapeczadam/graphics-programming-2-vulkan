@@ -65,11 +65,11 @@ void point_light_system::render()
         std::map<float, game_object::id_t> sorted;
         for (auto &go : *frame_info.game_objects_ptr | std::views::values)
         {
-            if (go.get_name() != "point_light") continue;
+            if (go.name() != "point_light") continue;
 
             auto offset = frame_info.camera_ptr->get_position() - go.transform.translation;
             float dis_squared = glm::dot(offset, offset);
-            sorted[dis_squared] = go.get_id();
+            sorted[dis_squared] = go.id();
         }
         
         pipeline_->bind(frame_info.command_buffer);

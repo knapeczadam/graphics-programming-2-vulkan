@@ -1,13 +1,10 @@
-﻿#include "input_manager.h"
-
-// Standard includes
-#include <iostream>
+﻿#include "shading_mode_controller.h"
 
 #include "src/engine/frame_info.h"
 
 namespace dae
 {
-    void input_manager::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+    void shading_mode_controller::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
     {
         if (key == GLFW_KEY_1 and action == GLFW_PRESS)
         {

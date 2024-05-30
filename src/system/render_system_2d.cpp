@@ -44,7 +44,7 @@ void render_system_2d::render()
         
         for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
-            if (obj.get_name() != "2d") continue;
+            if (obj.name() != "2d") continue;
             
             push_constant_data_2d push{};
             push.transform = obj.transform.mat4();

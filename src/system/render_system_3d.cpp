@@ -46,7 +46,7 @@ void render_system_3d::render()
         for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
         {
             if (obj.model == nullptr) continue;
-            if (obj.get_name() != "3d") continue;
+            if (obj.name() != "3d") continue;
             
             push_constant_data_3d push{};
             push.model_matrix = obj.transform.mat4();

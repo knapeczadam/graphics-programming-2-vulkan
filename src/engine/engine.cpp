@@ -3,7 +3,7 @@
 // Project includes
 #include "src/engine/camera.h"
 #include "src/engine/game_time.h"
-#include "src/input/input_manager.h"
+#include "src/input/shading_mode_controller.h"
 #include "src/input/movement_controller.h"
 #include "src/system/pbr_system.h"
 #include "src/system/point_light_system.h"
@@ -123,7 +123,7 @@ namespace dae
         viewer_object.transform.translation = {0.0f, -1.5f, -5.0f};
         viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
-        glfwSetKeyCallback(window_ptr_->get_glfw_window(), input_manager::key_callback);
+        glfwSetKeyCallback(window_ptr_->get_glfw_window(), shading_mode_controller::key_callback);
         
         global_ubo ubo{};
         auto &frame_info = frame_info::instance();
@@ -266,21 +266,21 @@ namespace dae
         go.model = model;
         go.transform.translation = {-1.2f, 0.0f, 2.5f};
         go.transform.scale = glm::vec3{-0.5f};
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
         
         model = model::create_model_from_file(device_ptr_, "data/assets/models/beetle.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-0.2f, 2.0f, 1.5f};
         go.transform.scale = glm::vec3{-5.8f};
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
         
         model = model::create_model_from_file(device_ptr_, "data/assets/models/quad.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {0.0f, 0.0f, 0.0f};
         go.transform.scale = glm::vec3{3};
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
         
         model = model::create_model_from_file(device_ptr_, "data/assets/models/vehicle.obj");
         go = game_object::create_game_object("pbr");
@@ -288,10 +288,10 @@ namespace dae
         go.transform.translation = {0.0f, -2.2f, 0.0f};
         go.transform.scale = glm::vec3{0.1f};
         go.set_material(0.4f, 0.96f, 0.915f, 1.0f, 0.0f, 0.6f);
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
 
         go = game_object::make_point_light(0.2f);
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
         
         std::vector<glm::vec3> light_colors{
             {1.f, .1f, .1f},
@@ -312,7 +312,7 @@ namespace dae
                 {0.0f, -1.0f, 0.0f}
             );
             point_light.transform.translation = glm::vec3{rotate_light * glm::vec4{-1.0f, -1.0f, 0.0f, 1.0f}};
-            game_objects_.emplace(point_light.get_id(), std::move(point_light));
+            game_objects_.emplace(point_light.id(), std::move(point_light));
         }
 
 
@@ -320,12 +320,12 @@ namespace dae
         model = create_oval_model(device_ptr_, {}, 0.5f, 0.5f, 50);
         go.model = model;
         go.transform.translation = {2.0f, -1.0f, 0.0f};
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
         
         go  = game_object::create_game_object("2d");
         model = create_n_gon_model(device_ptr_, {}, 0.5f, 3);
         go.model = model;
         go.transform.translation = {-2.0f, -1.0f, 0.0f};
-        game_objects_.emplace(go.get_id(), std::move(go));
+        game_objects_.emplace(go.id(), std::move(go));
     }
 }

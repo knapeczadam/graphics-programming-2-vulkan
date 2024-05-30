@@ -17,7 +17,7 @@ namespace dae
         render_system_2d &operator=(render_system_2d const &other) = delete;
         render_system_2d &operator=(render_system_2d &&other)      = delete;
         
-        void render();
+        void render() override;
 
     protected:
         void create_pipeline_layout(VkDescriptorSetLayout global_set_layout) override;

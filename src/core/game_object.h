@@ -56,12 +56,12 @@ namespace dae
 
         static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> game_object;
 
-        [[nodiscard]] auto get_id() const -> id_t { return id_; }
-        [[nodiscard]] auto get_name() const -> std::string { return name_; }
-        [[nodiscard]] auto get_material() const -> material const & { return material_; }
+        [[nodiscard]] auto id() const -> id_t { return id_; }
+        [[nodiscard]] auto name() const -> std::string { return name_; }
+        [[nodiscard]] auto material() const -> material const & { return material_; }
         void set_material(float r, float g, float b, float a, float metallic, float roughness)
         {
-            material_ = material{glm::vec4{r, g, b, a}, metallic, roughness};
+            material_ = dae::material{glm::vec4{r, g, b, a}, metallic, roughness};
         }
 
     private:
@@ -69,14 +69,14 @@ namespace dae
 
     public:
         std::shared_ptr<model> model     = {};
-        glm::vec3                  color     = {};
-        transform_component        transform = {};
+        glm::vec3              color     = {};
+        transform_component    transform = {};
 
         std::unique_ptr<point_light_component> point_light = nullptr;
 
     private:
-        id_t        id_;
-        std::string name_;
-        material    material_ = {};
+        id_t          id_;
+        std::string   name_;
+        dae::material material_ = {};
     };
 }

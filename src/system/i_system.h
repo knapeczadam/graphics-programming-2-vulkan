@@ -22,6 +22,9 @@ namespace dae
         i_system &operator=(i_system const &other) = delete;
         i_system &operator=(i_system &&other)      = delete;
 
+        virtual void update() { }
+        virtual void render() { }
+
     protected:
         virtual void create_pipeline_layout(VkDescriptorSetLayout global_set_layout) = 0;
         virtual void create_pipeline(VkRenderPass render_pass) = 0;
