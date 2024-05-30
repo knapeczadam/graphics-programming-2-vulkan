@@ -71,10 +71,10 @@ namespace dae
                                  .build();
 
 
-        texture diffuse_texture{device_ptr_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_B8G8R8A8_UNORM};
-        texture normal_texture{device_ptr_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture specular_texture{device_ptr_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_UNORM};
-        texture gloss_texture{device_ptr_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture diffuse_texture{device_ptr_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture normal_texture{device_ptr_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture specular_texture{device_ptr_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture gloss_texture{device_ptr_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_SRGB};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();
@@ -277,7 +277,7 @@ namespace dae
         go.transform.scale = glm::vec3{3};
         game_objects_.emplace(go.get_id(), std::move(go));
         
-        model = model::create_model_from_file(device_ptr_, "data/assets/models/sphere.obj");
+        model = model::create_model_from_file(device_ptr_, "data/assets/models/vehicle.obj");
         go = game_object::create_game_object("pbr");
         go.model = model;
         go.transform.translation = {0.0f, -2.2f, 0.0f};

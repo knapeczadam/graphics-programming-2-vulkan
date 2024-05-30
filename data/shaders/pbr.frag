@@ -159,61 +159,62 @@ vec3 brdf(vec3 n, vec3 l, vec3 v, vec3 albedo, float metallic, float roughness)
     return d * f * g / denom;
 }
 
-vec4 ShadePixel(vec3 normal, vec3 tangent, vec3 viewDir, vec3 diffuseColor, vec3 normalColor, vec3 specularColor, float gloss) {
-    bool gUseNormalMap = true;
-    vec3 gLightDir = vec3(0.577f, -0.577f, 0.577f);
-    float gLightIntensity = 1.0f;
-    float gKD = 7.0f;
-    float gShininess = 25.0f;
-    vec3 gAmbientColor = vec3(0.3f);
-    int gShadingMode = 0;
+bool gUseNormalMap = true;
+vec3 gLightDir = vec3(0.577f, 0.577f, 0.577f);
+float gLightIntensity = 1.0f;
+float gKD = 7.0f;
+float gShininess = 25.0f;
+vec3 gAmbientColor = vec3(0.03f);
+int gShadingMode = 3;
 
+vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, vec3 normal_color, vec3 specular_color, float gloss) 
+{
     vec3 color = vec3(0);
 
     // Binormal
     vec3 binormal = cross(normal, tangent);
 
     // Tangent-space transformation matrix
-    mat3 tangentSpace = mat3(tangent, binormal, normal);
+    mat3 tangent_space = mat3(tangent, binormal, normal);
 
     // Remap normal from [0, 1] to [-1, 1]
-    normalColor = normalColor * 2.0f - vec3(1.0f);
+    normal_color = normal_color * 2.0f - vec3(1.0f);
 
     // Transform normal from tangent-space to world-space
-    normal = gUseNormalMap ? normalColor : normal;
+    normal = gUseNormalMap ? tangent_space * normal_color : normal;
 
     // Light direction
-    vec3 lightDir = normalize(gLightDir);
+    vec3 light_dir = normalize(gLightDir);
 
     // Radiance (directional light)
     vec3 radiance = (vec3(1.0f, 1.0f, 1.0f) * gLightIntensity);
 
     // Observed area
-    vec3 observedArea = vec3(clamp(dot(normal, -lightDir), 0.0f, 1.0f));
+    vec3 observed_area = vec3(clamp(dot(normal, -light_dir), 0.0f, 1.0f));
 
     // Diffuse lighting
-    vec3 diffuse = diffuseColor * gKD / PI;
+    vec3 diffuse = diffuse_color * gKD / PI;
 
     // Phong specular lighting
-    vec3 reflectedLight = reflect(-lightDir, normal);
-    float cosAlpha = clamp(dot(reflectedLight, -viewDir), 0.0f, 1.0f);
-    vec3 phong = specularColor * pow(cosAlpha, gloss * gShininess);
+    vec3 reflected_light = reflect(-light_dir, normal);
+    float cos_alpha = clamp(dot(reflected_light, -view_dir), 0.0f, 1.0f);
+    vec3 phong = specular_color * pow(cos_alpha, gloss * gShininess);
 
     if (gShadingMode == 0)
     {
-        color = observedArea;
+        color = observed_area;
     }
     else if (gShadingMode == 1)
     {
-        color = diffuse * observedArea;
+        color = diffuse * observed_area;
     }
     else if (gShadingMode == 2)
     {
-        color = phong * observedArea;
+        color = phong * observed_area;
     }
     else
     {
-        color = radiance * (diffuse + phong + gAmbientColor) * observedArea;
+        color = radiance * (diffuse + phong + gAmbientColor) * observed_area;
     }
     return vec4(color, 1.0);
 }
@@ -228,8 +229,16 @@ void main()
     float metallic  = push.metallic;
     float roughness = push.roughness;
 
-    out_color.rgb = base_color * ambient;
+//    out_color.rgb = base_color * ambient;
     out_color.a   = 1.0f;
+    
+    vec3 diffuse_color = texture(diffuse_texture, in_uv).rgb;
+    vec3 normal_color  = texture(normal_texture, in_uv).rgb;
+    vec3 specular_color = texture(specular_texture, in_uv).rgb;
+    float gloss_color = texture(gloss_texture, in_uv).r;
+    
+    out_color = shade_pixel(in_normal, in_tangent, view_dir, diffuse_color, normal_color, specular_color, gloss_color);
+    /*
     
     for (int i = 0; i < ubo.num_lights; ++i)
     {
@@ -247,4 +256,5 @@ void main()
             out_color.rgb +=  radiance(light, in_position) * (diffuse + specular) * observed_area;
         }
     }
+*/
 }
