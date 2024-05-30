@@ -30,15 +30,12 @@ namespace dae
     engine::engine()
     {
         window_ptr_= &window::instance();
-        window_ptr_->init(width, height, "Hello Vulkan!");
+        window_ptr_->init(width, height, "Graphics Programming 2 | Adam Knapecz");
 
         device_ptr_ = &device::instance();
-        device_ptr_->init(window_ptr_);
-
         renderer_ptr_ = &renderer::instance();
-        renderer_ptr_->init(window_ptr_, device_ptr_);
         
-        global_pool_ = descriptor_pool::builder(device_ptr_)
+        global_pool_ = descriptor_pool::builder()
                        .set_max_sets(swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swap_chain::MAX_FRAMES_IN_FLIGHT)
@@ -55,7 +52,6 @@ namespace dae
         for (int i = 0; i < ubo_buffers.size(); ++i)
         {
             ubo_buffers[i] = std::make_unique<buffer>(
-                device_ptr_,
                 sizeof(global_ubo),
                 1,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -64,7 +60,7 @@ namespace dae
             ubo_buffers[i]->map();
         }
 
-        auto global_set_layout = descriptor_set_layout::builder(device_ptr_)
+        auto global_set_layout = descriptor_set_layout::builder()
                                  .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                  .add_binding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .add_binding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -73,10 +69,10 @@ namespace dae
                                  .build();
 
 
-        texture diffuse_texture{device_ptr_, "data/assets/textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture normal_texture{device_ptr_, "data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_UNORM};
-        texture specular_texture{device_ptr_, "data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture gloss_texture{device_ptr_, "data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture diffuse_texture{"data/assets/textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture normal_texture{"data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_UNORM};
+        texture specular_texture{"data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture gloss_texture{"data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_SRGB};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();
@@ -194,28 +190,28 @@ namespace dae
 
     void engine::load_game_objects()
     {
-        std::shared_ptr<model> model = model::create_model_from_file(device_ptr_, "data/assets/models/suzanne.obj");
+        std::shared_ptr<model> model = model::create_model_from_file("data/assets/models/suzanne.obj");
         auto go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-1.2f, 0.0f, 2.5f};
         go.transform.scale = glm::vec3{-0.5f};
         game_objects_.emplace(go.id(), std::move(go));
         
-        model = model::create_model_from_file(device_ptr_, "data/assets/models/beetle.obj");
+        model = model::create_model_from_file("data/assets/models/beetle.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {-0.2f, 2.0f, 1.5f};
         go.transform.scale = glm::vec3{-5.8f};
         game_objects_.emplace(go.id(), std::move(go));
         
-        model = model::create_model_from_file(device_ptr_, "data/assets/models/quad.obj");
+        model = model::create_model_from_file("data/assets/models/quad.obj");
         go = game_object::create_game_object("3d");
         go.model = model;
         go.transform.translation = {0.0f, 0.0f, 0.0f};
         go.transform.scale = glm::vec3{3};
         game_objects_.emplace(go.id(), std::move(go));
         
-        model = model::create_model_from_file(device_ptr_, "data/assets/models/vehicle.obj");
+        model = model::create_model_from_file("data/assets/models/vehicle.obj");
         go = game_object::create_game_object("pbr");
         go.model = model;
         go.transform.translation = {0.0f, -2.2f, 0.0f};

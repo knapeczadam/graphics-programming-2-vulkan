@@ -96,7 +96,6 @@ void render_system_3d::render()
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            device_ptr_,
             "data/shaders/shader_3d.vert.spv",
             "data/shaders/shader_3d.frag.spv",
             pipeline_config);

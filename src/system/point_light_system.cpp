@@ -140,7 +140,6 @@ void point_light_system::render()
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            device_ptr_,
             "data/shaders/point_light.vert.spv",
             "data/shaders/point_light.frag.spv",
             pipeline_config);

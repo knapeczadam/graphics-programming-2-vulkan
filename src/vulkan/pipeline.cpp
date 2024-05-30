@@ -23,11 +23,10 @@
 namespace dae
 {
     pipeline::pipeline(
-        device *device_ptr,
         std::string const &vertex_file_path,
         std::string const &fragment_file_path,
         pipeline_config_info const &config_info)
-        : device_ptr_{device_ptr}
+        : device_ptr_{&device::instance()}
     {
         create_graphics_pipeline(vertex_file_path, fragment_file_path, config_info);
     }

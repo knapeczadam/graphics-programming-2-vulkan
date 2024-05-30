@@ -66,9 +66,9 @@ namespace dae
         vkDestroyInstance(instance_, nullptr);
     }
 
-    void device::init(window *window_ptr)
+    device::device()
+        : window_ptr_{&window::instance()}
     {
-        window_ptr_ = window_ptr;
         create_instance();
         setup_debug_messenger();
         create_surface();

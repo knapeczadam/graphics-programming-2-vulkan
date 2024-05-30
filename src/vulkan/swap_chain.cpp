@@ -12,15 +12,15 @@
 
 namespace dae
 {
-    swap_chain::swap_chain(device *device_ptr, VkExtent2D window_extent)
-        : device_ptr_{device_ptr}, window_extent_{window_extent}
+    swap_chain::swap_chain(VkExtent2D window_extent)
+        : device_ptr_{&device::instance()}, window_extent_{window_extent}
     {
         init();
     }
 
-    swap_chain::swap_chain(device *device_ptr, VkExtent2D window_extent,
+    swap_chain::swap_chain(VkExtent2D window_extent,
         std::shared_ptr<swap_chain> const &previous)
-        : device_ptr_{device_ptr}
+        : device_ptr_{&device::instance()}
         , window_extent_{window_extent}
         , old_swap_chain_{previous}
     {

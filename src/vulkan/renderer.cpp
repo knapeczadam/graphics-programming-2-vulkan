@@ -15,15 +15,6 @@ namespace dae
         free_command_buffers();    
     }
 
-    void renderer::init(window *window_ptr, device *device_ptr)
-    {
-        window_ptr_ = window_ptr;
-        device_ptr_ = device_ptr;
-        
-        recreate_swap_chain();
-        create_command_buffers();
-    }
-
     auto renderer::begin_frame() -> VkCommandBuffer
     {
         assert(not is_frame_started_ and "Can't call begin_frame while already in progess");
@@ -121,6 +112,14 @@ namespace dae
         vkCmdEndRenderPass(command_buffer);
     }
 
+    renderer::renderer()
+        : window_ptr_{&window::instance()}
+        , device_ptr_{&device::instance()}
+    {
+        recreate_swap_chain();
+        create_command_buffers();
+    }
+
     void renderer::create_command_buffers()
     {
         command_buffers_.resize(swap_chain::MAX_FRAMES_IN_FLIGHT);
@@ -160,12 +159,12 @@ namespace dae
         vkDeviceWaitIdle(device_ptr_->logical_device());
         if (swap_chain_ == nullptr)
         {
-            swap_chain_ = std::make_unique<swap_chain>(device_ptr_, extent);
+            swap_chain_ = std::make_unique<swap_chain>(extent);
         }
         else
         {
             std::shared_ptr<swap_chain> old_swap_chain = std::move(swap_chain_);
-            swap_chain_ = std::make_unique<swap_chain>(device_ptr_, extent, old_swap_chain);
+            swap_chain_ = std::make_unique<swap_chain>(extent, old_swap_chain);
 
             if (not old_swap_chain->compare_swap_formats(*swap_chain_))
             {

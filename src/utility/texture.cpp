@@ -24,8 +24,8 @@
 
 namespace dae
 {
-    texture::texture(device *device_ptr, std::string const &file_path, VkFormat format)
-        : device_ptr_{device_ptr}
+    texture::texture(std::string const &file_path, VkFormat format)
+        : device_ptr_{&device::instance()}
         , image_format_{format}
     {
         int text_channels, bytes_per_pixel;
@@ -35,7 +35,6 @@ namespace dae
         mip_levels_ = static_cast<uint32_t>(std::floor(std::log2(std::max(width_, height_)))) + 1;
 
         buffer staging_buffer{
-            device_ptr_,
             4,
             static_cast<uint32_t>(width_ * height_),
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,

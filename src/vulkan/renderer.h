@@ -26,8 +26,6 @@ namespace dae
         renderer &operator=(renderer const &other) = delete;
         renderer &operator=(renderer &&other)      = delete;
 
-        void init(window *window_ptr, device *device_ptr);
-
         [[nodiscard]] auto swap_chain_render_pass() const -> VkRenderPass { return swap_chain_->render_pass(); }
         [[nodiscard]] auto aspect_ratio() const -> float { return swap_chain_->extent_aspect_ratio(); }
         [[nodiscard]] auto is_frame_in_progress() const -> bool { return is_frame_started_; }
@@ -50,7 +48,7 @@ namespace dae
 
     private:
         friend class singleton<renderer>;
-        renderer() = default;
+        renderer();
         
         void create_command_buffers();
         void free_command_buffers();

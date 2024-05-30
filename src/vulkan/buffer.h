@@ -12,7 +12,6 @@ namespace dae
     {
     public:
         buffer(
-            device *device_ptr,
             VkDeviceSize instance_size,
             uint32_t instance_count,
             VkBufferUsageFlags usage_flags,

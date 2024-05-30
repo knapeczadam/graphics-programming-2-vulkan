@@ -17,8 +17,8 @@ namespace dae
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2; // at most 2 command buffers to the device's graphics queue at once
 
-        swap_chain(device *device_ptr, VkExtent2D window_extent);
-        swap_chain(device *device_ptr, VkExtent2D window_extent, std::shared_ptr<swap_chain> const &previous);
+        explicit swap_chain(VkExtent2D window_extent);
+        swap_chain(VkExtent2D window_extent, std::shared_ptr<swap_chain> const &previous);
         ~swap_chain();
 
         swap_chain(swap_chain const &)            = delete;

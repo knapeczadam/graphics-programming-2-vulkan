@@ -35,7 +35,7 @@ namespace dae
         modelBuilder.indices.push_back(segments);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<model>(device_ptr, modelBuilder);
+        return std::make_unique<model>(modelBuilder);
     }
 
     std::unique_ptr<model> factory::create_n_gon(device *device_ptr, glm::vec3 offset, float radius, int sides)
@@ -70,6 +70,6 @@ namespace dae
         modelBuilder.indices.push_back(sides - 1);
         modelBuilder.indices.push_back(1);
 
-        return std::make_unique<model>(device_ptr, modelBuilder);
+        return std::make_unique<model>(modelBuilder);
     }
 }

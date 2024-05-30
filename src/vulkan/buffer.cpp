@@ -34,13 +34,12 @@ namespace dae
     }
 
     buffer::buffer(
-        device                *device_ptr,
         VkDeviceSize          instance_size,
         uint32_t              instance_count,
         VkBufferUsageFlags    usage_flags,
         VkMemoryPropertyFlags memory_property_flags,
         VkDeviceSize          min_offset_alignment)
-        : device_ptr_{device_ptr},
+        : device_ptr_{&device::instance()},
           instance_count_{instance_count},
           instance_size_{instance_size},
           usage_flags_{usage_flags},
@@ -48,7 +47,7 @@ namespace dae
     {
         alignment_size_ = get_alignment(instance_size, min_offset_alignment);
         buffer_size_ = alignment_size_ * instance_count;
-        device_ptr->create_buffer(buffer_size_, usage_flags, memory_property_flags, buffer_, memory_);
+        device_ptr_->create_buffer(buffer_size_, usage_flags, memory_property_flags, buffer_, memory_);
     }
 
     buffer::~buffer()

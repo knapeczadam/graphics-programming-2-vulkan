@@ -48,8 +48,6 @@ namespace dae
         device &operator=(device const &other) = delete;
         device &operator=(device &&other)      = delete;
 
-        void init(window *window_ptr);
-
         [[nodiscard]] auto command_pool() const -> VkCommandPool { return command_pool_; }
         [[nodiscard]] auto logical_device() const -> VkDevice { return device_; }
         [[nodiscard]] auto physical_device() const -> VkPhysicalDevice { return physical_device_; }
@@ -84,7 +82,7 @@ namespace dae
 
     private:
         friend class singleton<device>;
-        device() = default;
+        device();
 
     private:
         void create_instance();

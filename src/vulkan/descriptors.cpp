@@ -11,6 +11,11 @@ namespace dae
 {
     // *************** Descriptor Set Layout Builder *********************
 
+    descriptor_set_layout::builder::builder()
+        : device_ptr_{&device::instance()}
+    {
+    }
+
     descriptor_set_layout::builder &descriptor_set_layout::builder::add_binding(
         uint32_t binding,
         VkDescriptorType descriptor_type,
@@ -66,6 +71,11 @@ namespace dae
 
     // *************** Descriptor Pool Builder *********************
 
+    descriptor_pool::builder::builder()
+        : device_ptr_{&device::instance()}
+    {
+    }
+
     auto descriptor_pool::builder::add_pool_size(VkDescriptorType const descriptor_type, uint32_t count) -> descriptor_pool::builder &
     {
         pool_sizes_.push_back({descriptor_type, count});
@@ -86,17 +96,16 @@ namespace dae
 
     auto descriptor_pool::builder::build() const -> std::unique_ptr<descriptor_pool>
     {
-        return std::make_unique<descriptor_pool>(device_ptr_, max_sets_, pool_flags_, pool_sizes_);
+        return std::make_unique<descriptor_pool>(max_sets_, pool_flags_, pool_sizes_);
     }
 
     // *************** Descriptor Pool *********************
 
     descriptor_pool::descriptor_pool(
-        device *device_ptr,
         uint32_t max_sets,
         VkDescriptorPoolCreateFlags pool_flags,
         const std::vector<VkDescriptorPoolSize> &pool_sizes)
-        : device_ptr_{device_ptr}
+        : device_ptr_{&device::instance()}
     {
         VkDescriptorPoolCreateInfo descriptor_pool_info{};
         descriptor_pool_info.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -105,7 +114,7 @@ namespace dae
         descriptor_pool_info.maxSets       = max_sets;
         descriptor_pool_info.flags         = pool_flags;
 
-        if (vkCreateDescriptorPool(device_ptr->logical_device(), &descriptor_pool_info, nullptr, &descriptor_pool_) !=
+        if (vkCreateDescriptorPool(device_ptr_->logical_device(), &descriptor_pool_info, nullptr, &descriptor_pool_) !=
             VK_SUCCESS)
         {
             throw std::runtime_error("failed to create descriptor pool!");

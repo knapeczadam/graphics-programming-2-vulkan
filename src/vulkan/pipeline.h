@@ -39,7 +39,6 @@ namespace dae
     public:
         pipeline() = default;
         pipeline(
-            device *device_ptr,
             std::string const &vertex_file_path,
             std::string const &fragment_file_path,
             pipeline_config_info const &config_info);

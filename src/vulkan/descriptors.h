@@ -19,9 +19,7 @@ namespace dae
         class builder
         {
         public:
-            explicit builder(device *device_ptr) : device_ptr_{device_ptr}
-            {
-            }
+            builder();
 
             auto add_binding(
                 uint32_t           binding,
@@ -58,9 +56,7 @@ namespace dae
         class builder
         {
         public:
-            explicit builder(device *device_ptr) : device_ptr_{device_ptr}
-            {
-            }
+            builder();
 
             auto add_pool_size(VkDescriptorType descriptor_type, uint32_t count) -> builder &;
             auto set_pool_flags(VkDescriptorPoolCreateFlags flags) -> builder &;
@@ -75,7 +71,6 @@ namespace dae
         };
 
         descriptor_pool(
-            device *device_ptr,
             uint32_t max_sets,
             VkDescriptorPoolCreateFlags pool_flags,
             const std::vector<VkDescriptorPoolSize> &pool_sizes);
