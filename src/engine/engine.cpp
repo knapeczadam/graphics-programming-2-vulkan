@@ -2,6 +2,7 @@
 
 // Project includes
 #include "src/engine/camera.h"
+#include "src/engine/game_time.h"
 #include "src/input/movement_controller.h"
 #include "src/system/pbr_system.h"
 #include "src/system/point_light_system.h"
@@ -9,11 +10,12 @@
 #include "src/system/render_system_3d.h"
 #include "src/utility/texture.h"
 #include "src/vulkan/buffer.h"
-#include "src/vulkan/renderer.h"
 #include "src/vulkan/device.h"
+#include "src/vulkan/renderer.h"
 
 // Standard includes
 #include <chrono>
+#include <thread>
 
 // GLM includes
 #define GLM_FORCE_RADIANS
@@ -121,7 +123,10 @@ namespace dae
         viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
 
-        auto current_time = std::chrono::high_resolution_clock::now();
+        using namespace std::chrono;
+        using namespace std::chrono_literals;
+        auto last_time = high_resolution_clock::now();
+        float lag         = 0.0f;
 
         //---------------------------------------------------------
         // GAME LOOP
@@ -130,13 +135,13 @@ namespace dae
         {
             glfwPollEvents();
 
-            auto new_time = std::chrono::high_resolution_clock::now();
-            float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
-            current_time = new_time;
+            auto current_time = high_resolution_clock::now();
+            game_time::instance().set_delta_time(duration<float>(current_time - last_time).count()); // dt always has a 1 frame delay
+            
+            last_time = current_time;
+            lag += game_time::instance().delta_time();
 
-            // frame_time = glm::min(frame_time, max_frame_time);
-
-            camera_controller.move(window_ptr_->get_glfw_window(), frame_time, viewer_object);
+            camera_controller.move(window_ptr_->get_glfw_window(), viewer_object);
             camera.set_view_yxz(viewer_object.transform.translation, viewer_object.transform.rotation);
             
             float aspect = renderer_ptr_->aspect_ratio();
@@ -149,7 +154,6 @@ namespace dae
                 
                 frame_info frame_info{
                     frame_index,
-                    frame_time,
                     command_buffer,
                     camera,
                     global_descriptor_sets[frame_index],
@@ -174,6 +178,9 @@ namespace dae
                 
                 renderer_ptr_->end_swap_chain_render_pass(command_buffer);
                 renderer_ptr_->end_frame();
+                
+                auto const sleep_time = current_time + milliseconds(static_cast<long long>(game_time::instance().ms_per_frame())) - high_resolution_clock::now();
+                std::this_thread::sleep_for(sleep_time);
             }
         }
         vkDeviceWaitIdle(device_ptr_->logical_device());

@@ -49,6 +49,7 @@
     <ClInclude Include="src\engine\engine.h" />
     <ClInclude Include="src\engine\camera.h" />
     <ClInclude Include="src\engine\frame_info.h" />
+    <ClInclude Include="src\engine\game_time.h" />
     <ClInclude Include="src\engine\scene_config_manager.h" />
     <ClInclude Include="src\engine\scene_loader.h" />
     <ClInclude Include="src\engine\window.h" />

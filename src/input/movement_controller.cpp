@@ -1,9 +1,13 @@
 ﻿#include "movement_controller.h"
 
+// Project includes
+#include "src/engine/game_time.h"
+
 namespace dae
 {
-    void movement_controller::move(GLFWwindow* window_ptr, float dt, game_object& game_object)
+    void movement_controller::move(GLFWwindow* window_ptr, game_object& game_object)
     {
+        float dt = game_time::instance().delta_time();
         double mouse_x, mouse_y;
         glm::vec3 rotate{0};
         

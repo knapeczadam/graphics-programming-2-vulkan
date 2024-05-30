@@ -25,12 +25,13 @@ namespace dae
         glm::vec4 ambient_light_color {1.0f, 1.0f, 1.0f, 0.02f};
         point_light point_lights[MAX_LIGHTS];
         int num_lights;
+        bool use_normal;
+        int shading_mode;
     };
     
     struct frame_info
     {
         int              frame_index;
-        float            frame_time;
         VkCommandBuffer  command_buffer;
         camera           &camera;
         VkDescriptorSet  global_descriptor_set;

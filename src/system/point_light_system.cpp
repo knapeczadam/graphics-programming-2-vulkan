@@ -1,6 +1,7 @@
 ﻿#include "point_light_system.h"
 
 // Project includes
+#include "src/engine/game_time.h"
 #include "src/vulkan/device.h"
 
 // Standard includes
@@ -34,7 +35,7 @@ namespace dae
     {
         auto rotate_light = glm::rotate(
             glm::mat4{1.0f},
-            frame_info.frame_time,
+            game_time::instance().delta_time(),
             {0.0f, -1.0f, 0.0f}
         );
         

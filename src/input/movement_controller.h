@@ -23,7 +23,7 @@ namespace dae
     class movement_controller
     {
     public:
-        void move(GLFWwindow *window_ptr, float dt, game_object &game_object);
+        void move(GLFWwindow *window_ptr, game_object &game_object);
         
     private:
         float move_speed = 3.0f;
