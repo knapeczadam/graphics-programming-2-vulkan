@@ -4,6 +4,7 @@
 #include "src/core/factory.h"
 #include "src/engine/camera.h"
 #include "src/engine/game_time.h"
+#include "src/engine/scene_manager.h"
 #include "src/input/movement_controller.h"
 #include "src/input/shading_mode_controller.h"
 #include "src/system/pbr_system.h"
@@ -25,6 +26,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+
 namespace dae
 {
     engine::engine()
@@ -40,14 +42,10 @@ namespace dae
                        .add_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .add_pool_size(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swap_chain::MAX_FRAMES_IN_FLIGHT)
                        .build();
-        
-        load_game_objects();
     }
 
     void engine::run(std::function<void()> const &load)
     {
-        load();
-        
         std::vector<std::unique_ptr<buffer>> ubo_buffers(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < ubo_buffers.size(); ++i)
         {
@@ -68,7 +66,15 @@ namespace dae
                                  .add_binding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
 
+        // scenes
+        auto &scene_manager = scene_manager::instance();
+        scene_manager.create_scene("2d", std::make_unique<render_system_2d>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("3d", std::make_unique<render_system_3d>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("pbr", std::make_unique<pbr_system>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("light", std::make_unique<point_light_system>(global_set_layout->get_descriptor_set_layout()));
+        load();
 
+        // textures
         texture diffuse_texture{"data/assets/textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
         texture normal_texture{"data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_UNORM};
         texture specular_texture{"data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_SRGB};
@@ -108,15 +114,11 @@ namespace dae
                 .build(global_descriptor_sets[i]);
         }
         
-        render_system_3d render_system_3d {global_set_layout->get_descriptor_set_layout()};
-        render_system_2d render_system_2d {global_set_layout->get_descriptor_set_layout()};
-        point_light_system point_light_system {global_set_layout->get_descriptor_set_layout()};
-        pbr_system pbr_system {global_set_layout->get_descriptor_set_layout()};
         camera camera{};
         // camera.set_view_direction(glm::vec3{0.0f}, glm::vec3{2.5f, 0.0f, 1.0f});
         // camera.set_view_target(glm::vec3{0.0f, -1.5f, -5.0f}, glm::vec3{0.0f, 0.0f, 0.0f});
 
-        auto viewer_object = game_object::create_game_object("viewer");
+        auto viewer_object = game_object("viewer");
         viewer_object.transform.translation = {0.0f, -1.5f, -5.0f};
         viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
@@ -125,6 +127,7 @@ namespace dae
         global_ubo ubo{};
         auto &frame_info = frame_info::instance();
 
+        // Time
         using namespace std::chrono;
         using namespace std::chrono_literals;
         auto last_time = high_resolution_clock::now();
@@ -135,14 +138,17 @@ namespace dae
         //---------------------------------------------------------
         while (not window_ptr_->should_close())
         {
+            // Input
             glfwPollEvents();
 
+            // Time
             auto current_time = high_resolution_clock::now();
             game_time::instance().set_delta_time(duration<float>(current_time - last_time).count()); // dt always has a 1 frame delay
             
             last_time = current_time;
             lag += game_time::instance().delta_time();
 
+            // Camera
             camera_controller.move(window_ptr_->get_glfw_window(), viewer_object);
             camera.set_view_yxz(viewer_object.transform.translation, viewer_object.transform.rotation);
             
@@ -153,31 +159,27 @@ namespace dae
             if (auto command_buffer = renderer_ptr_->begin_frame())
             {
                 int frame_index = renderer_ptr_->frame_index();
-                
+
+                // frame info
                 frame_info.frame_index = frame_index;
                 frame_info.command_buffer = command_buffer;
                 frame_info.camera_ptr = &camera;
                 frame_info.global_descriptor_set = global_descriptor_sets[frame_index];
-                frame_info.game_objects_ptr = &game_objects_;
                 frame_info.ubo_ptr = &ubo;
-                
-                // update
+
+                // ubo
                 ubo.projection = camera.get_projection();
                 ubo.view = camera.get_view();
                 ubo.inverse_view = camera.get_inverse_view();
                 
-                point_light_system.update();
-                
+                // update
+                scene_manager.update();
                 ubo_buffers[frame_index]->write_to_buffer(&ubo);
                 ubo_buffers[frame_index]->flush();
                 
                 // render
                 renderer_ptr_->begin_swap_chain_render_pass(command_buffer);
-                render_system_2d.render();
-                render_system_3d.render();
-                pbr_system.render();
-                point_light_system.render();
-                
+                scene_manager.render();
                 renderer_ptr_->end_swap_chain_render_pass(command_buffer);
                 renderer_ptr_->end_frame();
                 
@@ -186,75 +188,5 @@ namespace dae
             }
         }
         vkDeviceWaitIdle(device_ptr_->logical_device());
-    }
-
-    void engine::load_game_objects()
-    {
-        std::shared_ptr<model> model = model::create_model_from_file("data/assets/models/suzanne.obj");
-        auto go = game_object::create_game_object("3d");
-        go.model = model;
-        go.transform.translation = {-1.2f, 0.0f, 2.5f};
-        go.transform.scale = glm::vec3{-0.5f};
-        game_objects_.emplace(go.id(), std::move(go));
-        
-        model = model::create_model_from_file("data/assets/models/beetle.obj");
-        go = game_object::create_game_object("3d");
-        go.model = model;
-        go.transform.translation = {-0.2f, 2.0f, 1.5f};
-        go.transform.scale = glm::vec3{-5.8f};
-        game_objects_.emplace(go.id(), std::move(go));
-        
-        model = model::create_model_from_file("data/assets/models/quad.obj");
-        go = game_object::create_game_object("3d");
-        go.model = model;
-        go.transform.translation = {0.0f, 0.0f, 0.0f};
-        go.transform.scale = glm::vec3{3};
-        game_objects_.emplace(go.id(), std::move(go));
-        
-        model = model::create_model_from_file("data/assets/models/vehicle.obj");
-        go = game_object::create_game_object("pbr");
-        go.model = model;
-        go.transform.translation = {0.0f, -2.2f, 0.0f};
-        go.transform.scale = glm::vec3{0.1f};
-        go.set_material(0.4f, 0.96f, 0.915f, 1.0f, 0.0f, 0.6f);
-        game_objects_.emplace(go.id(), std::move(go));
-
-        go = game_object::make_point_light(0.2f);
-        game_objects_.emplace(go.id(), std::move(go));
-        
-        std::vector<glm::vec3> light_colors{
-            {1.f, .1f, .1f},
-            {.1f, .1f, 1.f},
-            {.1f, 1.f, .1f},
-            {1.f, 1.f, .1f},
-            {.1f, 1.f, 1.f},
-            {1.f, 1.f, 1.f} //
-        };
-
-        for (int i = 0; i < light_colors.size(); ++i)
-        {
-            auto point_light = game_object::make_point_light(0.2f);
-            point_light.color = light_colors[i];
-            auto rotate_light = glm::rotate(
-                glm::mat4{1.0f},
-                (i * glm::two_pi<float>()) / light_colors.size(),
-                {0.0f, -1.0f, 0.0f}
-            );
-            point_light.transform.translation = glm::vec3{rotate_light * glm::vec4{-1.0f, -1.0f, 0.0f, 1.0f}};
-            game_objects_.emplace(point_light.id(), std::move(point_light));
-        }
-
-
-        go  = game_object::create_game_object("2d");
-        model = factory::create_oval(device_ptr_, {}, 0.5f, 0.5f, 50);
-        go.model = model;
-        go.transform.translation = {2.0f, -1.0f, 0.0f};
-        game_objects_.emplace(go.id(), std::move(go));
-        
-        go  = game_object::create_game_object("2d");
-        model = factory::create_n_gon(device_ptr_, {}, 0.5f, 3);
-        go.model = model;
-        go.transform.translation = {-2.0f, -1.0f, 0.0f};
-        game_objects_.emplace(go.id(), std::move(go));
     }
 }

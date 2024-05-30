@@ -41,18 +41,16 @@ namespace dae
         );
         
         int light_index = 0;
-        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
+        for (auto &obj : frame_info.game_objects)
         {
-            if (obj.point_light == nullptr) continue;
-
             assert(light_index < MAX_LIGHTS and "Point lights exceed maximum specified");
 
             // update light position
-            obj.transform.translation = glm::vec3{rotate_light * glm::vec4{obj.transform.translation, 1.0f}};
+            obj->transform.translation = glm::vec3{rotate_light * glm::vec4{obj->transform.translation, 1.0f}};
 
             // copy light to ubo
-            frame_info.ubo_ptr->point_lights[light_index].position = glm::vec4{obj.transform.translation, 1.0f};
-            frame_info.ubo_ptr->point_lights[light_index].color    = glm::vec4{obj.color, obj.point_light->light_intensity};
+            frame_info.ubo_ptr->point_lights[light_index].position = glm::vec4{obj->transform.translation, 1.0f};
+            frame_info.ubo_ptr->point_lights[light_index].color    = glm::vec4{obj->color, obj->point_light->light_intensity};
 
             ++light_index;
         }
@@ -63,13 +61,11 @@ void point_light_system::render()
     {
         auto &frame_info = frame_info::instance();
         std::map<float, game_object::id_t> sorted;
-        for (auto &go : *frame_info.game_objects_ptr | std::views::values)
+        for (auto &go : frame_info.game_objects)
         {
-            if (go.name() != "point_light") continue;
-
-            auto offset = frame_info.camera_ptr->get_position() - go.transform.translation;
+            auto offset = frame_info.camera_ptr->get_position() - go->transform.translation;
             float dis_squared = glm::dot(offset, offset);
-            sorted[dis_squared] = go.id();
+            sorted[dis_squared] = go->id();
         }
         
         pipeline_->bind(frame_info.command_buffer);
@@ -84,15 +80,21 @@ void point_light_system::render()
             0,
             nullptr
         );
+
+        std::map<game_object::id_t, game_object*> game_objects;
+        for (auto &go : frame_info.game_objects)
+        {
+            game_objects[go->id()] = go;
+        }
         
         for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
-            auto &go = frame_info.game_objects_ptr->at(it->second);
+            auto &go = game_objects.at(it->second);
 
             point_light_push_constants push{};
-            push.position = glm::vec4{go.transform.translation, 1.0f};
-            push.color    = glm::vec4{go.color, go.point_light->light_intensity};
-            push.radius   = go.transform.scale.x;
+            push.position = glm::vec4{go->transform.translation, 1.0f};
+            push.color    = glm::vec4{go->color, go->point_light->light_intensity};
+            push.radius   = go->transform.scale.x;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,

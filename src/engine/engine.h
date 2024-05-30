@@ -33,15 +33,10 @@ namespace dae
         void run(std::function<void()> const &load);
 
     private:
-        void load_game_objects();
-
-    private:
         window   *window_ptr_   = nullptr;
         device   *device_ptr_   = nullptr;
         renderer *renderer_ptr_ = nullptr;
         
-        
         std::unique_ptr<descriptor_pool> global_pool_{};
-        game_object::map                 game_objects_;
     };
 }

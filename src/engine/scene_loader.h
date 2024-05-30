@@ -18,6 +18,7 @@ namespace dae
         void load_scenes();
         void load_2d_scene();
         void load_3d_scene();
+        void load_light_scene();
         void load_pbr_scene();
 
     private:

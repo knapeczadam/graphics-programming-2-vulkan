@@ -1,12 +1,14 @@
 ﻿#include "factory.h"
 
+// Standard includes
+#include <iostream>
+
 // GLM includes
 #include <glm/gtc/constants.hpp>
 
 namespace dae
 {
-    std::unique_ptr<model> factory::create_oval(device *device_ptr, glm::vec3 offset, float radiusX, float radiusY,
-                                                int segments)
+    std::unique_ptr<model> factory::create_oval(glm::vec3 offset, float radiusX, float radiusY, int segments)
     {
         model::builder modelBuilder{};
 
@@ -38,7 +40,7 @@ namespace dae
         return std::make_unique<model>(modelBuilder);
     }
 
-    std::unique_ptr<model> factory::create_n_gon(device *device_ptr, glm::vec3 offset, float radius, int sides)
+    std::unique_ptr<model> factory::create_n_gon(glm::vec3 offset, float radius, int sides)
     {
         model::builder modelBuilder{};
 

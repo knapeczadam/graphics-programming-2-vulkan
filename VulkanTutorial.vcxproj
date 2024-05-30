@@ -24,8 +24,10 @@
     <ClCompile Include="src\core\model.cpp" />
     <ClCompile Include="src\engine\engine.cpp" />
     <ClCompile Include="src\engine\camera.cpp" />
+    <ClCompile Include="src\engine\scene.cpp" />
     <ClCompile Include="src\engine\scene_config_manager.cpp" />
     <ClCompile Include="src\engine\scene_loader.cpp" />
+    <ClCompile Include="src\engine\scene_manager.cpp" />
     <ClCompile Include="src\engine\window.cpp" />
     <ClCompile Include="src\input\shading_mode_controller.cpp" />
     <ClCompile Include="src\utility\transform.cpp" />
@@ -53,8 +55,10 @@
     <ClInclude Include="src\engine\camera.h" />
     <ClInclude Include="src\engine\frame_info.h" />
     <ClInclude Include="src\engine\game_time.h" />
+    <ClInclude Include="src\engine\scene.h" />
     <ClInclude Include="src\engine\scene_config_manager.h" />
     <ClInclude Include="src\engine\scene_loader.h" />
+    <ClInclude Include="src\engine\scene_manager.h" />
     <ClInclude Include="src\engine\window.h" />
     <ClInclude Include="src\input\shading_mode_controller.h" />
     <ClInclude Include="src\utility\transform.h" />

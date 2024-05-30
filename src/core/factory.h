@@ -10,7 +10,7 @@ namespace dae
 {
     struct factory final
     {
-        static std::unique_ptr<model> create_oval(device *device_ptr, glm::vec3 offset, float radiusX, float radiusY, int segments);
-        static std::unique_ptr<model> create_n_gon(device *device_ptr, glm::vec3 offset, float radius, int sides);
+        static std::unique_ptr<model> create_oval(glm::vec3 offset, float radiusX, float radiusY, int segments);
+        static std::unique_ptr<model> create_n_gon(glm::vec3 offset, float radius, int sides);
     };
 }

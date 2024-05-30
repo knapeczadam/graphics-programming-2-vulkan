@@ -26,7 +26,7 @@ namespace dae
         create_pipeline(renderer::instance().swap_chain_render_pass());
     }
 
-void render_system_2d::render()
+    void render_system_2d::render()
     {
         auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
@@ -42,12 +42,10 @@ void render_system_2d::render()
             nullptr
         );
         
-        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
+        for (auto const &obj : frame_info.game_objects)
         {
-            if (obj.name() != "2d") continue;
-            
             push_constant_data_2d push{};
-            push.transform = obj.transform.mat4();
+            push.transform = obj->transform.mat4();
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
@@ -57,8 +55,8 @@ void render_system_2d::render()
                 sizeof(push_constant_data_2d),
                 &push);
             
-            obj.model->bind(frame_info.command_buffer);
-            obj.model->draw(frame_info.command_buffer);
+            obj->model->bind(frame_info.command_buffer);
+            obj->model->draw(frame_info.command_buffer);
         }
     }
 

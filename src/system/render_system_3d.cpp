@@ -43,14 +43,11 @@ void render_system_3d::render()
             nullptr
         );
 
-        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
+        for (auto const &obj : frame_info.game_objects)
         {
-            if (obj.model == nullptr) continue;
-            if (obj.name() != "3d") continue;
-            
             push_constant_data_3d push{};
-            push.model_matrix = obj.transform.mat4();
-            push.normal_matrix = obj.transform.normal_matrix();
+            push.model_matrix = obj->transform.mat4();
+            push.normal_matrix = obj->transform.normal_matrix();
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
@@ -60,8 +57,8 @@ void render_system_3d::render()
                 sizeof(push_constant_data_3d),
                 &push);
             
-            obj.model->bind(frame_info.command_buffer);
-            obj.model->draw(frame_info.command_buffer);
+            obj->model->bind(frame_info.command_buffer);
+            obj->model->draw(frame_info.command_buffer);
         }
     }
 

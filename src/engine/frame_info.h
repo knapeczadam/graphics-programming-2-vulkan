@@ -41,12 +41,12 @@ namespace dae
         frame_info &operator=(frame_info const &other) = delete;
         frame_info &operator=(frame_info &&other)      = delete;
         
-        int              frame_index;
-        VkCommandBuffer  command_buffer;
-        camera           *camera_ptr;
-        VkDescriptorSet  global_descriptor_set;
-        game_object::map *game_objects_ptr;
-        global_ubo       *ubo_ptr;
+        int                       frame_index;
+        VkCommandBuffer           command_buffer;
+        camera                    *camera_ptr;
+        VkDescriptorSet           global_descriptor_set;
+        std::vector<game_object*> game_objects;
+        global_ubo                *ubo_ptr;
         
     private:
         friend class singleton<frame_info>;

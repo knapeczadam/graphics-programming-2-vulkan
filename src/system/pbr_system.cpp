@@ -43,19 +43,16 @@ namespace dae
             nullptr
         );
 
-        for (auto &obj : *frame_info.game_objects_ptr | std::views::values)
+        for (auto &obj : frame_info.game_objects)
         {
-            if (obj.model == nullptr) continue;
-            if (obj.name() != "pbr") continue;
-            
             pbr_push_constant push{};
-            push.model_matrix = obj.transform.mat4();
-            push.normal_matrix = obj.transform.normal_matrix();
-            push.r = obj.material().base_color.r;
-            push.g = obj.material().base_color.g;
-            push.b = obj.material().base_color.b;
-            push.metallic = obj.material().metallic;
-            push.roughness = obj.material().roughness;
+            push.model_matrix = obj->transform.mat4();
+            push.normal_matrix = obj->transform.normal_matrix();
+            push.r = obj->material().base_color.r;
+            push.g = obj->material().base_color.g;
+            push.b = obj->material().base_color.b;
+            push.metallic = obj->material().metallic;
+            push.roughness = obj->material().roughness;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
@@ -65,8 +62,8 @@ namespace dae
                 sizeof(pbr_push_constant),
                 &push);
             
-            obj.model->bind(frame_info.command_buffer);
-            obj.model->draw(frame_info.command_buffer);
+            obj->model->bind(frame_info.command_buffer);
+            obj->model->draw(frame_info.command_buffer);
         }
     }
 

@@ -7,7 +7,6 @@
 // Standard includes
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 // GLM includes
 #include <glm/gtc/matrix_transform.hpp>
@@ -33,28 +32,20 @@ namespace dae
     {
         float light_intensity = 1.0f;
     };
-
+    
     class game_object
     {
     public:
         // Type aliases
         using id_t = unsigned int;
-        using map = std::unordered_map<id_t, game_object>;
-        
+
     public:
+        explicit game_object(std::string name) : id_{next_id_++}, name_{std::move(name)} {}
+        
         game_object(game_object const &)            = delete;
         game_object &operator=(game_object const &) = delete;
         game_object(game_object &&)                 = default;
         game_object &operator=(game_object &&)      = default;
-
-        
-        static auto create_game_object(std::string const &name) -> game_object
-        {
-            static id_t current_id = 0;
-            return game_object{current_id++, name};
-        }
-
-        static auto make_point_light(float intensity = 10.0f, float radius = 0.1f, glm::vec3 color = glm::vec3{1.0f}) -> game_object;
 
         [[nodiscard]] auto id() const -> id_t { return id_; }
         [[nodiscard]] auto name() const -> std::string { return name_; }
@@ -64,11 +55,8 @@ namespace dae
             material_ = dae::material{glm::vec4{r, g, b, a}, metallic, roughness};
         }
 
-    private:
-        game_object(id_t id, std::string name) : id_{id}, name_{std::move(name)} {}
-
     public:
-        std::shared_ptr<model> model     = {};
+        std::unique_ptr<model> model     = {};
         glm::vec3              color     = {};
         transform_component    transform = {};
 
@@ -78,5 +66,7 @@ namespace dae
         id_t          id_;
         std::string   name_;
         dae::material material_ = {};
+
+        static id_t next_id_;
     };
 }

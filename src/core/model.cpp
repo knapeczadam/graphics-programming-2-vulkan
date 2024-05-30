@@ -212,11 +212,9 @@ namespace dae
         create_index_buffers(builder.indices);
     }
 
-    model::~model()
-    {
-    }
+    model::~model() = default;
 
-    auto model::create_model_from_file(std::string const &file_path) -> std::unique_ptr<model>
+    auto model::create_model(std::string const &file_path) -> std::unique_ptr<model>
     {
         builder builder{};
         builder.load_model(file_path);
@@ -224,7 +222,7 @@ namespace dae
         return std::make_unique<model>(builder);
     }
 
-    auto model::create_model_from_vertices(std::vector<vertex> const &vertices) -> std::unique_ptr<model>
+    auto model::create_model(std::vector<vertex> const &vertices) -> std::unique_ptr<model>
     {
         builder builder{};
         builder.vertices = vertices;

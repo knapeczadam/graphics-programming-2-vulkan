@@ -2,6 +2,8 @@
 
 namespace dae
 {
+    game_object::id_t game_object::next_id_ = 0;
+    
     glm::mat4 transform_component::mat4()
         {
         const float c3 = glm::cos(rotation.z);
@@ -59,15 +61,5 @@ namespace dae
                     inverse_scale.z * (c1 * c2)
                 }
         };
-    }
-
-    auto game_object::make_point_light(float intensity, float radius, glm::vec3 color) -> game_object
-    {
-        game_object go = create_game_object("point_light");
-        go.color = color;
-        go.transform.scale.x = radius;
-        go.point_light = std::make_unique<point_light_component>();
-        go.point_light->light_intensity = intensity;
-        return go;
     }
 }

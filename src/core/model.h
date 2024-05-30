@@ -43,14 +43,14 @@ namespace dae
             void load_model(std::string const &file_path);
         };
         
-        model(builder const &builder);
+        explicit model(builder const &builder);
         ~model();
 
         model(model const &)            = delete;
         model &operator=(model const &) = delete;
 
-        static auto create_model_from_file(std::string const &file_path) -> std::unique_ptr<model>;
-        static auto create_model_from_vertices(std::vector<vertex> const &vertices) -> std::unique_ptr<model>;
+        static auto create_model(std::string const &file_path) -> std::unique_ptr<model>;
+        static auto create_model(std::vector<vertex> const &vertices) -> std::unique_ptr<model>;
 
         void bind(VkCommandBuffer command_buffer);
         void draw(VkCommandBuffer command_buffer);

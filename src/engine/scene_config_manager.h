@@ -22,7 +22,7 @@ namespace dae
         scene_config_manager &operator=(scene_config_manager &&other)      = delete;
         
         void load_scene_config(std::string const &file_path);
-        [[nodiscard]] auto get_scene_config() const -> json const & { return scene_config_; }
+        [[nodiscard]] auto scene_config() const -> json const & { return scene_config_; }
 
     private:
         friend class singleton<scene_config_manager>;
