@@ -134,7 +134,6 @@ namespace dae
         {
             throw std::runtime_error{"Failed to allocate command buffers!"};
         }
-
     }
 
     void renderer::free_command_buffers()

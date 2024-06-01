@@ -31,7 +31,6 @@
     <ClCompile Include="src\engine\window.cpp" />
     <ClCompile Include="src\input\shading_mode_controller.cpp" />
     <ClCompile Include="src\system\material_pbr_system.cpp" />
-    <ClCompile Include="src\utility\transform.cpp" />
     <ClCompile Include="src\vulkan\buffer.cpp" />
     <ClCompile Include="src\vulkan\descriptors.cpp" />
     <ClCompile Include="src\vulkan\device.cpp" />
@@ -42,7 +41,6 @@
     <ClCompile Include="src\system\i_system.cpp" />
     <ClCompile Include="src\system\texture_pbr_system.cpp" />
     <ClCompile Include="src\utility\texture.cpp" />
-    <ClCompile Include="src\utility\utils.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\system\point_light_system.cpp" />
     <ClCompile Include="src\system\render_3d_system.cpp" />
@@ -63,7 +61,6 @@
     <ClInclude Include="src\engine\window.h" />
     <ClInclude Include="src\input\shading_mode_controller.h" />
     <ClInclude Include="src\system\material_pbr_system.h" />
-    <ClInclude Include="src\utility\transform.h" />
     <ClInclude Include="src\vulkan\buffer.h" />
     <ClInclude Include="src\vulkan\descriptors.h" />
     <ClInclude Include="src\vulkan\device.h" />
@@ -95,9 +92,6 @@
     <Content Include="data\shaders\2d.vert" />
     <Content Include="data\shaders\3d.frag" />
     <Content Include="data\shaders\3d.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\component\family\" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

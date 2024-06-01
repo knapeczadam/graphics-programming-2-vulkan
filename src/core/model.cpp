@@ -44,7 +44,6 @@ namespace std
     
 }
 
-
 namespace dae
 {
     auto model::vertex::get_binding_description() -> std::vector<VkVertexInputBindingDescription>
@@ -197,8 +196,10 @@ namespace dae
                 float sy = delta_uv2.x;
                 float tx = delta_uv1.y;
                 float ty = delta_uv2.y;
+                
                 float handedness = (sx * ty - sy * tx) > 0.0f ? 1.0f : -1.0f;
                 tangent *= handedness;
+                
                 v0.tangent = tangent;
                 v1.tangent = tangent;
                 v2.tangent = tangent;
@@ -278,7 +279,6 @@ namespace dae
             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         );
-
 
         device_ptr_->copy_buffer(staging_buffer.get_buffer(), vertex_buffer_->get_buffer(), buffer_size);
     }

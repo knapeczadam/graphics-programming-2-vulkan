@@ -47,7 +47,9 @@ namespace dae
         ~model();
 
         model(model const &)            = delete;
+        model(model &&)                 = delete;
         model &operator=(model const &) = delete;
+        model &operator=(model &&)      = delete;
 
         static auto create_model(std::string const &file_path) -> std::unique_ptr<model>;
         static auto create_model(std::vector<vertex> const &vertices) -> std::unique_ptr<model>;

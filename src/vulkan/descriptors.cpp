@@ -9,8 +9,9 @@
 
 namespace dae
 {
-    // *************** Descriptor Set Layout Builder *********************
-
+    //--------------------------------------------------------------------------------------------------
+    // Descriptor Set Layout Builder
+    //--------------------------------------------------------------------------------------------------
     descriptor_set_layout::builder::builder()
         : device_ptr_{&device::instance()}
     {
@@ -37,8 +38,9 @@ namespace dae
         return std::make_unique<descriptor_set_layout>(bindings_);
     }
 
-    // *************** Descriptor Set Layout *********************
-
+    //--------------------------------------------------------------------------------------------------
+    // Descriptor Set Layout
+    //--------------------------------------------------------------------------------------------------
     descriptor_set_layout::descriptor_set_layout(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
         : device_ptr_{&device::instance()}
         , bindings_{bindings}
@@ -69,8 +71,9 @@ namespace dae
         vkDestroyDescriptorSetLayout(device_ptr_->logical_device(), descriptor_set_layout_, nullptr);
     }
 
-    // *************** Descriptor Pool Builder *********************
-
+    //--------------------------------------------------------------------------------------------------
+    // Descriptor Pool Builder
+    //--------------------------------------------------------------------------------------------------
     descriptor_pool::builder::builder()
         : device_ptr_{&device::instance()}
     {
@@ -99,8 +102,9 @@ namespace dae
         return std::make_unique<descriptor_pool>(max_sets_, pool_flags_, pool_sizes_);
     }
 
-    // *************** Descriptor Pool *********************
-
+    //--------------------------------------------------------------------------------------------------
+    // Descriptor Pool
+    //--------------------------------------------------------------------------------------------------
     descriptor_pool::descriptor_pool(
         uint32_t max_sets,
         VkDescriptorPoolCreateFlags pool_flags,
@@ -134,8 +138,6 @@ namespace dae
         alloc_info.pSetLayouts        = &descriptor_set_layout;
         alloc_info.descriptorSetCount = 1;
 
-        // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
-        // a new pool whenever an old pool fills up. But this is beyond our current scope
         if (vkAllocateDescriptorSets(device_ptr_->logical_device(), &alloc_info, &descriptor) != VK_SUCCESS)
         {
             return false;
@@ -157,8 +159,9 @@ namespace dae
         vkResetDescriptorPool(device_ptr_->logical_device(), descriptor_pool_, 0);
     }
 
-    // *************** Descriptor Writer *********************
-
+    //--------------------------------------------------------------------------------------------------
+    // Descriptor Writer
+    //--------------------------------------------------------------------------------------------------
     descriptor_writer::descriptor_writer(descriptor_set_layout *set_layout_ptr, descriptor_pool *pool_ptr)
         : set_layout_ptr_{set_layout_ptr}, pool_ptr_{pool_ptr}
     {

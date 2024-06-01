@@ -22,16 +22,18 @@ namespace dae
         ~swap_chain();
 
         swap_chain(swap_chain const &)            = delete;
+        swap_chain(swap_chain &&)                 = delete;
         swap_chain &operator=(swap_chain const &) = delete;
+        swap_chain &operator=(swap_chain &&)      = delete;
 
-        auto get_frame_buffer(int index) -> VkFramebuffer { return swap_chain_framebuffers_[index]; }
-        auto render_pass() -> VkRenderPass { return render_pass_; }
-        auto get_image_view(int index) -> VkImageView { return swap_chain_image_views_[index]; }
-        auto image_count() -> size_t { return swap_chain_images_.size(); }
-        auto swap_chain_image_format() -> VkFormat { return swap_chain_image_format_; }
-        auto swap_chain_extent() -> VkExtent2D { return swap_chain_extent_; }
-        auto width() -> uint32_t { return swap_chain_extent_.width; }
-        auto height() -> uint32_t { return swap_chain_extent_.height; }
+        [[nodiscard]] auto get_frame_buffer(int index) const -> VkFramebuffer { return swap_chain_framebuffers_[index]; }
+        [[nodiscard]] auto render_pass() const -> VkRenderPass { return render_pass_; }
+        [[nodiscard]] auto get_image_view(int index) const -> VkImageView { return swap_chain_image_views_[index]; }
+        [[nodiscard]] auto image_count() const -> size_t { return swap_chain_images_.size(); }
+        [[nodiscard]] auto swap_chain_image_format() const -> VkFormat { return swap_chain_image_format_; }
+        [[nodiscard]] auto swap_chain_extent() const -> VkExtent2D { return swap_chain_extent_; }
+        [[nodiscard]] auto width() const -> uint32_t { return swap_chain_extent_.width; }
+        [[nodiscard]] auto height() const -> uint32_t { return swap_chain_extent_.height; }
 
         auto extent_aspect_ratio() -> float;
 

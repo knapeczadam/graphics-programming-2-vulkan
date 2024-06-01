@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/utility/singleton.h"
 #include "src/system/i_system.h"
+#include "src/utility/singleton.h"
 
 // Standard includes
 #include <memory>

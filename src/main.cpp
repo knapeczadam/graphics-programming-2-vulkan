@@ -11,9 +11,6 @@
 #define ONE_TAB "\t"
 #define TWO_TABS "\t\t"
 
-#define RED_TEXT(text) "\033[1;31m" text "\033[0m"
-#define GREEN_TEXT(text) "\033[1;32m" text "\033[0m"
-#define MAGENTA_TEXT(text) "\033[1;35m" text "\033[0m"
 #define YELLOW_TEXT(text) "\033[1;33m" text "\033[0m"
 
 void print_debug()

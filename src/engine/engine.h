@@ -19,11 +19,7 @@ namespace dae
     class engine final
     {
     public:
-        static constexpr int width = 800;
-        static constexpr int height = 600;
-        static constexpr float max_frame_time = 60.0f;
-
-        engine(std::string const &data_path);
+        explicit engine(std::string const &data_path);
         ~engine() = default;
 
         engine(engine const &other)            = delete;
@@ -41,6 +37,8 @@ namespace dae
         std::unique_ptr<descriptor_pool> global_pool_{};
 
     public:
+        static constexpr int width  = 800;
+        static constexpr int height = 600;
         static std::string data_path;
     };
 }

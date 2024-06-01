@@ -16,7 +16,6 @@ namespace dae
         if (glfwCreateWindowSurface(instance, window_ptr_, nullptr, surface_ptr) != VK_SUCCESS)
         {
             throw std::runtime_error{"Failed to create window surface!"};
-            
         }
     }
 
@@ -26,13 +25,12 @@ namespace dae
         updated_window->frame_buffer_resized_ = true;
         updated_window->width_ = width;
         updated_window->height_ = height;
-        
     }
 
     void window::init(int width, int height, std::string const &name)
     {
-        width_ = width;
-        height_ = height;
+        width_       = width;
+        height_      = height;
         window_name_ = name;
 
         init_window();

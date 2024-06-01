@@ -12,11 +12,15 @@ namespace dae
     // Forward declarations
     class device;
 
-    struct pipeline_config_info
+    struct pipeline_config_info final
     {
         pipeline_config_info() = default;
-        pipeline_config_info(pipeline_config_info const &) = delete;
-        pipeline_config_info &operator=(pipeline_config_info const &) = delete;
+        ~pipeline_config_info() = default;
+        
+        pipeline_config_info(pipeline_config_info const &other)           = delete;
+        pipeline_config_info(pipeline_config_info &&other)                = delete;
+        pipeline_config_info &operator=(pipeline_config_info const &other) = delete;
+        pipeline_config_info &operator=(pipeline_config_info &&other)      = delete;
 
         std::vector<VkVertexInputBindingDescription> binding_descriptions{};
         std::vector<VkVertexInputAttributeDescription> attribute_descriptions{};
@@ -46,7 +50,9 @@ namespace dae
         ~pipeline();
 
         pipeline(pipeline const &other)            = delete;
+        pipeline(pipeline &&other)                 = delete;
         pipeline &operator=(pipeline const &other) = delete;
+        pipeline &operator=(pipeline &&other)      = delete;
 
         void bind(VkCommandBuffer command_buffer);
 

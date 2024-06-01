@@ -105,11 +105,11 @@ namespace dae
         submit_info.pWaitDstStageMask     = wait_stages;
 
         submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = buffers;
+        submit_info.pCommandBuffers    = buffers;
 
         VkSemaphore signal_semaphores[] = {render_finished_semaphores_[current_frame_]};
         submit_info.signalSemaphoreCount = 1;
-        submit_info.pSignalSemaphores = signal_semaphores;
+        submit_info.pSignalSemaphores    = signal_semaphores;
 
         vkResetFences(device_ptr_->logical_device(), 1, &in_flight_fences_[current_frame_]);
         if (vkQueueSubmit(device_ptr_->graphics_queue(), 1, &submit_info, in_flight_fences_[current_frame_]) != VK_SUCCESS)

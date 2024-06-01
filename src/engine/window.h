@@ -1,13 +1,14 @@
 ﻿#pragma once
 
+// Project includes
+#include "src/utility/singleton.h"
+
 // Standard includes
 #include <string>
 
 // GLFW includes
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
-#include "src/utility/singleton.h"
 
 namespace dae
 {

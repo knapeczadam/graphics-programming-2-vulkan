@@ -33,7 +33,7 @@ namespace dae
         float light_intensity = 1.0f;
     };
     
-    class game_object
+    class game_object final
     {
     public:
         // Type aliases
@@ -41,6 +41,7 @@ namespace dae
 
     public:
         explicit game_object(std::string name) : id_{next_id_++}, name_{std::move(name)} {}
+        ~game_object() = default;
         
         game_object(game_object const &)            = delete;
         game_object &operator=(game_object const &) = delete;

@@ -107,7 +107,6 @@ namespace dae
         emission_image_info.sampler     = gloss_texture.sampler();
         emission_image_info.imageView   = gloss_texture.image_view();
         emission_image_info.imageLayout = gloss_texture.image_layout();
-        
 
         std::vector<VkDescriptorSet> global_descriptor_sets(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
@@ -130,33 +129,36 @@ namespace dae
         viewer_object.transform.translation = {0.0f, -1.5f, -5.0f};
         viewer_object.transform.rotation = {-0.2f, 0.0f, 0.0f};
         movement_controller camera_controller = {};
+
+        // register input callbacks
         glfwSetKeyCallback(window_ptr_->get_glfw_window(), shading_mode_controller::key_callback);
-        
+
+        // ubo and frame info
         global_ubo ubo{};
         auto &frame_info = frame_info::instance();
 
-        // Time
+        // time
         using namespace std::chrono;
         using namespace std::chrono_literals;
         auto last_time = high_resolution_clock::now();
         float lag         = 0.0f;
 
         //---------------------------------------------------------
-        // GAME LOOP
+        // Game Loop
         //---------------------------------------------------------
         while (not window_ptr_->should_close())
         {
-            // Input
+            // input
             glfwPollEvents();
 
-            // Time
+            // time
             auto current_time = high_resolution_clock::now();
             game_time::instance().set_delta_time(duration<float>(current_time - last_time).count()); // dt always has a 1 frame delay
             
             last_time = current_time;
             lag += game_time::instance().delta_time();
 
-            // Camera
+            // camera
             camera_controller.move(window_ptr_->get_glfw_window(), viewer_object);
             camera.set_view_yxz(viewer_object.transform.translation, viewer_object.transform.rotation);
             

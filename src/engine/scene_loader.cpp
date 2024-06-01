@@ -1,9 +1,10 @@
 ﻿#include "scene_loader.h"
 
-#include "scene.h"
-#include "scene_config_manager.h"
-#include "scene_manager.h"
+// Project includes
 #include "src/core/factory.h"
+#include "src/engine/scene.h"
+#include "src/engine/scene_config_manager.h"
+#include "src/engine/scene_manager.h"
 
 namespace dae
 {

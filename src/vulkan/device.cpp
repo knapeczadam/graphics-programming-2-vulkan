@@ -184,8 +184,6 @@ namespace dae
         create_info.enabledExtensionCount   = static_cast<uint32_t>(device_extensions_.size());
         create_info.ppEnabledExtensionNames = device_extensions_.data();
 
-        // might not really be necessary anymore because device specific validation layers
-        // have been deprecated
         if (enable_validation_layers)
         {
             create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers_.size());

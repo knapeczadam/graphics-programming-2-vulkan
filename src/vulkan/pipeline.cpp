@@ -1,8 +1,8 @@
 ﻿#include "pipeline.h"
 
 // Project includes
-#include "src/engine/engine.h"
 #include "src/core/model.h"
+#include "src/engine/engine.h"
 #include "src/vulkan/device.h"
 
 // Standard includes

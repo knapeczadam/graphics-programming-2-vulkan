@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/vulkan/swap_chain.h"
 #include "src/utility/singleton.h"
+#include "src/vulkan/swap_chain.h"
 
 // Standard includes
 #include <cassert>

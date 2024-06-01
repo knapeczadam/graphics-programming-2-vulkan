@@ -35,15 +35,15 @@ layout (push_constant) uniform Push
 {
     mat4 model_matrix;
     mat4 normal_matrix;
-    int shading_mode;
+    int  shading_mode;
     bool use_normal_map;
 } push;
 
-vec3 gLightDir = vec3(0.577f, 0.577f, 0.577f);
-float gLightIntensity = 1.0f;
-float gKD = 7.0f;
-float gShininess = 25.0f;
-vec3 gAmbientColor = vec3(0.03f);
+const vec3  g_light_dir       = vec3(0.577f, 0.577f, 0.577f);
+const float g_light_intensity = 1.0f;
+const float g_kd              = 7.0f;
+const float g_shininess       = 25.0f;
+const vec3  g_ambient_color   = vec3(0.03f);
 
 vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, vec3 normal_color, vec3 specular_color, float gloss) 
 {
@@ -62,21 +62,21 @@ vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, v
     normal = push.use_normal_map ? tangent_space * normal_color : normal;
 
     // Light direction
-    vec3 light_dir = normalize(gLightDir);
+    vec3 light_dir = normalize(g_light_dir);
 
     // Radiance (directional light)
-    vec3 radiance = (vec3(1.0f, 1.0f, 1.0f) * gLightIntensity);
+    vec3 radiance = (vec3(1.0f, 1.0f, 1.0f) * g_light_intensity);
 
     // Observed area
     vec3 observed_area = vec3(clamp(dot(normal, -light_dir), 0.0f, 1.0f));
 
     // Diffuse lighting
-    vec3 diffuse = diffuse_color * gKD / PI;
+    vec3 diffuse = diffuse_color * g_kd / PI;
 
     // Phong specular lighting
     vec3 reflected_light = reflect(-light_dir, normal);
     float cos_alpha = clamp(dot(reflected_light, -view_dir), 0.0f, 1.0f);
-    vec3 phong = specular_color * pow(cos_alpha, gloss * gShininess);
+    vec3 phong = specular_color * pow(cos_alpha, gloss * g_shininess);
 
     if (push.shading_mode == 0)
     {
@@ -92,7 +92,7 @@ vec4 shade_pixel(vec3 normal, vec3 tangent, vec3 view_dir, vec3 diffuse_color, v
     }
     else
     {
-        color = radiance * (diffuse + phong + gAmbientColor) * observed_area;
+        color = radiance * (diffuse + phong + g_ambient_color) * observed_area;
     }
     return vec4(color, 1.0);
 }
@@ -102,10 +102,10 @@ void main()
     vec3 camera_pos_world = ubo.inverse_view[3].xyz;
     vec3 view_dir         = normalize(camera_pos_world - in_position);
     
-    vec3 diffuse_color = texture(diffuse_texture, in_uv).rgb;
-    vec3 normal_color  = texture(normal_texture, in_uv).rgb;
+    vec3 diffuse_color  = texture(diffuse_texture, in_uv).rgb;
+    vec3 normal_color   = texture(normal_texture, in_uv).rgb;
     vec3 specular_color = texture(specular_texture, in_uv).rgb;
-    float gloss_color = texture(gloss_texture, in_uv).r;
+    float gloss_color   = texture(gloss_texture, in_uv).r;
 
     out_color = shade_pixel(in_normal, in_tangent, view_dir, diffuse_color, normal_color, specular_color, gloss_color);
 }

@@ -7,7 +7,7 @@
 
 namespace dae
 {
-    class camera
+    class camera final
     {
     public:
         void set_orthographic_projection(float left, float right, float top, float bottom, float near, float far);

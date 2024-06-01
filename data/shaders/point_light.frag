@@ -1,6 +1,7 @@
 #version 450
 
-layout (location = 0) in vec2 frag_offset;
+layout (location = 0) in vec2 in_offset;
+
 layout (location = 0) out vec4 out_color;
 
 struct point_light
@@ -21,21 +22,21 @@ layout (set = 0, binding = 0) uniform global_ubo
 
 layout (push_constant) uniform Push
 {
-    vec4 position;
-    vec4 color;
+    vec4  position;
+    vec4  color;
     float radius;
 } push;
 
-const float M_PI = 3.1415926538;
+#define PI 3.1415926535897932384626433832795
 
 void main()
 {
-    float dist = sqrt(dot(frag_offset, frag_offset));
+    float dist = sqrt(dot(in_offset, in_offset));
     if (dist >= 1.0f)
     {
         discard;
     }
-//    out_color = vec4(push.color.rgb, 0.5f * (cos(dist * M_PI) + 1.0f));
-    float cos_dist = 0.5f * (cos(dist * M_PI) + 1.0f);
+    
+    float cos_dist = 0.5f * (cos(dist * PI) + 1.0f);
     out_color = vec4(push.color.rgb + cos_dist, cos_dist);
 }

@@ -1,8 +1,5 @@
 ﻿#include "factory.h"
 
-// Standard includes
-#include <iostream>
-
 // GLM includes
 #include <glm/gtc/constants.hpp>
 

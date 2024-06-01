@@ -31,8 +31,8 @@ const float ambient = 0.01f;
 
 layout (push_constant) uniform Push
 {
-    mat4 model_matrix;
-    mat4 normal_matrix;
+    mat4  model_matrix;
+    mat4  normal_matrix;
     float r;
     float g;
     float b;

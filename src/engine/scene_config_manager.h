@@ -3,8 +3,15 @@
 // Project includes
 #include "src/utility/singleton.h"
 
+// Standard includes
+#include <string>
+
 // JSON includes
+#if defined(CMAKE_BUILD)
+#include <single_include/nlohmann/json.hpp>
+#else
 #include "json.hpp"
+#endif
 
 namespace dae
 {

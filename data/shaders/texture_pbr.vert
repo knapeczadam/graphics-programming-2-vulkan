@@ -33,18 +33,18 @@ layout (push_constant) uniform Push
 {
     mat4 model_matrix;
     mat4 normal_matrix;
-    int shading_mode;
+    int  shading_mode;
     bool use_normal_map;
 } push;
 
 void main()
 {
     vec4 position_world = push.model_matrix * vec4(in_position, 1.0f);
-    gl_Position = ubo.projection * (ubo.view * position_world);
+    gl_Position         = ubo.projection * (ubo.view * position_world);
 
-    out_normal = normalize(mat3(push.normal_matrix) * in_normal);
-    out_tangent = normalize(mat3(push.normal_matrix) * in_tangent.xyz);
+    out_normal   = normalize(mat3(push.normal_matrix) * in_normal);
+    out_tangent  = normalize(mat3(push.normal_matrix) * in_tangent.xyz);
     out_position = position_world.xyz;
-    out_color = in_color;
-    out_uv = in_uv;
+    out_color    = in_color;
+    out_uv       = in_uv;
 }

@@ -13,13 +13,13 @@ namespace dae
 {
     struct material_pbr_push_constant
     {
-        glm::mat4 model_matrix{1.0f}; // 16 * 4 = 64 bytes
-        glm::mat4 normal_matrix{1.0f}; // 16 * 4 = 64 bytes
+        glm::mat4 model_matrix{1.0f};
+        glm::mat4 normal_matrix{1.0f};
         float r;
         float g;
         float b;
         float metallic;
-        float roughness; // 4 bytes
+        float roughness;
     };
     
     material_pbr_system::material_pbr_system(VkDescriptorSetLayout global_set_layout)

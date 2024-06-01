@@ -16,7 +16,7 @@ namespace dae
     class descriptor_set_layout final
     {
     public:
-        class builder
+        class builder final
         {
         public:
             builder();
@@ -38,7 +38,9 @@ namespace dae
         ~descriptor_set_layout();
         
         descriptor_set_layout(descriptor_set_layout const &other)            = delete;
+        descriptor_set_layout(descriptor_set_layout &&other)                 = delete;
         descriptor_set_layout &operator=(descriptor_set_layout const &other) = delete;
+        descriptor_set_layout &operator=(descriptor_set_layout &&other)      = delete;
 
         [[nodiscard]] auto get_descriptor_set_layout() const -> VkDescriptorSetLayout { return descriptor_set_layout_; }
 
@@ -77,7 +79,9 @@ namespace dae
         ~descriptor_pool();
         
         descriptor_pool(const descriptor_pool &other)            = delete;
+        descriptor_pool(descriptor_pool &&other)                 = delete;
         descriptor_pool &operator=(const descriptor_pool &other) = delete;
+        descriptor_pool &operator=(descriptor_pool &&other)      = delete;
 
         auto allocate_descriptor(const VkDescriptorSetLayout descriptor_set_layout, VkDescriptorSet &descriptor) const -> bool;
         void free_descriptors(std::vector<VkDescriptorSet> &descriptors) const;
