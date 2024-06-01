@@ -1,12 +1,50 @@
 {
+  "2d": [
+    {
+      "name": "quad",
+      "transform": {
+        "position": [
+          -2,
+          -1.0,
+          1.5
+        ],
+        "rotation": [
+          0.0,
+          1.5707963268,
+          1.5707963268
+        ],
+        "scale": -0.5
+      },
+      "model": "assets/models/quad.obj",
+      "texture": "assets/textures/texture.jpg"
+    },
+    {
+      "name": "quad",
+      "transform": {
+        "position": [
+          -1.7,
+          -1.0,
+          1.7
+        ],
+        "rotation": [
+          0.0,
+          1.5707963268,
+          1.5707963268
+        ],
+        "scale": -0.5
+      },
+      "model": "assets/models/quad.obj",
+      "texture": "assets/textures/texture.jpg"
+    }
+  ],
   "3d": [
     {
       "name": "suzanne",
       "transform": {
         "position": [
           -1.2,
-          0.0,
-          2.5
+          -0.2,
+          2.2
         ],
         "scale": -0.5
       },

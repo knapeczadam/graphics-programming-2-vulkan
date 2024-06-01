@@ -62,6 +62,7 @@ namespace dae
         transform_component    transform = {};
 
         std::unique_ptr<point_light_component> point_light = nullptr;
+        bool use_texture = false;
 
     private:
         id_t          id_;

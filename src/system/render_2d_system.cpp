@@ -18,7 +18,8 @@ namespace dae
 {
     struct push_constant_data_2d
     {
-        glm::mat4 transform{1.0f}; 
+        glm::mat4 transform{1.0f};
+        bool use_texture;
     };
     
     render_2d_system::render_2d_system(VkDescriptorSetLayout global_set_layout)
@@ -47,6 +48,7 @@ namespace dae
         {
             push_constant_data_2d push{};
             push.transform = obj->transform.mat4();
+            push.use_texture = obj->use_texture;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,

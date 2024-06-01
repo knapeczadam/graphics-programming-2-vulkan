@@ -7,6 +7,7 @@ layout (location = 3) in vec2 in_uv;
 layout (location = 4) in vec3 in_tangent;
 
 layout (location = 0) out vec3 out_color;
+layout (location = 3) out vec2  out_uv;
 
 layout (set = 0, binding = 0) uniform global_ubo
 {
@@ -22,8 +23,9 @@ layout (push_constant) uniform Push
 
 void main()
 {
-    vec4 position_world = push.model_matrix * vec4(in_position, 1.0f);
+    vec4 position = push.model_matrix * vec4(in_position, 1.0f);
     
     out_color           = in_color;
-    gl_Position         = ubo.projection * (ubo.view * position_world);
+    out_uv              = in_uv;
+    gl_Position         = ubo.projection * (ubo.view * position);
 }

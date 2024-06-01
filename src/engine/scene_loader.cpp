@@ -25,6 +25,8 @@ namespace dae
         go_ptr->transform.translation = {2.0f, -1.0f, 0.0f};
         
         scene_ptr = scene_manager::instance().find("2d");
+        auto const &scene_config = scene_config_manager::instance().scene_config();
+        
         go_ptr = scene_ptr->create_game_object("oval");
         go_ptr->model = factory::create_oval({}, 0.5f, 0.5f, 30);
         go_ptr->transform.translation = {2.0f, -1.0f, 2.0f};
@@ -33,6 +35,43 @@ namespace dae
         go_ptr = scene_ptr->create_game_object("ngon");
         go_ptr->model = factory::create_n_gon({}, 0.5f, 3);
         go_ptr->transform.translation = {-2.0f, -1.0f, 0.0f};
+        
+        
+        for (auto const &object : scene_config["2d"])
+        {
+            std::string name = object.contains("name") ? object["name"] : "game_object";
+            auto go_ptr = scene_ptr->create_game_object(name);
+            if (object.contains("transform"))
+            {
+                auto transform = object["transform"];
+                glm::vec3 position = transform.contains("position") ? glm::vec3{transform["position"][0], transform["position"][1], transform["position"][2]} : glm::vec3{0.0f};
+                glm::vec3 rotation = transform.contains("rotation") ? glm::vec3{transform["rotation"][0], transform["rotation"][1], transform["rotation"][2]} : glm::vec3{0.0f};
+                glm::vec3 scale = glm::vec3{1.0f};
+                if (transform.contains("scale"))
+                {
+                    if (transform["scale"].is_number())
+                    {
+                        scale = glm::vec3{transform["scale"]};
+                    }
+                    else if (transform["scale"].is_array())
+                    {
+                        scale = glm::vec3{transform["scale"][0], transform["scale"][1], transform["scale"][2]};
+                    }
+                }
+                go_ptr->transform.translation = position;
+                go_ptr->transform.rotation = rotation;
+                go_ptr->transform.scale = scale;
+            }
+            if (object.contains("model"))
+            {
+                go_ptr->model = model::create_model(object["model"]);
+            }
+            if (object.contains("texture"))
+            {
+                texture_path_ = object["texture"];
+                go_ptr->use_texture = true;
+            }
+        }
     }
 
     void scene_loader::load_3d_scene()

@@ -6,10 +6,10 @@ layout (location = 2) in vec3 in_normal;
 layout (location = 3) in vec2 in_uv;
 layout (location = 4) in vec3 in_tangent;
 
-layout(location = 0) out vec3 out_color;
-layout(location = 1) out vec3 out_position;
-layout(location = 2) out vec3 out_normal;
-layout(location = 3) out vec2 out_uv;
+layout (location = 0) out vec3 out_color;
+layout (location = 1) out vec3 out_position;
+layout (location = 2) out vec3 out_normal;
+layout (location = 3) out vec2 out_uv;
 
 struct point_light
 {

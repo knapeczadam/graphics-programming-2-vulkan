@@ -71,6 +71,7 @@ namespace dae
                                  .add_binding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .add_binding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .add_binding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+                                 .add_binding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
                                  .build();
 
         // scenes
@@ -87,6 +88,7 @@ namespace dae
         texture normal_texture{scene_loader::instance().normal_texture_path(), VK_FORMAT_R8G8B8A8_UNORM};
         texture specular_texture{scene_loader::instance().specular_texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
         texture gloss_texture{scene_loader::instance().glossiness_texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
+        texture texture{scene_loader::instance().texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();
@@ -108,6 +110,11 @@ namespace dae
         emission_image_info.imageView   = gloss_texture.image_view();
         emission_image_info.imageLayout = gloss_texture.image_layout();
 
+        VkDescriptorImageInfo texture_image_info{};
+        texture_image_info.sampler     = texture.sampler();
+        texture_image_info.imageView   = texture.image_view();
+        texture_image_info.imageLayout = texture.image_layout();
+
         std::vector<VkDescriptorSet> global_descriptor_sets(swap_chain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < global_descriptor_sets.size(); ++i)
         {
@@ -118,6 +125,7 @@ namespace dae
                 .write_image(2, &normal_image_info)
                 .write_image(3, &specular_image_info)
                 .write_image(4, &emission_image_info)
+                .write_image(5, &texture_image_info)
                 .build(global_descriptor_sets[i]);
         }
         

@@ -26,6 +26,7 @@ namespace dae
         void load_material_pbr_scene();
         void load_texture_pbr_scene();
 
+        [[nodiscard]] auto texture_path() const -> std::string const & { return texture_path_; }
         [[nodiscard]] auto diffuse_texture_path() const -> std::string const & { return diffuse_texture_path_; }
         [[nodiscard]] auto normal_texture_path() const -> std::string const & { return normal_texture_path_; }
         [[nodiscard]] auto specular_texture_path() const -> std::string const & { return specular_texture_path_; }
@@ -37,9 +38,10 @@ namespace dae
 
     private:
         std::string const debug_texture_path_ = engine::data_path + "assets/textures/debug.png";
-        std::string diffuse_texture_path_    = debug_texture_path_;
-        std::string normal_texture_path_     = debug_texture_path_;
-        std::string specular_texture_path_   = debug_texture_path_;
-        std::string glossiness_texture_path_ = debug_texture_path_;
+        std::string texture_path_             = debug_texture_path_;
+        std::string diffuse_texture_path_     = debug_texture_path_;
+        std::string normal_texture_path_      = debug_texture_path_;
+        std::string specular_texture_path_    = debug_texture_path_;
+        std::string glossiness_texture_path_  = debug_texture_path_;
     };
 }
