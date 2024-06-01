@@ -19,8 +19,8 @@ namespace dae
             last_mouse_x_ = mouse_x;
             last_mouse_y_ = mouse_y;
 
-            rotate.x += look_speed * delta_y * dt * -1;
-            rotate.y += look_speed * delta_x * dt;
+            rotate.x += look_speed * static_cast<float>(delta_y) * dt * -1.0f;
+            rotate.y += look_speed * static_cast<float>(delta_x) * dt;
         }
         
         if (glfwGetKey(window_ptr, key_mappings::look_right) == GLFW_PRESS)

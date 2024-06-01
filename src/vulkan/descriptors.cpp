@@ -46,9 +46,10 @@ namespace dae
         , bindings_{bindings}
     {
         std::vector<VkDescriptorSetLayoutBinding> set_layout_bindings{};
-        for (auto kv : bindings)
+        set_layout_bindings.reserve(bindings.size());
+        for (auto const &[fst, snd] : bindings)
         {
-            set_layout_bindings.push_back(kv.second);
+            set_layout_bindings.push_back(snd);
         }
 
         VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info{};
@@ -222,6 +223,6 @@ namespace dae
         {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool_ptr_->device_ptr_->logical_device(), writes_.size(), writes_.data(), 0, nullptr);
+        vkUpdateDescriptorSets(pool_ptr_->device_ptr_->logical_device(), static_cast<uint32_t>(writes_.size()), writes_.data(), 0, nullptr);
     }
 }

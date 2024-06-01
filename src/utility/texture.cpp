@@ -29,7 +29,7 @@ namespace dae
         : device_ptr_{&device::instance()}
         , image_format_{format}
     {
-        int text_channels, bytes_per_pixel;
+        int text_channels;
 
         std::string const path = ENGINE_DIR + engine::data_path + file_path;
         stbi_uc *pixels = stbi_load(path.c_str(), &width_, &height_, &text_channels, STBI_rgb_alpha);

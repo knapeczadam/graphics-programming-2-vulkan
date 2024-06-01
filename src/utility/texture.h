@@ -39,8 +39,8 @@ namespace dae
         VkFormat       image_format_ = VK_FORMAT_UNDEFINED;
         VkImageLayout  image_layout_ = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        int width_      = 0;
-        int height_     = 0;
-        int mip_levels_ = 0;
+        int      width_      = 0;
+        int      height_     = 0;
+        uint32_t mip_levels_ = 0;
     };
 }
