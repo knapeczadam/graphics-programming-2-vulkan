@@ -1,6 +1,7 @@
 ﻿#include "swap_chain.h"
 
 // Project includes
+#include "src/utility/utils.h"
 #include "src/vulkan/device.h"
 
 // Standard includes
@@ -425,7 +426,7 @@ namespace dae
         {
             if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
             {
-                std::cout << "Present mode: Mailbox" << '\n';
+                std::cout << YELLOW_TEXT("[Present Mode]\n") << ONE_TAB <<  GREEN_TEXT("Mailbox") << '\n';
                 return available_present_mode;
             }
         }

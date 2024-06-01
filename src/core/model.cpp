@@ -220,7 +220,9 @@ namespace dae
     {
         builder builder{};
         builder.load_model(file_path);
+#ifndef NDEBUG
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
+#endif
         return std::make_unique<model>(builder);
     }
 
@@ -228,7 +230,9 @@ namespace dae
     {
         builder builder{};
         builder.vertices = vertices;
+#ifndef NDEBUG
         std::cout << "Vertex count: " << builder.vertices.size() << '\n';
+#endif
         return std::make_unique<model>(builder);
     }
 

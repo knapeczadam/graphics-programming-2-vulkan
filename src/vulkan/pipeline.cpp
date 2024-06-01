@@ -157,8 +157,10 @@ namespace dae
         auto const vert_code = read_file(vertex_file_path);
         auto const frag_code = read_file(fragment_file_path);
 
+#ifndef NDEBUG
         std::cout << "Vertex shader code size: " << vert_code.size() << '\n';
         std::cout << "Fragment shader code size: " << frag_code.size() << '\n';
+#endif
 
         create_shader_module(vert_code, &vertex_shader_module_);
         create_shader_module(frag_code, &fragment_shader_module_);

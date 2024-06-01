@@ -23,6 +23,12 @@ namespace dae
         auto go_ptr = scene_ptr->create_game_object("oval");
         go_ptr->model = factory::create_oval({}, 0.5f, 0.5f, 50);
         go_ptr->transform.translation = {2.0f, -1.0f, 0.0f};
+        
+        scene_ptr = scene_manager::instance().find("2d");
+        go_ptr = scene_ptr->create_game_object("oval");
+        go_ptr->model = factory::create_oval({}, 0.5f, 0.5f, 30);
+        go_ptr->transform.translation = {2.0f, -1.0f, 2.0f};
+        go_ptr->transform.rotation = {0.0f, 0.0f, glm::pi<float>() / 2.0f};
 
         go_ptr = scene_ptr->create_game_object("ngon");
         go_ptr->model = factory::create_n_gon({}, 0.5f, 3);

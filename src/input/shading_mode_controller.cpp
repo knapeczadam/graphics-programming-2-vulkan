@@ -2,12 +2,10 @@
 
 // Project includes
 #include "src/engine/frame_info.h"
+#include "src/utility/utils.h"
 
 // Standard includes
 #include <iostream>
-
-#define GREEN_TEXT(text) "\033[1;32m" text "\033[0m"
-#define MAGENTA_TEXT(text) "\033[1;35m" text "\033[0m"
 
 namespace dae
 {

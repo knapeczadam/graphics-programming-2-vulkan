@@ -2,6 +2,7 @@
 
 // Project includes
 #include "src/engine/window.h"
+#include "src/utility/utils.h"
 
 // Standard includes
 #include <cstring>
@@ -131,7 +132,7 @@ namespace dae
         {
             throw std::runtime_error("failed to find GPUs with Vulkan support!");
         }
-        std::cout << "Device count: " << device_count << '\n';
+        std::cout << YELLOW_TEXT("[Device Count]\n") << ONE_TAB << GREEN_TEXT("" + std::to_string(device_count) + "") << '\n';
         std::vector<VkPhysicalDevice> devices(device_count);
         vkEnumeratePhysicalDevices(instance_, &device_count, devices.data());
 
@@ -150,7 +151,8 @@ namespace dae
         }
 
         vkGetPhysicalDeviceProperties(physical_device_, &properties);
-        std::cout << "physical device: " << properties.deviceName << '\n';
+        std::string device_name = properties.deviceName;
+        std::cout << YELLOW_TEXT("[Physical Device]\n") << ONE_TAB << GREEN_TEXT("" + device_name + "") << '\n';
     }
 
     void device::create_logical_device()
@@ -313,19 +315,21 @@ namespace dae
         std::vector<VkExtensionProperties> extensions(extension_count);
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
 
-        std::cout << "available extensions:" << '\n';
+        std::cout << YELLOW_TEXT("[Available Extensions]") << '\n';
         std::unordered_set<std::string> available;
-        for (auto const &[extensionName, specVersion] : extensions)
+        for (auto const &[extension_name, spec_version] : extensions)
         {
-            std::cout << "\t" << extensionName << '\n';
-            available.insert(extensionName);
+            std::string extension_name_str = extension_name;
+            std::cout << ONE_TAB << GREEN_TEXT("" + extension_name_str + "") << '\n';
+            available.insert(extension_name);
         }
 
-        std::cout << "required extensions:" << '\n';
+        std::cout << YELLOW_TEXT("[Required Extensions]") << '\n';
         auto required_extensions = this->required_extensions();
         for (const auto &required : required_extensions)
         {
-            std::cout << "\t" << required << '\n';
+            std::string required_str = required;
+            std::cout << ONE_TAB << RED_TEXT("" + required_str + "") << '\n';
             if (available.find(required) == available.end())
             {
                 throw std::runtime_error("Missing required glfw extension");
