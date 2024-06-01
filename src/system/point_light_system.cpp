@@ -1,6 +1,7 @@
 ﻿#include "point_light_system.h"
 
 // Project includes
+#include "src/engine/frame_info.h"
 #include "src/engine/game_time.h"
 #include "src/vulkan/device.h"
 #include "src/vulkan/renderer.h"
@@ -142,8 +143,8 @@ void point_light_system::render()
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            "data/shaders/point_light.vert.spv",
-            "data/shaders/point_light.frag.spv",
+            "shaders/point_light.vert.spv",
+            "shaders/point_light.frag.spv",
             pipeline_config);
     }
 }

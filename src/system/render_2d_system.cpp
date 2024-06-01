@@ -1,6 +1,7 @@
-﻿#include "render_system_2d.h"
+﻿#include "render_2d_system.h"
 
 // Project includes
+#include "src/engine/frame_info.h"
 #include "src/vulkan/device.h"
 #include "src/vulkan/renderer.h"
 
@@ -20,13 +21,13 @@ namespace dae
         glm::mat4 transform{1.0f}; 
     };
     
-    render_system_2d::render_system_2d(VkDescriptorSetLayout global_set_layout)
+    render_2d_system::render_2d_system(VkDescriptorSetLayout global_set_layout)
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(renderer::instance().swap_chain_render_pass());
     }
 
-    void render_system_2d::render()
+    void render_2d_system::render()
     {
         auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
@@ -60,7 +61,7 @@ namespace dae
         }
     }
 
-    void render_system_2d::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
+    void render_2d_system::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
     {
         VkPushConstantRange push_constant_range{};
         push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -82,7 +83,7 @@ namespace dae
         }
     }
 
-    void render_system_2d::create_pipeline(VkRenderPass render_pass)
+    void render_2d_system::create_pipeline(VkRenderPass render_pass)
     {
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
@@ -91,8 +92,8 @@ namespace dae
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            "data/shaders/shader_2d.vert.spv",
-            "data/shaders/shader_2d.frag.spv",
+            "shaders/2d.vert.spv",
+            "shaders/2d.frag.spv",
             pipeline_config);
     }
 }

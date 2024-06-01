@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 // Project includes
-#include "src/engine/frame_info.h"
 #include "src/system/i_system.h"
 
 namespace dae

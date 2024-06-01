@@ -1,6 +1,7 @@
-﻿#include "render_system_3d.h"
+﻿#include "texture_pbr_system.h"
 
 // Project includes
+#include "src/engine/frame_info.h"
 #include "src/vulkan/device.h"
 #include "src/vulkan/renderer.h"
 
@@ -8,26 +9,23 @@
 #include <ranges>
 #include <stdexcept>
 
-// GLM includes
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-
 namespace dae
 {
-    struct push_constant_data_3d
+    struct texture_pbr_push_constant
     {
         glm::mat4 model_matrix{1.0f};
         glm::mat4 normal_matrix{1.0f};
+        int shading_mode;
+        bool use_normal;
     };
     
-    render_system_3d::render_system_3d(VkDescriptorSetLayout global_set_layout)
+    texture_pbr_system::texture_pbr_system(VkDescriptorSetLayout global_set_layout)
     {
         create_pipeline_layout(global_set_layout);
         create_pipeline(renderer::instance().swap_chain_render_pass());
     }
 
-void render_system_3d::render()
+    void texture_pbr_system::render()
     {
         auto &frame_info = frame_info::instance();
         pipeline_->bind(frame_info.command_buffer);
@@ -45,16 +43,18 @@ void render_system_3d::render()
 
         for (auto const &obj : frame_info.game_objects)
         {
-            push_constant_data_3d push{};
+            texture_pbr_push_constant push{};
             push.model_matrix = obj->transform.mat4();
             push.normal_matrix = obj->transform.normal_matrix();
+            push.use_normal = frame_info.use_normal;
+            push.shading_mode = frame_info.shading_mode;
 
             vkCmdPushConstants(
                 frame_info.command_buffer,
                 pipeline_layout_,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                sizeof(push_constant_data_3d),
+                sizeof(texture_pbr_push_constant),
                 &push);
             
             obj->model->bind(frame_info.command_buffer);
@@ -62,13 +62,13 @@ void render_system_3d::render()
         }
     }
 
-    void render_system_3d::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
+    void texture_pbr_system::create_pipeline_layout(VkDescriptorSetLayout global_set_layout)
     {
         VkPushConstantRange push_constant_range{};
         push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         push_constant_range.offset     = 0;
-        push_constant_range.size       = sizeof(push_constant_data_3d);
-
+        push_constant_range.size       = sizeof(texture_pbr_push_constant);
+        
         std::vector<VkDescriptorSetLayout> descriptor_set_layouts{global_set_layout};
         
         VkPipelineLayoutCreateInfo pipeline_layout_info{};
@@ -84,7 +84,7 @@ void render_system_3d::render()
         }
     }
 
-    void render_system_3d::create_pipeline(VkRenderPass render_pass)
+    void texture_pbr_system::create_pipeline(VkRenderPass render_pass)
     {
         assert(pipeline_layout_ != nullptr and "Cannot create pipeline before pipeline layout");
         
@@ -93,8 +93,8 @@ void render_system_3d::render()
         pipeline_config.render_pass = render_pass;
         pipeline_config.pipeline_layout = pipeline_layout_;
         pipeline_ = std::make_unique<pipeline>(
-            "data/shaders/shader_3d.vert.spv",
-            "data/shaders/shader_3d.frag.spv",
+            "shaders/texture_pbr.vert.spv",
+            "shaders/texture_pbr.frag.spv",
             pipeline_config);
     }
 }

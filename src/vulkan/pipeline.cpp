@@ -1,6 +1,7 @@
 ﻿#include "pipeline.h"
 
 // Project includes
+#include "src/engine/engine.h"
 #include "src/core/model.h"
 #include "src/vulkan/device.h"
 
@@ -129,11 +130,11 @@ namespace dae
 
     auto pipeline::read_file(std::string const &file_path) -> std::vector<char>
     {
-        std::string const engine_path = ENGINE_DIR + file_path;
-        std::ifstream file{engine_path, std::ios::ate | std::ios::binary};
+        std::string const path = ENGINE_DIR + engine::data_path + file_path;
+        std::ifstream file{path, std::ios::ate | std::ios::binary};
         if (not file.is_open())
         {
-            throw std::runtime_error{"failed to open file: " + engine_path};
+            throw std::runtime_error{"failed to open file: " + path};
         }
 
         size_t file_size = static_cast<size_t>(file.tellg());

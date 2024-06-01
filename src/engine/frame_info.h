@@ -27,8 +27,6 @@ namespace dae
         glm::vec4 ambient_light_color {1.0f, 1.0f, 1.0f, 0.02f};
         point_light point_lights[MAX_LIGHTS];
         int num_lights;
-        bool use_normal;
-        int shading_mode;
     };
     
     class frame_info final : public singleton<frame_info>
@@ -47,6 +45,8 @@ namespace dae
         VkDescriptorSet           global_descriptor_set;
         std::vector<game_object*> game_objects;
         global_ubo                *ubo_ptr;
+        bool use_normal   = true;
+        int  shading_mode = 3;
         
     private:
         friend class singleton<frame_info>;

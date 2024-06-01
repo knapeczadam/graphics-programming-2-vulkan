@@ -1,8 +1,9 @@
 ﻿#include "model.h"
 
 // Project includes
-#include "src/vulkan/device.h"
+#include "src/engine/engine.h"
 #include "src/utility/utils.h"
+#include "src/vulkan/device.h"
 
 // Standard includes
 #include <cassert>
@@ -113,8 +114,8 @@ namespace dae
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
 
-        std::string const engine_path = ENGINE_DIR + file_path;
-        if (not tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, engine_path.c_str()))
+        std::string const path = ENGINE_DIR + engine::data_path + file_path;
+        if (not tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path.c_str()))
         {
             throw std::runtime_error{warn + err};
         }

@@ -3,14 +3,15 @@
 // Project includes
 #include "src/core/factory.h"
 #include "src/engine/camera.h"
+#include "src/engine/frame_info.h"
 #include "src/engine/game_time.h"
 #include "src/engine/scene_manager.h"
 #include "src/input/movement_controller.h"
 #include "src/input/shading_mode_controller.h"
-#include "src/system/pbr_system.h"
 #include "src/system/point_light_system.h"
-#include "src/system/render_system_2d.h"
-#include "src/system/render_system_3d.h"
+#include "src/system/render_2d_system.h"
+#include "src/system/render_3d_system.h"
+#include "src/system/texture_pbr_system.h"
 #include "src/utility/texture.h"
 #include "src/vulkan/buffer.h"
 #include "src/vulkan/device.h"
@@ -26,11 +27,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include "scene_loader.h"
+#include "src/system/material_pbr_system.h"
 
 namespace dae
 {
-    engine::engine()
+    std::string engine::data_path;
+    
+    engine::engine(std::string const &path)
     {
+        data_path = path;
+        
         window_ptr_= &window::instance();
         window_ptr_->init(width, height, "Graphics Programming 2 | Adam Knapecz");
 
@@ -68,17 +75,18 @@ namespace dae
 
         // scenes
         auto &scene_manager = scene_manager::instance();
-        scene_manager.create_scene("2d", std::make_unique<render_system_2d>(global_set_layout->get_descriptor_set_layout()));
-        scene_manager.create_scene("3d", std::make_unique<render_system_3d>(global_set_layout->get_descriptor_set_layout()));
-        scene_manager.create_scene("pbr", std::make_unique<pbr_system>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("2d", std::make_unique<render_2d_system>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("3d", std::make_unique<render_3d_system>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("material_pbr", std::make_unique<material_pbr_system>(global_set_layout->get_descriptor_set_layout()));
+        scene_manager.create_scene("texture_pbr", std::make_unique<texture_pbr_system>(global_set_layout->get_descriptor_set_layout()));
         scene_manager.create_scene("light", std::make_unique<point_light_system>(global_set_layout->get_descriptor_set_layout()));
         load();
 
         // textures
-        texture diffuse_texture{"data/assets/textures/vehicle_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture normal_texture{"data/assets/textures/vehicle_normal.png", VK_FORMAT_R8G8B8A8_UNORM};
-        texture specular_texture{"data/assets/textures/vehicle_specular.png", VK_FORMAT_R8G8B8A8_SRGB};
-        texture gloss_texture{"data/assets/textures/vehicle_gloss.png", VK_FORMAT_R8G8B8A8_SRGB};
+        texture diffuse_texture{scene_loader::instance().diffuse_texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
+        texture normal_texture{scene_loader::instance().normal_texture_path(), VK_FORMAT_R8G8B8A8_UNORM};
+        texture specular_texture{scene_loader::instance().specular_texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
+        texture gloss_texture{scene_loader::instance().glossiness_texture_path(), VK_FORMAT_R8G8B8A8_SRGB};
 
         VkDescriptorImageInfo diffuse_image_info{};
         diffuse_image_info.sampler     = diffuse_texture.sampler();

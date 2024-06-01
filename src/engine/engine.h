@@ -7,6 +7,7 @@
 // Standard includes
 #include <functional>
 #include <memory>
+#include <string>
 
 namespace dae
 {
@@ -22,7 +23,7 @@ namespace dae
         static constexpr int height = 600;
         static constexpr float max_frame_time = 60.0f;
 
-        engine();
+        engine(std::string const &data_path);
         ~engine() = default;
 
         engine(engine const &other)            = delete;
@@ -38,5 +39,8 @@ namespace dae
         renderer *renderer_ptr_ = nullptr;
         
         std::unique_ptr<descriptor_pool> global_pool_{};
+
+    public:
+        static std::string data_path;
     };
 }

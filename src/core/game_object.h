@@ -50,9 +50,9 @@ namespace dae
         [[nodiscard]] auto id() const -> id_t { return id_; }
         [[nodiscard]] auto name() const -> std::string { return name_; }
         [[nodiscard]] auto material() const -> material const & { return material_; }
-        void set_material(float r, float g, float b, float a, float metallic, float roughness)
+        void set_material(float r, float g, float b, float metallic, float roughness)
         {
-            material_ = dae::material{glm::vec4{r, g, b, a}, metallic, roughness};
+            material_ = dae::material{glm::vec3{r, g, b}, metallic, roughness};
         }
 
     public:

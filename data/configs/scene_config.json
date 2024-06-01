@@ -1,0 +1,234 @@
+{
+  "3d": [
+    {
+      "name": "suzanne",
+      "transform": {
+        "position": [
+          -1.2,
+          0.0,
+          2.5
+        ],
+        "scale": -0.5
+      },
+      "model": "assets/models/suzanne.obj"
+    },
+    {
+      "name": "beetle",
+      "transform": {
+        "position": [
+          -0.2,
+          2.0,
+          1.5
+        ],
+        "scale": -5.8
+      },
+      "model": "assets/models/beetle.obj"
+    },
+    {
+      "name": "quad",
+      "transform": {
+        "scale": 3
+      },
+      "model": "assets/models/quad.obj"
+    }
+  ],
+  "_comment": "https://physicallybased.info/",
+  "material_pbr": [
+    {
+      "name": "aluminium",
+      "transform": {
+        "position": [
+          -0.8,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.912,
+        0.914,
+        0.920
+      ],
+      "metallic": 1.0,
+      "roughness": 0.2,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "banana",
+      "transform": {
+        "position": [
+          -0.6,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.634,
+        0.532,
+        0.111
+      ],
+      "metallic": 0.0,
+      "roughness": 0.45,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "brass",
+      "transform": {
+        "position": [
+          -0.4,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.887,
+        0.789,
+        0.434
+      ],
+      "metallic": 1.0,
+      "roughness": 0.35,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "carrot",
+      "transform": {
+        "position": [
+          -0.2,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.713,
+        0.170,
+        0.026
+      ],
+      "metallic": 0.0,
+      "roughness": 0.8,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "chromium",
+      "transform": {
+        "position": [
+           0.0,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.638,
+        0.651,
+        0.663
+      ],
+      "metallic": 1.0,
+      "roughness": 0.1,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "gold",
+      "transform": {
+        "position": [
+          0.2,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.944,
+        0.776,
+        0.373
+      ],
+      "metallic": 1.0,
+      "roughness": 0.6,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "pearl",
+      "transform": {
+        "position": [
+          0.4,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.800,
+        0.750,
+        0.700
+      ],
+      "metallic": 0.0,
+      "roughness": 0.05,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "silver",
+      "transform": {
+        "position": [
+          0.6,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.962,
+        0.949,
+        0.922
+      ],
+      "metallic": 1.0,
+      "roughness": 0.5,
+      "model": "assets/models/sphere.obj"
+    },
+    {
+      "name": "silicon",
+      "transform": {
+        "position": [
+          0.8,
+          -1.0,
+          -3.0
+        ],
+        "scale": 0.08
+      },
+      "base_color": [
+        0.344,
+        0.367,
+        0.419
+      ],
+      "metallic": 1.0,
+      "roughness": 0.2,
+      "model": "assets/models/sphere.obj"
+    }
+  ],
+  "texture_pbr": [
+    {
+      "name": "vehicle",
+      "transform": {
+        "position": [
+          0.0,
+          -2.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": 0.08
+      },
+      "textures": {
+        "diffuse": "assets/textures/vehicle_diffuse.png",
+        "normal": "assets/textures/vehicle_normal.png",
+        "specular": "assets/textures/vehicle_specular.png",
+        "glossiness": "assets/textures/vehicle_gloss.png"
+      },
+      "model": "assets/models/vehicle.obj"
+    }
+  ]
+}
