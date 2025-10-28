@@ -1,4 +1,4 @@
-# 🎨 Graphics Programming 2 – Vulkan  
+# 🌋 Graphics Programming 2 – Vulkan  
 
 Hey there, fellow DAE student, curious visitor, or graphics enthusiast 👋  
 Welcome to my **Graphics Programming 2 – Vulkan** repository — part of the **fourth semester (2024)** at **DAE**.
